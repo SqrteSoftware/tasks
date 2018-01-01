@@ -1,0 +1,19 @@
+.item {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    list-style-type: none;
+}
+
+.itemInput {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    outline: none;
+}
+
+.itemHandle {
+    position: absolute;
+    left: -15px;
+    top: 2px;
+}
