@@ -7,7 +7,6 @@ class Item extends Component {
 
     constructor(props) {
         super(props);
-        this.ref = null;
         this.state = {
             'activeDrag': false,
             'position': {x: 0, y: 0}
@@ -64,7 +63,6 @@ class Item extends Component {
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {
-        this.ref = ref;
         if (ref !== null) {
             this.props.onRef({'id': this.props.item.id, 'ref': ref});
         }

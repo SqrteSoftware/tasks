@@ -8,8 +8,10 @@ RUN apk update && \
         nodejs-npm \
         bash
 
-ADD . /src
+ADD ./package.json /src/
 
 WORKDIR /src
 
 RUN npm install
+
+ADD . /src
