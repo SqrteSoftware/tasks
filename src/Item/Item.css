@@ -1,7 +1,6 @@
 .item {
-    border: none;
-    border-bottom: 1px solid #ccc;
     list-style-type: none;
+    padding-left: 10px;
 }
 
 .itemInput {
@@ -10,10 +9,31 @@
     border: none;
     background-color: transparent;
     outline: none;
+    border: none;
+    border-bottom: 1px solid #ccc;
 }
 
 .itemHandle {
     position: absolute;
-    left: -15px;
-    top: 2px;
+    left: -8px;
+    top: 5px;
+    content: '....';
+    width: 10px;
+    height: 20px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 5px;
+    padding: 3px 4px;
+    cursor: move;
+    vertical-align: middle;
+    margin-top: -.7em;
+    margin-right: .3em;
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    color: #cccccc;
+    text-shadow: 1px 0 1px black;
+}
+.itemHandle::after {
+    content: '.. .. ..';
 }

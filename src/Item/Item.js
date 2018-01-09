@@ -27,7 +27,7 @@ class Item extends Component {
                 <li className="item"
                     ref={this.onRef.bind(this)}
                     style={activeDrag ? {position: 'absolute', top: position.y, left: position.x} : {}}>
-                    <span className="itemHandle">X</span>
+                    <span className="itemHandle"></span>
                     <input className="itemInput" type="text" value={item.value} onChange={ this.onChange.bind(this) }/>
                 </li>
             </Draggable>
