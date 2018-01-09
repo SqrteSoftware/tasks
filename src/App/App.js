@@ -70,25 +70,23 @@ class App extends Component {
                     cols={12}
                     rowHeight={30}
                     width={1200}
-                    draggableCancel=".list"
-                    onLayoutChange={l => console.log('layout change',l)}>
+                    draggableCancel=".list">
                     {
-                        listData.map(item => {
-                            return (
-                                <div key={item.parent.id}
-                                     className="App-list"
-                                     style={this.state.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
-                                    <List
-                                        children={item.children}
-                                        onItemRef={this.onItemRef.bind(this)}
-                                        onItemDragStart={this.onItemDragStart.bind(this)}
-                                        onItemDrag={this.onItemDrag.bind(this)}
-                                        onItemDragStop={this.onItemDragStop.bind(this)}
-                                        overlappedItemId={this.state.overlappedItemId}
-                                        onItemChange={this.onItemChange.bind(this)}/>
-                                </div>
-                            )
-                        })
+                        listData.map(item => { return (
+                            <div key={item.parent.id}
+                                 className="App-list"
+                                 style={this.state.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
+                                <List
+                                    parent={item.parent}
+                                    children={item.children}
+                                    onItemRef={this.onItemRef.bind(this)}
+                                    onItemDragStart={this.onItemDragStart.bind(this)}
+                                    onItemDrag={this.onItemDrag.bind(this)}
+                                    onItemDragStop={this.onItemDragStop.bind(this)}
+                                    overlappedItemId={this.state.overlappedItemId}
+                                    onItemChange={this.onItemChange.bind(this)}/>
+                            </div>
+                        )})
                     }
                 </ReactGridLayout>
             </div>

@@ -19,27 +19,30 @@ class List extends Component {
         }
 
         return (
-            <ul className="list">
-                {items.map((item) =>
-                    {
-                        if (item.placeholder) {
-                            return <li key={"placeholder"} style={{backgroundColor: 'lightyellow'}}>drop here</li>
+            <div>
+                <h1 className="listTitle">{this.props.parent.value}</h1>
+                <ul className="list">
+                    {items.map((item) =>
+                        {
+                            if (item.placeholder) {
+                                return <li key={"placeholder"} style={{backgroundColor: 'lightyellow'}}>drop here</li>
+                            }
+                            else {
+                                return (
+                                    <Item
+                                        key={item.id}
+                                        item={item}
+                                        onDragStart={this.onItemDragStart.bind(this)}
+                                        onDrag={this.onItemDrag.bind(this)}
+                                        onDragStop={this.onItemDragStop.bind(this)}
+                                        onRef={this.onItemRef.bind(this)}
+                                        onChange={this.onItemChange.bind(this)}/>
+                                )
+                            }
                         }
-                        else {
-                            return (
-                                <Item
-                                    key={item.id}
-                                    item={item}
-                                    onDragStart={this.onItemDragStart.bind(this)}
-                                    onDrag={this.onItemDrag.bind(this)}
-                                    onDragStop={this.onItemDragStop.bind(this)}
-                                    onRef={this.onItemRef.bind(this)}
-                                    onChange={this.onItemChange.bind(this)}/>
-                            )
-                        }
-                    }
-                )}
-            </ul>
+                    )}
+                </ul>
+            </div>
         );
     }
 
