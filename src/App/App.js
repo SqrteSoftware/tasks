@@ -119,8 +119,21 @@ class App extends Component {
         }
     }
 
-    onItemDragStop() {
+    onItemDragStop(draggedItemId) {
+        let overlappedItemId = this.state.overlappedItemId;
+        let items = this.state.items;
+        if (overlappedItemId) {
+            items = items.slice();
+            // Save ref and remove dragged item
+            let draggedItemIndex = items.findIndex(item => item.id === draggedItemId);
+            let draggedItem = items[draggedItemIndex];
+            items.splice(draggedItemIndex, 1);
+            // Insert dragged item at new location
+            let overlappedItemIndex = items.findIndex(item => item.id === overlappedItemId);
+            items.splice(overlappedItemIndex, 0, draggedItem);
+        }
         this.setState({
+            'items': items,
             'overlappedItemId': null,
             'activeDragParentId': null
         });
