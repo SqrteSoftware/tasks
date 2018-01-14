@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Draggable from 'react-draggable';
+import {DraggableCore} from 'react-draggable';
 
 import './Item.css';
 
@@ -18,23 +18,32 @@ class Item extends Component {
         let activeDrag = this.state.activeDrag;
         let position = this.state.position;
         return (
-            <Draggable
-                position={{x: 0, y: 0}}
+            <DraggableCore
                 onDrag={this.onDrag.bind(this)}
                 onStart={this.onDragStart.bind(this)}
                 onStop={this.onDragStop.bind(this)}
                 handle={'.itemHandle'}>
                 <li className="item"
                     ref={this.onRef.bind(this)}
-                    style={activeDrag ? {position: 'absolute', top: position.y, left: position.x} : {}}>
+                    style={this.getStyles(activeDrag, position)}>
                     <span className="itemHandle"></span>
                     <input className="itemInput" type="text" value={item.value} onChange={ this.onChange.bind(this) }/>
                 </li>
-            </Draggable>
+            </DraggableCore>
         );
     }
 
-    onChange(e) {
+    getStyles(activeDrag, position) {
+        if (activeDrag) {
+            return {position: 'absolute', top: position.y, left: position.x, zIndex: 1}
+        }
+        else {
+            return {position: 'relative'}
+        }
+    }
+
+
+    onChange(e, data) {
         this.props.onChange(this.props.item.id, e.target.value);
     }
 
@@ -49,8 +58,12 @@ class Item extends Component {
     }
 
     onDrag(e, meta) {
-        meta.id = this.props.item.id;
-        this.props.onDrag(meta);
+        this.setState({
+            'position': {x: meta.x, y: meta.y}
+        }, () => {
+            meta.id = this.props.item.id;
+            this.props.onDrag(meta);
+        });
     }
 
     onDragStop() {
