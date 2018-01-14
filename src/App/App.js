@@ -42,6 +42,7 @@ let itemStore = [
     {id: "item28", value: "test 28", pid: "item26"},
     {id: "item29", value: "test 29", pid: "item26"},
     {id: "item30", value: "test 30", pid: "item26"},
+    {id: "item31", value: "test 31", pid: "item26"},
 ];
 
 
@@ -120,8 +121,8 @@ class App extends Component {
     }
 
     onItemDragStop(draggedItemId) {
-        let overlappedItemId = this.state.overlappedItemId;
         let items = this.state.items;
+        let overlappedItemId = this.state.overlappedItemId;
         if (overlappedItemId) {
             items = items.slice();
             // Save ref and remove dragged item
@@ -130,6 +131,8 @@ class App extends Component {
             items.splice(draggedItemIndex, 1);
             // Insert dragged item at new location
             let overlappedItemIndex = items.findIndex(item => item.id === overlappedItemId);
+            let overlappedItem = items[overlappedItemIndex];
+            draggedItem = Object.assign({}, draggedItem, {'pid': overlappedItem.pid});
             items.splice(overlappedItemIndex, 0, draggedItem);
         }
         this.setState({
@@ -167,15 +170,17 @@ class App extends Component {
 
 function createLists(items) {
     let listData = [];
-    items.forEach((item, i)=> {
+    let index = 0;
+    items.forEach((item)=> {
         if (item.pid === "") {
             let parentId = item.id;
             listData.push({
                 'parent': item,
                 'children': items.filter(item => item.pid === parentId),
-                'layout':  {i: item.id, x: i%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
+                'layout':  {i: item.id, x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
             });
             listData.push()
+            index++;
         }
     });
     return listData;
