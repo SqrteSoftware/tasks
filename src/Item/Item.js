@@ -7,6 +7,7 @@ class Item extends Component {
 
     constructor(props) {
         super(props);
+        this.widthOnDragStart = null;
         this.state = {
             'activeDrag': false,
             'position': {x: 0, y: 0}
@@ -25,7 +26,7 @@ class Item extends Component {
                 handle={'.itemHandle'}>
                 <li className="item"
                     ref={this.onRef.bind(this)}
-                    style={this.getStyles(activeDrag, position)}>
+                    style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     <span className="itemHandle"></span>
                     <input className="itemInput" type="text" value={item.value} onChange={ this.onChange.bind(this) }/>
                 </li>
@@ -33,12 +34,23 @@ class Item extends Component {
         );
     }
 
-    getStyles(activeDrag, position) {
+    getListItemStyles(activeDrag, position, width) {
         if (activeDrag) {
-            return {position: 'absolute', top: position.y, left: position.x, zIndex: 1}
+            // When dragging, we switch to absolute positioning. Before
+            // doing this, we must lock in the item's current relative
+            // position and width.
+            return {
+                position: 'absolute',
+                top: position.y,
+                left: position.x,
+                zIndex: 1,
+                widthOnDragStart: width
+            }
         }
         else {
-            return {position: 'relative'}
+            return {
+                position: 'relative'
+            }
         }
     }
 
@@ -48,6 +60,7 @@ class Item extends Component {
     }
 
     onDragStart(e, data) {
+        this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
             'position': {x: data.node.offsetLeft, y: data.node.offsetTop}
