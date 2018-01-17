@@ -67,7 +67,6 @@ class App extends Component {
             <div className="App">
                 <ReactGridLayout
                     className="layout"
-                    layout={listData.map(item => item.layout)}
                     cols={12}
                     rowHeight={30}
                     width={1200}
@@ -75,6 +74,7 @@ class App extends Component {
                     {
                         listData.map(item => { return (
                             <div key={item.parent.id}
+                                 data-grid={item.layout}
                                  className="App-list"
                                  style={this.state.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
@@ -177,7 +177,7 @@ function createLists(items) {
             listData.push({
                 'parent': item,
                 'children': items.filter(item => item.pid === parentId),
-                'layout':  {i: item.id, x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
+                'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
             });
             listData.push()
             index++;

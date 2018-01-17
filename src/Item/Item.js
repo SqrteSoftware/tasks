@@ -44,7 +44,7 @@ class Item extends Component {
                 top: position.y,
                 left: position.x,
                 zIndex: 1,
-                widthOnDragStart: width
+                width: width
             }
         }
         else {
