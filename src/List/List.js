@@ -6,11 +6,6 @@ import Item from '../Item/Item';
 
 class List extends Component {
 
-    constructor(props) {
-        super(props);
-        this.itemRefsById = {};
-    }
-
     render() {
         let items = this.props.children.slice(0);
         let overlappedItemIndex = items.findIndex(item => item.id === this.props.overlappedItemId);
@@ -63,12 +58,6 @@ class List extends Component {
     }
 
     onItemRef(obj) {
-        if (obj.ref !== null) {
-            this.itemRefsById[obj.id] = obj;
-        }
-        else {
-            delete this.itemRefsById[obj.id];
-        }
         this.props.onItemRef(obj);
     }
 };

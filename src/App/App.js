@@ -171,7 +171,7 @@ class App extends Component {
 function createLists(items) {
     let listData = [];
     let index = 0;
-    items.forEach((item)=> {
+    items.forEach((item) => {
         if (item.pid === "") {
             let parentId = item.id;
             listData.push({
@@ -179,7 +179,7 @@ function createLists(items) {
                 'children': items.filter(item => item.pid === parentId),
                 'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
             });
-            listData.push()
+            listData.push();
             index++;
         }
     });
