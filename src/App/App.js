@@ -6,45 +6,6 @@ import 'react-resizable/css/styles.css'
 import './App.css';
 import List from '../List/List';
 
-let itemStore = [
-    {id: "item1", value: "test 1", pid: ""},
-    {id: "item2", value: "test 2", pid: "item1"},
-    {id: "item3", value: "test 3", pid: "item1"},
-    {id: "item4", value: "test 4", pid: "item1"},
-    {id: "item5", value: "test 5", pid: "item1"},
-
-    {id: "item6", value: "test 6", pid: ""},
-    {id: "item7", value: "test 7", pid: "item6"},
-    {id: "item8", value: "test 8", pid: "item6"},
-    {id: "item9", value: "test 9", pid: "item6"},
-    {id: "item10", value: "test 10", pid: "item6"},
-
-    {id: "item11", value: "test 11", pid: ""},
-    {id: "item12", value: "test 12", pid: "item11"},
-    {id: "item13", value: "test 13", pid: "item11"},
-    {id: "item14", value: "test 14", pid: "item11"},
-    {id: "item15", value: "test 15", pid: "item11"},
-
-    {id: "item16", value: "test 16", pid: ""},
-    {id: "item17", value: "test 17", pid: "item16"},
-    {id: "item18", value: "test 18", pid: "item16"},
-    {id: "item19", value: "test 19", pid: "item16"},
-    {id: "item20", value: "test 10", pid: "item16"},
-
-    {id: "item21", value: "test 21", pid: ""},
-    {id: "item22", value: "test 22", pid: "item21"},
-    {id: "item23", value: "test 23", pid: "item21"},
-    {id: "item24", value: "test 24", pid: "item21"},
-    {id: "item25", value: "test 25", pid: "item21"},
-
-    {id: "item26", value: "test 26", pid: ""},
-    {id: "item27", value: "test 27", pid: "item26"},
-    {id: "item28", value: "test 28", pid: "item26"},
-    {id: "item29", value: "test 29", pid: "item26"},
-    {id: "item30", value: "test 30", pid: "item26"},
-    {id: "item31", value: "test 31", pid: "item26"},
-];
-
 
 class App extends Component {
 
@@ -184,6 +145,27 @@ function createLists(items) {
         }
     });
     return listData;
+}
+
+// Generate testing items
+let itemStore = [];
+let parentId = null;
+for (let i = 0; i < 40; i++) {
+    let item = {
+        id: "item" + i,
+        value: "item value " + i,
+        complete: false,
+        // parents: [],
+        pid: ""
+    };
+    if (i % 5 === 0) {
+        parentId = "item" + i;
+    }
+    else {
+        item.pid = parentId;
+        // item.parents.push({id: parentId});
+    }
+    itemStore.push(item);
 }
 
 export default App;
