@@ -66,7 +66,7 @@ class Item extends Component {
             'position': {x: data.node.offsetLeft, y: data.node.offsetTop}
         }, () => {
             // fire onDragStart only AFTER the item has re-rendered with absolute positioning
-            this.props.onDragStart(this.props.item.id);
+            this.props.onDragStart(this.props.item.id, this.props.parentId);
         });
     }
 
@@ -84,16 +84,16 @@ class Item extends Component {
             'activeDrag': false,
             'position': {x: 0, y: 0}
         });
-        this.props.onDragStop(this.props.item.id);
+        this.props.onDragStop(this.props.item.id, this.props.parentId);
     }
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {
         if (ref !== null) {
-            this.props.onRef({'id': this.props.item.id, 'ref': ref});
+            this.props.onItemRef({'id': this.props.item.id, 'ref': ref});
         }
         else {
-            this.props.onRef({'id': this.props.item.id, 'ref': null});
+            this.props.onItemRef({'id': this.props.item.id, 'ref': null});
         }
     }
 };

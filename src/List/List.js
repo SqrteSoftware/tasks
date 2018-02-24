@@ -16,7 +16,8 @@ class List extends Component {
         return (
             <div>
                 <h1 className="listTitle">{this.props.parent.value}</h1>
-                <ul className="list">
+                <ul className="list"
+                    ref={this.onRef.bind(this)}>
                     {items.map((item) =>
                         {
                             if (item.placeholder) {
@@ -27,10 +28,11 @@ class List extends Component {
                                     <Item
                                         key={item.id}
                                         item={item}
+                                        parentId={this.props.parent.id}
                                         onDragStart={this.onItemDragStart.bind(this)}
                                         onDrag={this.onItemDrag.bind(this)}
                                         onDragStop={this.onItemDragStop.bind(this)}
-                                        onRef={this.onItemRef.bind(this)}
+                                        onItemRef={this.onItemRef.bind(this)}
                                         onChange={this.onItemChange.bind(this)}/>
                                 )
                             }
@@ -45,20 +47,30 @@ class List extends Component {
         this.props.onItemChange(itemId, value);
     }
 
-    onItemDragStart(itemId) {
-        this.props.onItemDragStart(itemId);
+    onItemDragStart(itemId, parentId) {
+        this.props.onItemDragStart(itemId, parentId);
     }
 
     onItemDrag(meta) {
         this.props.onItemDrag(meta.id);
     }
 
-    onItemDragStop(itemId) {
-        this.props.onItemDragStop(itemId);
+    onItemDragStop(itemId, parentId) {
+        this.props.onItemDragStop(itemId, parentId);
     }
 
     onItemRef(obj) {
         this.props.onItemRef(obj);
+    }
+
+    // Fired when item DOM element is mounted/unmounted
+    onRef(ref) {
+        if (ref !== null) {
+            this.props.onListRef({'id': this.props.parent.id, 'ref': ref});
+        }
+        else {
+            this.props.onListRef({'id': this.props.parent.id, 'ref': null});
+        }
     }
 };
 

@@ -15,15 +15,19 @@ class App extends Component {
         this.itemRefsById = {};
         this.itemBoundsById = {};
 
+        this.listRefsById = {};
+        this.listBoundsById = {};
+
         this.state = {
-            'overlappedItemId': null,
             'activeDragParentId': null,
+            'overlappedItemId': null,
+            'overlappedListId': null,
             'items': itemStore
         };
     }
 
     render() {
-        var listData = createLists(this.state.items);
+        var listData = createViewData(this.state.items);
         return (
             <div className="App">
                 <ReactGridLayout
@@ -41,6 +45,7 @@ class App extends Component {
                                 <List
                                     parent={item.parent}
                                     children={item.children}
+                                    onListRef={this.onListRef.bind(this)}
                                     onItemRef={this.onItemRef.bind(this)}
                                     onItemDragStart={this.onItemDragStart.bind(this)}
                                     onItemDrag={this.onItemDrag.bind(this)}
@@ -62,39 +67,63 @@ class App extends Component {
         this.setState({'items': items});
     }
 
-    onItemDragStart(itemId) {
+    onItemDragStart(itemId, parentId) {
         Object.keys(this.itemRefsById).forEach(itemId => {
             let itemRef = this.itemRefsById[itemId];
             this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
         });
-
-        let item = this.state.items.find(i => { return i.id === itemId });
-        this.setState({'activeDragParentId': item.pid});
+        Object.keys(this.listRefsById).forEach(listId => {
+            let listRef = this.listRefsById[listId];
+            this.listBoundsById[listId] = listRef.getBoundingClientRect();
+        });
+        this.setState({'activeDragParentId': parentId});
     }
 
     onItemDrag(itemId) {
         let itemRef = this.itemRefsById[itemId];
-        this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
-        let overlappedItemId = this.findOverlappedItemId(itemId);
+        let itemBound = itemRef.getBoundingClientRect();
+        this.itemBoundsById[itemId] = itemBound;
+
+        let overlappedItemId = this.findCoveredId(itemId, itemBound, this.itemBoundsById);
         if (this.state.overlappedItemId !== overlappedItemId) {
             this.setState({'overlappedItemId': overlappedItemId});
         }
+        let overlappedListId = this.findCoveredId(itemId, itemBound, this.listBoundsById);
+        if (this.state.overlappedListId !== overlappedListId) {
+            this.setState({'overlappedListId': overlappedListId});
+        }
     }
 
-    onItemDragStop(draggedItemId) {
+    // TODO:
+    onItemDragStop(draggedItemId, currentListId) {
         let items = this.state.items;
         let overlappedItemId = this.state.overlappedItemId;
+        let overlappedListId = this.state.overlappedListId;
         if (overlappedItemId) {
             items = items.slice();
-            // Save ref and remove dragged item
+            // Get dragged item object
             let draggedItemIndex = items.findIndex(item => item.id === draggedItemId);
             let draggedItem = items[draggedItemIndex];
-            items.splice(draggedItemIndex, 1);
-            // Insert dragged item at new location
+            // Get overlapped item object
             let overlappedItemIndex = items.findIndex(item => item.id === overlappedItemId);
             let overlappedItem = items[overlappedItemIndex];
-            draggedItem = Object.assign({}, draggedItem, {'pid': overlappedItem.pid});
-            items.splice(overlappedItemIndex, 0, draggedItem);
+            // Get new parent and order
+            let oldParent = overlappedItem.parents.find(parent => parent.id === overlappedListId);
+            // Remove the old parent and add the new
+            let newParents = draggedItem.parents.filter(parent => parent.id !== currentListId);
+            newParents.push({id: overlappedListId, order: oldParent.order});
+            draggedItem.parents = newParents;
+            // Reorder list items
+            items.forEach(item => {
+                let parent = item.parents.find(parent => parent.id === overlappedListId);
+                if (parent) {
+                   if (item.id !== draggedItemId) {
+                       if (parent.order >= oldParent.order) {
+                           parent.order++;
+                       }
+                   }
+               }
+            });
         }
         this.setState({
             'items': items,
@@ -112,32 +141,47 @@ class App extends Component {
         }
     }
 
-    findOverlappedItemId(itemId) {
-        let overlappedItemId = null;
-        let draggedItemBound = this.itemBoundsById[itemId];
-        Object.keys(this.itemRefsById).forEach((currentItemId) => {
-            if (currentItemId === itemId) return;
-            if (this.itemBoundsById[currentItemId] === undefined) return;
-            let currentItemBound = this.itemBoundsById[currentItemId];
-            if (draggedItemBound.x > currentItemBound.left && draggedItemBound.y > currentItemBound.top) {
-                if (draggedItemBound.x < currentItemBound.right && draggedItemBound.y < currentItemBound.bottom) {
-                    overlappedItemId = currentItemId;
+    onListRef(obj) {
+        if (obj.ref !== null) {
+            this.listRefsById[obj.id] = obj.ref;
+        }
+        else {
+            delete this.listRefsById[obj.id];
+        }
+    }
+
+    findCoveredId(hoverId, hoverBound, boundsById) {
+        let coveredId = null;
+        Object.keys(boundsById).forEach((boundId) => {
+            if (boundId === hoverId) return;
+            let bound = boundsById[boundId];
+            if (hoverBound.x > bound.left && hoverBound.y > bound.top) {
+                if (hoverBound.x < bound.right && hoverBound.y < bound.bottom) {
+                    coveredId = boundId;
                 }
             }
         });
-        return overlappedItemId;
+        return coveredId;
     }
 }
 
-function createLists(items) {
+
+function createViewData(items) {
+    console.log("recompile view data")
     let listData = [];
     let index = 0;
     items.forEach((item) => {
-        if (item.pid === "") {
-            let parentId = item.id;
+        if (item.parents.length <= 0) {
+            let parentItem = item;
             listData.push({
-                'parent': item,
-                'children': items.filter(item => item.pid === parentId),
+                'parent': parentItem,
+                'children': items.filter(item => {
+                    return item.parents.find(parent => parent.id === parentItem.id);
+                }).sort((a, b) => {
+                    let parentA = a.parents.find(parent => parent.id === parentItem.id);
+                    let parentB = b.parents.find(parent => parent.id === parentItem.id);
+                    return parentA.order - parentB.order;
+                }),
                 'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
             });
             listData.push();
@@ -155,15 +199,13 @@ for (let i = 0; i < 40; i++) {
         id: "item" + i,
         value: "item value " + i,
         complete: false,
-        // parents: [],
-        pid: ""
+        parents: []
     };
     if (i % 5 === 0) {
         parentId = "item" + i;
     }
     else {
-        item.pid = parentId;
-        // item.parents.push({id: parentId});
+        item.parents.push({id: parentId, order: i % 5});
     }
     itemStore.push(item);
 }
