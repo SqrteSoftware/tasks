@@ -68,10 +68,12 @@ class App extends Component {
     }
 
     onItemDragStart(itemId, parentId) {
+        // Update the bounds of all items
         Object.keys(this.itemRefsById).forEach(itemId => {
             let itemRef = this.itemRefsById[itemId];
             this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
         });
+        // Update the bounds of all lists
         Object.keys(this.listRefsById).forEach(listId => {
             let listRef = this.listRefsById[listId];
             this.listBoundsById[listId] = listRef.getBoundingClientRect();
@@ -80,14 +82,16 @@ class App extends Component {
     }
 
     onItemDrag(itemId) {
+        // Update bound of dragged item
         let itemRef = this.itemRefsById[itemId];
         let itemBound = itemRef.getBoundingClientRect();
         this.itemBoundsById[itemId] = itemBound;
-
+        // Find the currently overlapped item if any
         let overlappedItemId = this.findCoveredId(itemId, itemBound, this.itemBoundsById);
         if (this.state.overlappedItemId !== overlappedItemId) {
             this.setState({'overlappedItemId': overlappedItemId});
         }
+        // Find the currently overlapped list if any
         let overlappedListId = this.findCoveredId(itemId, itemBound, this.listBoundsById);
         if (this.state.overlappedListId !== overlappedListId) {
             this.setState({'overlappedListId': overlappedListId});
@@ -107,9 +111,9 @@ class App extends Component {
             // Get overlapped item object
             let overlappedItemIndex = items.findIndex(item => item.id === overlappedItemId);
             let overlappedItem = items[overlappedItemIndex];
-            // Get new parent and order
+            // Get parent of overlapped item
             let oldParent = overlappedItem.parents.find(parent => parent.id === overlappedListId);
-            // Remove the old parent and add the new
+            // Remove the old parent and add the parent of the overlapped item
             let newParents = draggedItem.parents.filter(parent => parent.id !== currentListId);
             newParents.push({id: overlappedListId, order: oldParent.order});
             draggedItem.parents = newParents;
@@ -167,7 +171,6 @@ class App extends Component {
 
 
 function createViewData(items) {
-    console.log("recompile view data")
     let listData = [];
     let index = 0;
     items.forEach((item) => {
