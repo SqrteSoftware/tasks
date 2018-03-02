@@ -155,12 +155,14 @@ class App extends Component {
     }
 
     findCoveredId(hoverId, hoverBound, boundsById) {
+        let hoverMidX = hoverBound.x + (hoverBound.width / 2);
+        let hoverMidY = hoverBound.y + (hoverBound.height / 2);
         let coveredId = null;
         Object.keys(boundsById).forEach((boundId) => {
             if (boundId === hoverId) return;
             let bound = boundsById[boundId];
-            if (hoverBound.x > bound.left && hoverBound.y > bound.top) {
-                if (hoverBound.x < bound.right && hoverBound.y < bound.bottom) {
+            if (hoverMidX > bound.left && hoverMidY > bound.top) {
+                if (hoverMidX < bound.right && hoverMidY < bound.bottom) {
                     coveredId = boundId;
                 }
             }
