@@ -169,6 +169,27 @@ class App extends Component {
         });
         return coveredId;
     }
+
+    findOverlappedItems(draggedId, itemBoundsById) {
+        let draggedBound = itemBoundsById[draggedId];
+        let draggedMidX = draggedBound.x + (draggedBound.width / 2);
+        let draggedTop = draggedBound.top;
+        let draggedBottom = draggedBound.bottom;
+        let overlappedItems = {itemAbove: null, itemBelow: null};
+        Object.keys(itemBoundsById).forEach((itemId) => {
+            if (itemId === draggedId) return;
+            let itemBound = itemBoundsById[itemId];
+            if (draggedMidX > itemBound.left && draggedMidX < itemBound.right) {
+                if (draggedTop > itemBound.bottom && draggedTop < itemBound.top) {
+                    overlappedItems.itemAbove = itemId;
+                }
+                else if (draggedBottom < itemBound.top && draggedBottom > itemBound.bottom) {
+                    overlappedItems.itemBelow = itemId;
+                }
+            }
+        });
+        return overlappedItems;
+    }
 }
 
 
