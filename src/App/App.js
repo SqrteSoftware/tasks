@@ -180,10 +180,10 @@ class App extends Component {
             if (itemId === draggedId) return;
             let itemBound = itemBoundsById[itemId];
             if (draggedMidX > itemBound.left && draggedMidX < itemBound.right) {
-                if (draggedTop > itemBound.bottom && draggedTop < itemBound.top) {
+                if (draggedTop < itemBound.bottom && draggedTop > itemBound.top) {
                     overlappedItems.itemAbove = itemId;
                 }
-                else if (draggedBottom < itemBound.top && draggedBottom > itemBound.bottom) {
+                else if (draggedBottom > itemBound.top && draggedBottom < itemBound.bottom) {
                     overlappedItems.itemBelow = itemId;
                 }
             }
