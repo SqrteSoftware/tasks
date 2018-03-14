@@ -10,6 +10,7 @@ class List extends Component {
         let items = this.props.children.slice(0);
         let overlappedItemIndex = items.findIndex(item => item.id === this.props.overlappedItemId);
         if (overlappedItemIndex >= 0) {
+            if (this.props.overlappedItemPos === 'below') overlappedItemIndex++;
             items.splice(overlappedItemIndex, 0, {'placeholder': true});
         }
 

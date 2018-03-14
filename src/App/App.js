@@ -21,6 +21,7 @@ class App extends Component {
         this.state = {
             'activeDragParentId': null,
             'overlappedItemId': null,
+            'overlappedItemPos': null,
             'overlappedListId': null,
             'items': itemStore
         };
@@ -51,6 +52,7 @@ class App extends Component {
                                     onItemDrag={this.onItemDrag.bind(this)}
                                     onItemDragStop={this.onItemDragStop.bind(this)}
                                     overlappedItemId={this.state.overlappedItemId}
+                                    overlappedItemPos={this.state.overlappedItemPos}
                                     onItemChange={this.onItemChange.bind(this)}/>
                             </div>
                         )})
@@ -86,19 +88,26 @@ class App extends Component {
         let itemRef = this.itemRefsById[itemId];
         let itemBound = itemRef.getBoundingClientRect();
         this.itemBoundsById[itemId] = itemBound;
-        // Find the currently overlapped item if any
-        let overlappedItemId = this.findCoveredId(itemId, itemBound, this.itemBoundsById);
-        if (this.state.overlappedItemId !== overlappedItemId) {
-            this.setState({'overlappedItemId': overlappedItemId});
-        }
+
         // Find the currently overlapped list if any
         let overlappedListId = this.findCoveredId(itemId, itemBound, this.listBoundsById);
         if (this.state.overlappedListId !== overlappedListId) {
             this.setState({'overlappedListId': overlappedListId});
         }
+
+        if (overlappedListId) {
+            let listItems = getItemsWithParent(overlappedListId, this.state.items);
+            let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
+            this.setState({'overlappedItemId': nearestItem.id});
+            this.setState({'overlappedItemPos': nearestItem.position});
+        }
+        else {
+            this.setState({'overlappedItemId': null});
+            this.setState({'overlappedItemPos': null});
+        }
     }
 
-    // TODO:
+    // TODO: refactor
     onItemDragStop(draggedItemId, currentListId) {
         let items = this.state.items;
         let overlappedItemId = this.state.overlappedItemId;
@@ -190,6 +199,47 @@ class App extends Component {
         });
         return overlappedItems;
     }
+
+    findOverlappedItem(draggedId, itemBoundsById) {
+        let draggedBound = itemBoundsById[draggedId];
+        let draggedMidX = draggedBound.x + (draggedBound.width / 2);
+        let draggedMidY = draggedBound.y + (draggedBound.height / 2);
+
+        let overlappedItem = {id: null, position: null};
+        Object.keys(itemBoundsById).forEach((itemId) => {
+            if (itemId === draggedId) return;
+            let itemBound = itemBoundsById[itemId];
+            if (draggedMidX > itemBound.left && draggedMidX < itemBound.right) {
+                if (draggedMidY > itemBound.top && draggedMidY < itemBound.bottom) {
+                    overlappedItem.id = itemId;
+                    let itemBoundMidY = itemBound.top + (itemBound.height / 2);
+                    overlappedItem.position = draggedMidY < itemBoundMidY ? 'above' : 'below';
+                }
+            }
+        });
+        return overlappedItem;
+    }
+
+    findNearestItem(draggedId, listItems, itemBoundsById) {
+        let draggedBound = itemBoundsById[draggedId];
+        let draggedMidY = draggedBound.y + (draggedBound.height / 2);
+
+        let nearestItem = {id: null, position: null};
+        let currentLeastDistance = null;
+        listItems.forEach((item) => {
+            let itemId = item.id;
+            if (itemId === draggedId) return;
+            let itemBound = itemBoundsById[itemId];
+            let itemMidY = itemBound.y + (itemBound .height / 2);
+            if (Math.abs(draggedMidY - itemMidY) < currentLeastDistance
+                || currentLeastDistance === null) {
+                currentLeastDistance = Math.abs(draggedMidY - itemMidY);
+                nearestItem.id = itemId;
+                nearestItem.position = draggedMidY < itemMidY ? 'above' : 'below';
+            }
+        });
+        return nearestItem;
+    }
 }
 
 
@@ -201,9 +251,7 @@ function createViewData(items) {
             let parentItem = item;
             listData.push({
                 'parent': parentItem,
-                'children': items.filter(item => {
-                    return item.parents.find(parent => parent.id === parentItem.id);
-                }).sort((a, b) => {
+                'children': getItemsWithParent(parentItem.id, items).sort((a, b) => {
                     let parentA = a.parents.find(parent => parent.id === parentItem.id);
                     let parentB = b.parents.find(parent => parent.id === parentItem.id);
                     return parentA.order - parentB.order;
@@ -215,6 +263,13 @@ function createViewData(items) {
         }
     });
     return listData;
+}
+
+function getItemsWithParent(parentId, items) {
+    let children = items.filter(item => {
+        return item.parents.find(parent => parent.id === parentId);
+    })
+    return children;
 }
 
 // Generate testing items
