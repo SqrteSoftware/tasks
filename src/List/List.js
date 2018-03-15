@@ -22,7 +22,7 @@ class List extends Component {
                     {items.map((item) =>
                         {
                             if (item.placeholder) {
-                                return <li key={"placeholder"} style={{backgroundColor: 'lightyellow'}}>drop here</li>
+                                return <li key={"placeholder"} style={{backgroundColor: 'lightyellow', listStyleType: 'none'}}>&nbsp;</li>
                             }
                             else {
                                 return (
