@@ -179,47 +179,6 @@ class App extends Component {
         return coveredId;
     }
 
-    findOverlappedItems(draggedId, itemBoundsById) {
-        let draggedBound = itemBoundsById[draggedId];
-        let draggedMidX = draggedBound.x + (draggedBound.width / 2);
-        let draggedTop = draggedBound.top;
-        let draggedBottom = draggedBound.bottom;
-        let overlappedItems = {itemAbove: null, itemBelow: null};
-        Object.keys(itemBoundsById).forEach((itemId) => {
-            if (itemId === draggedId) return;
-            let itemBound = itemBoundsById[itemId];
-            if (draggedMidX > itemBound.left && draggedMidX < itemBound.right) {
-                if (draggedTop < itemBound.bottom && draggedTop > itemBound.top) {
-                    overlappedItems.itemAbove = itemId;
-                }
-                else if (draggedBottom > itemBound.top && draggedBottom < itemBound.bottom) {
-                    overlappedItems.itemBelow = itemId;
-                }
-            }
-        });
-        return overlappedItems;
-    }
-
-    findOverlappedItem(draggedId, itemBoundsById) {
-        let draggedBound = itemBoundsById[draggedId];
-        let draggedMidX = draggedBound.x + (draggedBound.width / 2);
-        let draggedMidY = draggedBound.y + (draggedBound.height / 2);
-
-        let overlappedItem = {id: null, position: null};
-        Object.keys(itemBoundsById).forEach((itemId) => {
-            if (itemId === draggedId) return;
-            let itemBound = itemBoundsById[itemId];
-            if (draggedMidX > itemBound.left && draggedMidX < itemBound.right) {
-                if (draggedMidY > itemBound.top && draggedMidY < itemBound.bottom) {
-                    overlappedItem.id = itemId;
-                    let itemBoundMidY = itemBound.top + (itemBound.height / 2);
-                    overlappedItem.position = draggedMidY < itemBoundMidY ? 'above' : 'below';
-                }
-            }
-        });
-        return overlappedItem;
-    }
-
     findNearestItem(draggedId, listItems, itemBoundsById) {
         let draggedBound = itemBoundsById[draggedId];
         let draggedMidY = draggedBound.y + (draggedBound.height / 2);
