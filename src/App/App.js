@@ -230,7 +230,7 @@ class App extends Component {
             let itemId = item.id;
             if (itemId === draggedId) return;
             let itemBound = itemBoundsById[itemId];
-            let itemMidY = itemBound.y + (itemBound .height / 2);
+            let itemMidY = itemBound.y + (itemBound.height / 2);
             if (Math.abs(draggedMidY - itemMidY) < currentLeastDistance
                 || currentLeastDistance === null) {
                 currentLeastDistance = Math.abs(draggedMidY - itemMidY);

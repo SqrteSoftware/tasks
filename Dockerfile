@@ -15,3 +15,5 @@ WORKDIR /src
 RUN npm install
 
 ADD . /src
+
+ENTRYPOINT "/src/entrypoint.sh"
