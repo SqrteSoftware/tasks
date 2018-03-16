@@ -111,6 +111,7 @@ class App extends Component {
     onItemDragStop(draggedItemId, currentListId) {
         let items = this.state.items;
         let overlappedItemId = this.state.overlappedItemId;
+        let overlappedItemPos = this.state.overlappedItemPos;
         let overlappedListId = this.state.overlappedListId;
         if (overlappedItemId) {
             items = items.slice();
@@ -127,10 +128,11 @@ class App extends Component {
             newParents.push({id: overlappedListId, order: oldParent.order});
             draggedItem.parents = newParents;
             // Reorder list items
+            let letItemIdToSkip = overlappedItemPos === 'above' ? draggedItemId : overlappedItemId;
             items.forEach(item => {
                 let parent = item.parents.find(parent => parent.id === overlappedListId);
                 if (parent) {
-                   if (item.id !== draggedItemId) {
+                   if (item.id !== letItemIdToSkip) {
                        if (parent.order >= oldParent.order) {
                            parent.order++;
                        }
