@@ -8,12 +8,13 @@ RUN apk update && \
         nodejs-npm \
         bash
 
-ADD ./package.json /src/
-
 WORKDIR /src
 
+# Only run npm install if package.json has changed
+ADD ./package.json /src/
 RUN npm install
 
+# Add the rest of the source
 ADD . /src
 
 ENTRYPOINT "/src/entrypoint.sh"
