@@ -96,7 +96,7 @@ class App extends Component {
         }
 
         if (overlappedListId) {
-            let listItems = getItemsWithParent(overlappedListId, this.state.items);
+            let listItems = getChildrenItems(overlappedListId, this.state.items);
             let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
             this.setState({'overlappedItemId': nearestItem.id});
             this.setState({'overlappedItemPos': nearestItem.position});
@@ -212,7 +212,7 @@ function createViewData(items) {
             let parentItem = item;
             listData.push({
                 'parent': parentItem,
-                'children': getItemsWithParent(parentItem.id, items).sort((a, b) => {
+                'children': getChildrenItems(parentItem.id, items).sort((a, b) => {
                     let parentA = a.parents.find(parent => parent.id === parentItem.id);
                     let parentB = b.parents.find(parent => parent.id === parentItem.id);
                     return parentA.order - parentB.order;
@@ -226,7 +226,7 @@ function createViewData(items) {
     return listData;
 }
 
-function getItemsWithParent(parentId, items) {
+function getChildrenItems(parentId, items) {
     let children = items.filter(item => {
         return item.parents.find(parent => parent.id === parentId);
     })
