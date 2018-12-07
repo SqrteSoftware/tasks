@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.8
 
 RUN apk update && \
     apk add \
@@ -8,13 +8,13 @@ RUN apk update && \
         nodejs-npm \
         bash
 
-WORKDIR /src
+WORKDIR /braindump/app
 
 # Only run npm install if package.json has changed
-ADD ./package.json /src/
+ADD ./package.json /braindump/app
 RUN npm install
 
 # Add the rest of the source
-ADD . /src
+ADD . /braindump/app
 
-ENTRYPOINT "/src/entrypoint.sh"
+ENTRYPOINT "./entrypoint.sh"
