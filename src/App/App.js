@@ -97,7 +97,17 @@ class App extends Component {
 
         if (overlappedListId) {
             let listItems = getChildrenItems(overlappedListId, this.state.items);
+            // numChildren = Get number of child items
+            // listRef = Get list ref
+            // listHeight = listRef.bottom - listRef.top
+            // slotHeight = (listHeight / numChildren)
+            // draggedRelPos = (dragged item midY - listRef.top)
+            // slotPosition = (draggedRelPos % slotHeight) + 1
+            // Modify parent order of all child items based on slot position
+            // Update list template to show placeholder for dragged item
             let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
+
+
             this.setState({'overlappedItemId': nearestItem.id});
             this.setState({'overlappedItemPos': nearestItem.position});
         }
