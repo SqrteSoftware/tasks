@@ -5,6 +5,7 @@ import './Item.css';
 
 class Item extends Component {
 
+
     constructor(props) {
         super(props);
         this.widthOnDragStart = null;
@@ -14,10 +15,12 @@ class Item extends Component {
         };
     }
 
+
     render() {
         let item = this.props.item;
         let activeDrag = this.state.activeDrag;
         let position = this.state.position;
+
         return (
             <DraggableCore
                 onDrag={this.onDrag.bind(this)}
@@ -28,11 +31,13 @@ class Item extends Component {
                     ref={this.onRef.bind(this)}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     <span className="itemHandle"></span>
+                    <input className="itemCheckbox" type="checkbox" checked={item.checked}/>
                     <input className="itemInput" type="text" value={item.value} onChange={ this.onChange.bind(this) }/>
                 </li>
             </DraggableCore>
         );
     }
+
 
     getListItemStyles(activeDrag, position, width) {
         if (activeDrag) {
@@ -59,6 +64,7 @@ class Item extends Component {
         this.props.onChange(this.props.item.id, e.target.value);
     }
 
+
     onDragStart(e, data) {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
@@ -70,6 +76,7 @@ class Item extends Component {
         });
     }
 
+
     onDrag(e, meta) {
         this.setState({
             'position': {x: meta.x, y: meta.y}
@@ -79,6 +86,7 @@ class Item extends Component {
         });
     }
 
+
     onDragStop() {
         this.setState({
             'activeDrag': false,
@@ -86,6 +94,7 @@ class Item extends Component {
         });
         this.props.onDragStop(this.props.item.id, this.props.parentId);
     }
+
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {

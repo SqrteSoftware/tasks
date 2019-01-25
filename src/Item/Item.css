@@ -1,16 +1,6 @@
 .item {
     list-style-type: none;
-    padding-left: 10px;
-}
-
-.itemInput {
-    width: 100%;
-    padding: 0;
-    border: none;
-    background-color: transparent;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #ccc;
+    padding-left: 24px;
 }
 
 .itemHandle {
@@ -36,4 +26,20 @@
 }
 .itemHandle::after {
     content: '.. .. ..';
+}
+
+.itemInput {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.itemCheckbox {
+    position: absolute;
+    top: 1px;
+    left: 6px;
 }
