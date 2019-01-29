@@ -53,7 +53,9 @@ class App extends Component {
                                     onItemDragStop={this.onItemDragStop.bind(this)}
                                     overlappedItemId={this.state.overlappedItemId}
                                     overlappedItemPos={this.state.overlappedItemPos}
-                                    onItemChange={this.onItemChange.bind(this)}/>
+                                    onItemChange={this.onItemChange.bind(this)}
+                                    onItemCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                />
                             </div>
                         )})
                     }
@@ -164,6 +166,13 @@ class App extends Component {
         else {
             delete this.itemRefsById[obj.id];
         }
+    }
+
+    onItemCheckboxChange(itemId, value) {
+        let items = this.state.items.slice();
+        let itemIndex = items.findIndex(i => {return i.id === itemId});
+        items[itemIndex] = Object.assign({}, items[itemIndex], {complete: value});
+        this.setState({'items': items});
     }
 
     onListRef(obj) {

@@ -34,7 +34,9 @@ class List extends Component {
                                         onDrag={this.onItemDrag.bind(this)}
                                         onDragStop={this.onItemDragStop.bind(this)}
                                         onItemRef={this.onItemRef.bind(this)}
-                                        onChange={this.onItemChange.bind(this)}/>
+                                        onChange={this.onItemChange.bind(this)}
+                                        onCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                    />
                                 )
                             }
                         }
@@ -62,6 +64,10 @@ class List extends Component {
 
     onItemRef(obj) {
         this.props.onItemRef(obj);
+    }
+
+    onItemCheckboxChange(itemId, value) {
+        this.props.onItemCheckboxChange(itemId, value);
     }
 
     // Fired when item DOM element is mounted/unmounted

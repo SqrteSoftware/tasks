@@ -31,8 +31,16 @@ class Item extends Component {
                     ref={this.onRef.bind(this)}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     <span className="itemHandle"></span>
-                    <input className="itemCheckbox" type="checkbox" checked={item.checked}/>
-                    <input className="itemInput" type="text" value={item.value} onChange={ this.onChange.bind(this) }/>
+                    <input
+                        className="itemCheckbox"
+                        type="checkbox"
+                        checked={item.complete}
+                        onChange={this.onCheckboxChange.bind(this)}/>
+                    <input
+                        className="itemInput"
+                        type="text"
+                        value={item.value}
+                        onChange={ this.onChange.bind(this) }/>
                 </li>
             </DraggableCore>
         );
@@ -95,6 +103,10 @@ class Item extends Component {
         this.props.onDragStop(this.props.item.id, this.props.parentId);
     }
 
+
+    onCheckboxChange(event) {
+        this.props.onCheckboxChange(this.props.item.id, event.target.checked);
+    }
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {
