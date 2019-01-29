@@ -1,3 +1,8 @@
+.listContainer {
+    height: 100%;
+    overflow: hidden;
+}
+
 .list {
     padding: 0;
     padding: 10px;

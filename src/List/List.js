@@ -15,7 +15,7 @@ class List extends Component {
         }
 
         return (
-            <div>
+            <div className="listContainer">
                 <h1 className="listTitle">{this.props.parent.value}</h1>
                 <ul className="list"
                     ref={this.onRef.bind(this)}>
