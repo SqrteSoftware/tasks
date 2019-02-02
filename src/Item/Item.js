@@ -40,7 +40,7 @@ class Item extends Component {
                         className="itemInput"
                         type="text"
                         value={item.value}
-                        onChange={ this.onChange.bind(this) }/>
+                        onChange={ this.onChange.bind(this) } onKeyUp={this.onKeyUp.bind(this)}/>
                 </li>
             </DraggableCore>
         );
@@ -70,6 +70,11 @@ class Item extends Component {
 
     onChange(e, data) {
         this.props.onChange(this.props.item.id, e.target.value);
+    }
+
+
+    onKeyUp(event) {
+        this.props.onKeyUp(this.props.item.id, this.props.parentId, event);
     }
 
 
@@ -107,6 +112,7 @@ class Item extends Component {
     onCheckboxChange(event) {
         this.props.onCheckboxChange(this.props.item.id, event.target.checked);
     }
+
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {
