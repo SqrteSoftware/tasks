@@ -237,11 +237,7 @@ function createViewData(items) {
             let parentItem = item;
             listData.push({
                 'parent': parentItem,
-                'children': getChildrenItems(parentItem.id, items).sort((a, b) => {
-                    let parentA = a.parents.find(parent => parent.id === parentItem.id);
-                    let parentB = b.parents.find(parent => parent.id === parentItem.id);
-                    return parentA.order - parentB.order;
-                }),
+                'children': getChildrenItems(parentItem.id, items),
                 'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
             });
             listData.push();
@@ -255,7 +251,22 @@ function getChildrenItems(parentId, items) {
     let children = items.filter(item => {
         return item.parents.find(parent => parent.id === parentId);
     });
-    return children;
+    let firstChild = children.find(item => {
+        let parent = item.parents.find(parent => parent.id === parentId);
+        return parent.prev === null;
+    });
+    let sortedChildren = [];
+    let child = firstChild;
+    let parent;
+    while (child) {
+        sortedChildren.push(child)
+        parent = child.parents.find(parent => parent.id === parentId);
+        if (!parent || parent.next === null) {
+            break;
+        }
+        child = children.find(item => item.id === parent.next);
+    }
+    return sortedChildren;
 }
 
 let itemId = 0;
@@ -271,15 +282,22 @@ function createItem(value="", complete=false, parents=[]) {
 // Generate testing items
 let itemStore = [];
 let parentId = null;
+let lastItem = null;
 for (let i = 0; i < 40; i++) {
-    let item = createItem(
-        "item value " + i
-    );
+    let item = createItem("item value " + i);
     if (i % 5 === 0) {
+        lastItem = null;
         parentId = "item" + i;
     }
+    else if (lastItem === null) {
+        item.parents.push({id: parentId, prev: null, next: null});
+        lastItem = item;
+    }
     else {
-        item.parents.push({id: parentId, order: i % 5});
+        item.parents.push({id: parentId, prev: lastItem.id, next: null});
+        let lastItemParent = lastItem.parents.find(parent => parent.id === parentId);
+        lastItemParent.next = item.id;
+        lastItem = item;
     }
     itemStore.push(item);
 }
