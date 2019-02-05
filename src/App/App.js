@@ -74,14 +74,20 @@ class App extends Component {
 
     onItemKeyUp(itemId, parentId, event) {
         if (event.key === "Enter") {
-            console.log("Enter Pressed for item: ", itemId)
             let items = this.state.items.slice();
-            let itemIndex = items.findIndex(i => {return i.id === itemId});
-            let item = items[itemIndex];
-            let itemParent = item.parents.find(parent => parent.id === parentId);
-            let newItem = createItem("", false, [{id: parentId, order: itemParent.order}]);
-            items.splice(itemIndex + 1, 0, newItem);
-            console.log(items)
+            let item = items.find(i => {return i.id === itemId});
+            let itemParentMeta = item.parents.find(parent => parent.id === parentId);
+            let newItemParentMeta = {id: parentId, prev: itemId, next: itemParentMeta.next};
+            let newItem = createItem("", false, [newItemParentMeta]);
+            items.push(newItem);
+
+            if (itemParentMeta.next !== null) {
+                let nextItem = items.find(item => item.id === itemParentMeta.next);
+                let nextItemParentMeta = nextItem.parents.find(parent => parent.id === parentId);
+                nextItemParentMeta.prev = newItem.id;
+            }
+            itemParentMeta.next = newItem.id;
+
             this.setState({'items': items});
         }
     }
@@ -259,7 +265,7 @@ function getChildrenItems(parentId, items) {
     let child = firstChild;
     let parent;
     while (child) {
-        sortedChildren.push(child)
+        sortedChildren.push(child);
         parent = child.parents.find(parent => parent.id === parentId);
         if (!parent || parent.next === null) {
             break;
