@@ -75,21 +75,33 @@ class App extends Component {
     onItemKeyUp(itemId, parentId, event) {
         if (event.key === "Enter") {
             let items = this.state.items.slice();
-            let item = items.find(i => {return i.id === itemId});
-            let itemParentMeta = item.parents.find(parent => parent.id === parentId);
-            let newItemParentMeta = {id: parentId, prev: itemId, next: itemParentMeta.next};
-            let newItem = createItem("", false, [newItemParentMeta]);
+            let currentItem = items.find(i => {return i.id === itemId});
+            let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
+            let newItem = createItem();
             items.push(newItem);
 
-            if (itemParentMeta.next !== null) {
-                let nextItem = items.find(item => item.id === itemParentMeta.next);
-                let nextItemParentMeta = nextItem.parents.find(parent => parent.id === parentId);
-                nextItemParentMeta.prev = newItem.id;
-            }
-            itemParentMeta.next = newItem.id;
+            items = this.insertItemIntoList(newItem, parentId, currentItem.id, currentItemParentMeta.next, items);
 
             this.setState({'items': items});
         }
+    }
+
+    insertItemIntoList(itemToInsert, parentId, prevItemId, nextItemId, items) {
+        // Add item to parent list
+        itemToInsert.parents.push({id: parentId, prev: prevItemId, next: nextItemId});
+        // Find and point previous item to new item
+        if (prevItemId !== null) {
+            let prevItem = items.find(item => item.id === prevItemId);
+            let prevItemParentMeta = prevItem.parents.find(parent => parent.id === parentId);
+            prevItemParentMeta.next = itemToInsert.id;
+        }
+        // Find and point next item to new item
+        if (nextItemId !== null) {
+            let nextItem = items.find(item => item.id === nextItemId);
+            let nextItemParentMeta = nextItem.parents.find(parent => parent.id === parentId);
+            nextItemParentMeta.prev = itemToInsert.id;
+        }
+        return items;
     }
 
     onItemDragStart(itemId, parentId) {
@@ -133,37 +145,37 @@ class App extends Component {
 
     // TODO: refactor
     onItemDragStop(draggedItemId, currentListId) {
-        let items = this.state.items;
+        let items = this.state.items.slice();
         let overlappedItemId = this.state.overlappedItemId;
         let overlappedItemPos = this.state.overlappedItemPos;
         let overlappedListId = this.state.overlappedListId;
         if (overlappedItemId) {
             items = items.slice();
-            // Get dragged item object
-            let draggedItemIndex = items.findIndex(item => item.id === draggedItemId);
-            let draggedItem = items[draggedItemIndex];
-            // Get overlapped item object
-            let overlappedItemIndex = items.findIndex(item => item.id === overlappedItemId);
-            let overlappedItem = items[overlappedItemIndex];
-            // Get parent of overlapped item
+            let draggedItem = items.find(item => item.id === draggedItemId);
+            let overlappedItem = items.find(item => item.id === overlappedItemId);
             let overlappedItemParent = overlappedItem.parents.find(parent => parent.id === overlappedListId);
-            // Remove the old parent and add the parent of the overlapped item
-            let newParents = draggedItem.parents.filter(parent => parent.id !== currentListId);
-            newParents.push({id: overlappedListId, order: overlappedItemParent.order});
-            draggedItem.parents = newParents;
-            // Reorder list items
-            let itemIdToSkip = overlappedItemPos === 'above' ? draggedItemId : overlappedItemId;
-            items.forEach(item => {
-                let parent = item.parents.find(parent => parent.id === overlappedListId);
-                if (parent) {
-                    if (item.id !== itemIdToSkip) {
-                        if (parent.order >= overlappedItemParent.order) {
-                            parent.order++;
-                        }
-                    }
-                }
-            });
+            // Find prior references to dragged item
+            let draggedItemParent = draggedItem.parents.find(parent => parent.id === currentListId);
+            let oldPrevItem = items.find(item => item.id === draggedItemParent.prev);
+            let oldNextItem = items.find(item => item.id === draggedItemParent.next);
+            // Remove prior references to dragged item from other items
+            if (oldPrevItem) {
+                let oldPrevItemParent = oldPrevItem.parents.find(parent => parent.id === currentListId);
+                oldPrevItemParent.next = oldNextItem ? oldNextItem.id : null;
+            }
+            if (oldNextItem) {
+                let oldNextItemParent = oldNextItem.parents.find(parent => parent.id === currentListId);
+                oldNextItemParent.prev = oldPrevItem ? oldPrevItem.id : null;
+            }
+            // Remove the old parent list from dragged item
+            draggedItem.parents = draggedItem.parents.filter(parent => parent.id !== currentListId);
+            // Find the dragged item's new prev and next
+            let draggedItemPrev = overlappedItemPos === 'above' ? overlappedItemParent.prev : overlappedItemId;
+            let draggedItemNext = overlappedItemPos === 'above' ? overlappedItemId : overlappedItemParent.next;
+            // Insert item into new list
+            items = this.insertItemIntoList(draggedItem, overlappedListId, draggedItemPrev, draggedItemNext, items);
         }
+
         this.setState({
             'items': items,
             'overlappedItemId': null,
