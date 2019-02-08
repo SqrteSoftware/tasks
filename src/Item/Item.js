@@ -38,9 +38,12 @@ class Item extends Component {
                         onChange={this.onCheckboxChange.bind(this)}/>
                     <input
                         className="itemInput"
+                        ref={this.onInputRef.bind(this)}
                         type="text"
                         value={item.value}
-                        onChange={ this.onChange.bind(this) } onKeyUp={this.onKeyUp.bind(this)}/>
+                        onChange={ this.onChange.bind(this)}
+                        onKeyUp={this.onKeyUp.bind(this)}
+                        onFocus={this.onInputFocus.bind(this)}/>
                 </li>
             </DraggableCore>
         );
@@ -122,6 +125,17 @@ class Item extends Component {
         else {
             this.props.onItemRef({'id': this.props.item.id, 'ref': null});
         }
+    }
+
+
+    onInputRef(ref) {
+        if (ref !== null && this.props.giveFocus) {
+            ref.focus();
+        }
+    }
+
+    onInputFocus() {
+        this.props.onItemFocus(this.props.item.id);
     }
 };
 

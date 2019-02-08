@@ -23,12 +23,16 @@ class App extends Component {
             'overlappedItemId': null,
             'overlappedItemPos': null,
             'overlappedListId': null,
+            'listIdWithFocus': null,
+            'itemIdWithFocus': null,
             'items': itemStore
         };
     }
 
     render() {
         var listData = createViewData(this.state.items);
+        let listIdWithFocus = this.state.listIdWithFocus;
+        let itemIdWithFocus = this.state.itemIdWithFocus;
         return (
             <div className="App">
                 <ReactGridLayout
@@ -46,6 +50,7 @@ class App extends Component {
                                 <List
                                     parent={item.parent}
                                     children={item.children}
+                                    itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
                                     onListRef={this.onListRef.bind(this)}
                                     onItemRef={this.onItemRef.bind(this)}
                                     onItemDragStart={this.onItemDragStart.bind(this)}
@@ -56,6 +61,7 @@ class App extends Component {
                                     onItemChange={this.onItemChange.bind(this)}
                                     onItemKeyUp={this.onItemKeyUp.bind(this)}
                                     onItemCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                    onItemFocus={this.onItemFocus.bind(this)}
                                 />
                             </div>
                         )})
@@ -82,7 +88,11 @@ class App extends Component {
 
             items = this.insertItemIntoList(newItem, parentId, currentItem.id, currentItemParentMeta.next, items);
 
-            this.setState({'items': items});
+            this.setState({
+                'items': items,
+                'listIdWithFocus': parentId,
+                'itemIdWithFocus': newItem.id
+            });
         }
     }
 
@@ -205,6 +215,18 @@ class App extends Component {
         }
         else {
             delete this.listRefsById[obj.id];
+        }
+    }
+
+    onItemFocus(itemId) {
+        // If the item was given focus through state,
+        // clear the state so that focus can now shift to
+        // other elements again.
+        if (this.state.itemIdWithFocus !== null) {
+            this.setState({
+                "itemIdWithFocus": null,
+                "listIdWithFocus": null
+            })
         }
     }
 

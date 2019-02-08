@@ -7,6 +7,7 @@ import Item from '../Item/Item';
 class List extends Component {
 
     render() {
+        let itemIdWithFocus = this.props.itemIdWithFocus;
         let items = this.props.children.slice(0);
         let overlappedItemIndex = items.findIndex(item => item.id === this.props.overlappedItemId);
         if (overlappedItemIndex >= 0) {
@@ -30,6 +31,8 @@ class List extends Component {
                                         key={item.id}
                                         item={item}
                                         parentId={this.props.parent.id}
+                                        giveFocus={itemIdWithFocus === item.id}
+                                        onItemFocus={this.onItemFocus.bind(this)}
                                         onDragStart={this.onItemDragStart.bind(this)}
                                         onDrag={this.onItemDrag.bind(this)}
                                         onDragStop={this.onItemDragStop.bind(this)}
@@ -73,6 +76,10 @@ class List extends Component {
 
     onItemCheckboxChange(itemId, value) {
         this.props.onItemCheckboxChange(itemId, value);
+    }
+
+    onItemFocus(itemId) {
+        this.props.onItemFocus(itemId);
     }
 
     // Fired when item DOM element is mounted/unmounted
