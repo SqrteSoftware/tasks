@@ -37,7 +37,7 @@ class Item extends Component {
                         checked={item.complete}
                         onChange={this.onCheckboxChange.bind(this)}/>
                     <input
-                        className="itemInput"
+                        className={"itemInput" + (item.complete ? " complete" : "")}
                         ref={this.onInputRef.bind(this)}
                         type="text"
                         value={item.value}

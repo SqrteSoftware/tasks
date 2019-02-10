@@ -38,6 +38,10 @@
     border-bottom: 1px solid #ccc;
 }
 
+.itemInput.complete {
+    text-decoration: line-through;
+}
+
 .itemCheckbox {
     position: absolute;
     top: 1px;
