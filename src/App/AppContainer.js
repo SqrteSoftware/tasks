@@ -1,5 +1,7 @@
 import {connect} from 'react-redux';
 
+import {updateItemText} from '../actions';
+
 import App from './App';
 
 const mapStateToProps = (state) => {
@@ -9,7 +11,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => {
-    return {};
+    return {
+        updateItemText: (itemId, text) => dispatch(updateItemText(itemId, text))
+    };
 };
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);

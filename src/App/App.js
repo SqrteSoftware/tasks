@@ -72,10 +72,7 @@ class App extends Component {
     }
 
     onItemChange(itemId, value) {
-        let items = this.props.items.slice();
-        let itemIndex = items.findIndex(i => {return i.id === itemId});
-        items[itemIndex] = Object.assign({}, items[itemIndex], {value: value});
-        this.setState({'items': items});
+        this.props.updateItemText(itemId, value);
     }
 
     onItemKeyUp(itemId, parentId, event) {
