@@ -5,6 +5,7 @@ import 'react-resizable/css/styles.css'
 
 import './App.css';
 import List from '../List/List';
+import { createItem, createViewData, getChildrenItems } from '../utils';
 
 
 class App extends Component {
@@ -24,13 +25,12 @@ class App extends Component {
             'overlappedItemPos': null,
             'overlappedListId': null,
             'listIdWithFocus': null,
-            'itemIdWithFocus': null,
-            'items': itemStore
+            'itemIdWithFocus': null
         };
     }
 
     render() {
-        var listData = createViewData(this.state.items);
+        var listData = createViewData(this.props.items);
         let listIdWithFocus = this.state.listIdWithFocus;
         let itemIdWithFocus = this.state.itemIdWithFocus;
         return (
@@ -72,7 +72,7 @@ class App extends Component {
     }
 
     onItemChange(itemId, value) {
-        let items = this.state.items.slice();
+        let items = this.props.items.slice();
         let itemIndex = items.findIndex(i => {return i.id === itemId});
         items[itemIndex] = Object.assign({}, items[itemIndex], {value: value});
         this.setState({'items': items});
@@ -80,7 +80,7 @@ class App extends Component {
 
     onItemKeyUp(itemId, parentId, event) {
         if (event.key === "Enter") {
-            let items = this.state.items.slice();
+            let items = this.props.items.slice();
             let currentItem = items.find(i => {return i.id === itemId});
             let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
             let newItem = createItem();
@@ -141,7 +141,7 @@ class App extends Component {
         }
 
         if (overlappedListId) {
-            let listItems = getChildrenItems(overlappedListId, this.state.items);
+            let listItems = getChildrenItems(overlappedListId, this.props.items);
             let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
 
             this.setState({'overlappedItemId': nearestItem.id});
@@ -155,7 +155,7 @@ class App extends Component {
 
     // TODO: refactor
     onItemDragStop(draggedItemId, currentListId) {
-        let items = this.state.items.slice();
+        let items = this.props.items.slice();
         let overlappedItemId = this.state.overlappedItemId;
         let overlappedItemPos = this.state.overlappedItemPos;
         let overlappedListId = this.state.overlappedListId;
@@ -203,7 +203,7 @@ class App extends Component {
     }
 
     onItemCheckboxChange(itemId, value) {
-        let items = this.state.items.slice();
+        let items = this.props.items.slice();
         let itemIndex = items.findIndex(i => {return i.id === itemId});
         items[itemIndex] = Object.assign({}, items[itemIndex], {complete: value});
         this.setState({'items': items});
@@ -266,80 +266,6 @@ class App extends Component {
         });
         return nearestItem;
     }
-}
-
-
-function createViewData(items) {
-    let listData = [];
-    let index = 0;
-    items.forEach((item) => {
-        if (item.parents.length <= 0) {
-            let parentItem = item;
-            listData.push({
-                'parent': parentItem,
-                'children': getChildrenItems(parentItem.id, items),
-                'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
-            });
-            listData.push();
-            index++;
-        }
-    });
-    return listData;
-}
-
-function getChildrenItems(parentId, items) {
-    let children = items.filter(item => {
-        return item.parents.find(parent => parent.id === parentId);
-    });
-    let firstChild = children.find(item => {
-        let parent = item.parents.find(parent => parent.id === parentId);
-        return parent.prev === null;
-    });
-    let sortedChildren = [];
-    let child = firstChild;
-    let parent;
-    while (child) {
-        sortedChildren.push(child);
-        parent = child.parents.find(parent => parent.id === parentId);
-        if (!parent || parent.next === null) {
-            break;
-        }
-        child = children.find(item => item.id === parent.next);
-    }
-    return sortedChildren;
-}
-
-let itemId = 0;
-function createItem(value="", complete=false, parents=[]) {
-    return {
-        id: "item" + itemId++,
-        value,
-        complete,
-        parents
-    };
-}
-
-// Generate testing items
-let itemStore = [];
-let parentId = null;
-let lastItem = null;
-for (let i = 0; i < 40; i++) {
-    let item = createItem("item value " + i);
-    if (i % 5 === 0) {
-        lastItem = null;
-        parentId = "item" + i;
-    }
-    else if (lastItem === null) {
-        item.parents.push({id: parentId, prev: null, next: null});
-        lastItem = item;
-    }
-    else {
-        item.parents.push({id: parentId, prev: lastItem.id, next: null});
-        let lastItemParent = lastItem.parents.find(parent => parent.id === parentId);
-        lastItemParent.next = item.id;
-        lastItem = item;
-    }
-    itemStore.push(item);
 }
 
 export default App;
