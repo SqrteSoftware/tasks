@@ -1,5 +1,7 @@
 import { createItem } from './utils';
 
+let itemId = 0;
+
 export default function generateTestData()
 {
     // Generate testing items
@@ -7,7 +9,7 @@ export default function generateTestData()
     let parentId = null;
     let lastItem = null;
     for (let i = 0; i < 40; i++) {
-        let item = createItem("item value " + i);
+        let item = createItem("item" + itemId++,"item value " + i);
         if (i % 5 === 0) {
             lastItem = null;
             parentId = "item" + i;
@@ -22,5 +24,6 @@ export default function generateTestData()
         }
         itemStore.push(item);
     }
+    console.log(itemStore)
     return itemStore;
 }

@@ -1,8 +1,8 @@
-let itemId = 0;
 
-export function createItem(value="", complete=false, parents=[]) {
+
+export function createItem(id=null, value="", complete=false, parents=[]) {
     return {
-        id: "item" + itemId++,
+        id,
         value,
         complete,
         parents
