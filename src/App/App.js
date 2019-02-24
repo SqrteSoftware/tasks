@@ -58,7 +58,7 @@ class App extends Component {
                                     overlappedItemPos={this.state.overlappedItemPos}
                                     onItemChange={this.onItemChange.bind(this)}
                                     onItemKeyUp={this.onItemKeyUp.bind(this)}
-                                    onItemCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                    onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
                                     onItemFocus={this.onItemFocus.bind(this)}
                                 />
                             </div>
@@ -194,10 +194,6 @@ class App extends Component {
         else {
             delete this.itemRefsById[obj.id];
         }
-    }
-
-    onItemCheckboxChange(itemId, value) {
-        this.props.updateItemComplete(itemId, value);
     }
 
     onListRef(obj) {
