@@ -11,6 +11,13 @@ function items(state = [], action) {
                 }
                 return item;
             });
+        case 'UPDATE_ITEM_COMPLETE':
+            return state.map(item => {
+                if (item.id === action.itemId) {
+                    return {...item, complete: action.complete}
+                }
+                return item;
+            });
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             let items = state.slice();
             let newItem = createItem(action.id);

@@ -1,6 +1,11 @@
 import {connect} from 'react-redux';
 
-import {createNewItemWithFocus, updateItemText, updateFocus} from '../actions';
+import {
+    createNewItemWithFocus,
+    updateItemText,
+    updateItemComplete,
+    updateFocus
+} from '../actions';
 
 import App from './App';
 
@@ -15,6 +20,8 @@ const mapDispatchToProps = dispatch => {
     return {
         updateItemText: (itemId, text) =>
             dispatch(updateItemText(itemId, text)),
+        updateItemComplete: (itemId, complete) =>
+            dispatch(updateItemComplete(itemId, complete)),
         createNewItemWithFocus: (parentItemId, prevItemId, nextItemId) =>
             dispatch(createNewItemWithFocus(parentItemId, prevItemId, nextItemId)),
         updateFocus: (parentId, itemId) =>

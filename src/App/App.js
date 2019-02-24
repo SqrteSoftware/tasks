@@ -90,24 +90,6 @@ class App extends Component {
         }
     }
 
-    insertItemIntoList(itemToInsert, parentId, prevItemId, nextItemId, items) {
-        // Add item to parent list
-        itemToInsert.parents.push({id: parentId, prev: prevItemId, next: nextItemId});
-        // Find and point previous item to new item
-        if (prevItemId !== null) {
-            let prevItem = items.find(item => item.id === prevItemId);
-            let prevItemParentMeta = prevItem.parents.find(parent => parent.id === parentId);
-            prevItemParentMeta.next = itemToInsert.id;
-        }
-        // Find and point next item to new item
-        if (nextItemId !== null) {
-            let nextItem = items.find(item => item.id === nextItemId);
-            let nextItemParentMeta = nextItem.parents.find(parent => parent.id === parentId);
-            nextItemParentMeta.prev = itemToInsert.id;
-        }
-        return items;
-    }
-
     onItemDragStart(itemId, parentId) {
         // Update the bounds of all items
         Object.keys(this.itemRefsById).forEach(itemId => {
@@ -187,6 +169,24 @@ class App extends Component {
         });
     }
 
+    insertItemIntoList(itemToInsert, parentId, prevItemId, nextItemId, items) {
+        // Add item to parent list
+        itemToInsert.parents.push({id: parentId, prev: prevItemId, next: nextItemId});
+        // Find and point previous item to new item
+        if (prevItemId !== null) {
+            let prevItem = items.find(item => item.id === prevItemId);
+            let prevItemParentMeta = prevItem.parents.find(parent => parent.id === parentId);
+            prevItemParentMeta.next = itemToInsert.id;
+        }
+        // Find and point next item to new item
+        if (nextItemId !== null) {
+            let nextItem = items.find(item => item.id === nextItemId);
+            let nextItemParentMeta = nextItem.parents.find(parent => parent.id === parentId);
+            nextItemParentMeta.prev = itemToInsert.id;
+        }
+        return items;
+    }
+
     onItemRef(obj) {
         if (obj.ref !== null) {
             this.itemRefsById[obj.id] = obj.ref;
@@ -197,10 +197,7 @@ class App extends Component {
     }
 
     onItemCheckboxChange(itemId, value) {
-        let items = this.props.items.slice();
-        let itemIndex = items.findIndex(i => {return i.id === itemId});
-        items[itemIndex] = Object.assign({}, items[itemIndex], {complete: value});
-        this.setState({'items': items});
+        this.props.updateItemComplete(itemId, value);
     }
 
     onListRef(obj) {
