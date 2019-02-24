@@ -56,7 +56,7 @@ class App extends Component {
                                     onItemDragStop={this.onItemDragStop.bind(this)}
                                     overlappedItemId={this.state.overlappedItemId}
                                     overlappedItemPos={this.state.overlappedItemPos}
-                                    onItemChange={this.onItemChange.bind(this)}
+                                    onItemChange={this.props.updateItemText.bind(this)}
                                     onItemKeyUp={this.onItemKeyUp.bind(this)}
                                     onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
                                     onItemFocus={this.onItemFocus.bind(this)}
@@ -67,10 +67,6 @@ class App extends Component {
                 </ReactGridLayout>
             </div>
         );
-    }
-
-    onItemChange(itemId, value) {
-        this.props.updateItemText(itemId, value);
     }
 
     onItemKeyUp(itemId, parentId, event) {
