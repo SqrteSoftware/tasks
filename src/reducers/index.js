@@ -69,13 +69,31 @@ function focus(state = {'parentId': null, 'itemId': null}, action) {
     }
 }
 
+function dnd(state = {
+    'activeDragParentId': null,
+    'overlappedListId': null,
+    'overlappedItemId': null,
+    'overlappedItemPos': null
+}, action) {
+    switch (action.type) {
+        case 'UPDATE_DND':
+            return {
+                ...state,
+                ...action.values
+            };
+        default:
+            return state;
+    }
+}
+
 function clone(object) {
     return JSON.parse(JSON.stringify(object));
 }
 
 const rootReducer = combineReducers({
     items,
-    focus
+    focus,
+    dnd
 });
 
 export default rootReducer;

@@ -18,13 +18,7 @@ class App extends Component {
 
         this.listRefsById = {};
         this.listBoundsById = {};
-
-        this.state = {
-            'activeDragParentId': null,
-            'overlappedItemId': null,
-            'overlappedItemPos': null,
-            'overlappedListId': null,
-        };
+        this.listBoundsById = {};
     }
 
     render() {
@@ -44,7 +38,7 @@ class App extends Component {
                             <div key={item.parent.id}
                                  data-grid={item.layout}
                                  className="App-list"
-                                 style={this.state.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
+                                 style={this.props.dnd.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
                                     parent={item.parent}
                                     children={item.children}
@@ -54,8 +48,8 @@ class App extends Component {
                                     onItemDragStart={this.onItemDragStart.bind(this)}
                                     onItemDrag={this.onItemDrag.bind(this)}
                                     onItemDragStop={this.onItemDragStop.bind(this)}
-                                    overlappedItemId={this.state.overlappedItemId}
-                                    overlappedItemPos={this.state.overlappedItemPos}
+                                    overlappedItemId={this.props.dnd.overlappedItemId}
+                                    overlappedItemPos={this.props.dnd.overlappedItemPos}
                                     onItemChange={this.props.updateItemText.bind(this)}
                                     onItemKeyUp={this.onItemKeyUp.bind(this)}
                                     onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
@@ -97,7 +91,7 @@ class App extends Component {
             let listRef = this.listRefsById[listId];
             this.listBoundsById[listId] = listRef.getBoundingClientRect();
         });
-        this.setState({'activeDragParentId': parentId});
+        this.props.updateDnd({'activeDragParentId': parentId});
     }
 
     onItemDrag(itemId) {
@@ -108,29 +102,33 @@ class App extends Component {
 
         // Find the currently overlapped list if any
         let overlappedListId = this.findCoveredId(itemId, itemBound, this.listBoundsById);
-        if (this.state.overlappedListId !== overlappedListId) {
-            this.setState({'overlappedListId': overlappedListId});
+        if (this.props.dnd.overlappedListId !== overlappedListId) {
+            this.props.updateDnd({'overlappedListId': overlappedListId});
         }
 
         if (overlappedListId) {
             let listItems = getChildrenItems(overlappedListId, this.props.items);
             let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
-
-            this.setState({'overlappedItemId': nearestItem.id});
-            this.setState({'overlappedItemPos': nearestItem.position});
+            this.props.updateDnd({
+                'overlappedItemId': nearestItem.id,
+                'overlappedItemPos': nearestItem.position
+            });
         }
         else {
-            this.setState({'overlappedItemId': null});
-            this.setState({'overlappedItemPos': null});
+            this.props.updateDnd({
+                'overlappedItemId': null,
+                'overlappedItemPos': null
+            });
         }
     }
 
     // TODO: refactor
     onItemDragStop(draggedItemId, currentListId) {
         let items = this.props.items.slice();
-        let overlappedItemId = this.state.overlappedItemId;
-        let overlappedItemPos = this.state.overlappedItemPos;
-        let overlappedListId = this.state.overlappedListId;
+        let overlappedItemId = this.props.dnd.overlappedItemId;
+        let overlappedItemPos = this.props.dnd.overlappedItemPos;
+        let overlappedListId = this.props.dnd.overlappedListId;
+
         if (overlappedItemId) {
             items = items.slice();
             let draggedItem = items.find(item => item.id === draggedItemId);
@@ -158,8 +156,9 @@ class App extends Component {
             items = this.insertItemIntoList(draggedItem, overlappedListId, draggedItemPrev, draggedItemNext, items);
         }
 
-        this.setState({
-            'items': items,
+        this.setState({'items': items});
+
+        this.props.updateDnd({
             'overlappedItemId': null,
             'activeDragParentId': null
         });
