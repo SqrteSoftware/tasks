@@ -18,6 +18,20 @@ export const createNewItemWithFocus = (parentItemId, prevItemId, nextItemId) => 
     nextItemId
 });
 
+export const detachItemFromParent = (itemId, parentId) => ({
+    type: 'DETACH_ITEM_FROM_PARENT',
+    itemId,
+    parentId
+});
+
+export const attachItemToParent = (itemId, parentId, prevItemId, nextItemId) => ({
+    type: 'ATTACH_ITEM_TO_PARENT',
+    itemId,
+    parentId,
+    prevItemId,
+    nextItemId
+});
+
 export const updateFocus = (parentId=null, itemId=null) => ({
     type: 'UPDATE_FOCUS',
     parentId,
@@ -41,3 +55,4 @@ export const updateDnd = ({
         values
     };
 };
+
