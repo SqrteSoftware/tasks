@@ -5,7 +5,9 @@ import {
     updateItemText,
     updateItemComplete,
     updateFocus,
-    updateDnd
+    updateDnd,
+    detachItemFromParent,
+    attachItemToParent
 } from '../actions';
 
 import App from './App';
@@ -26,6 +28,11 @@ const mapDispatchToProps = dispatch => {
             dispatch(updateItemComplete(itemId, complete)),
         createNewItemWithFocus: (parentItemId, prevItemId, nextItemId) =>
             dispatch(createNewItemWithFocus(parentItemId, prevItemId, nextItemId)),
+        detachItemFromParent: (itemId, parentId) =>
+            dispatch(detachItemFromParent(itemId, parentId)),
+        attachItemToParent: (itemId, parentId, prevItemId, nextItemId) =>
+            dispatch(attachItemToParent(itemId, parentId, prevItemId, nextItemId)),
+
         updateFocus: (parentId, itemId) =>
             dispatch(updateFocus(parentId, itemId)),
         updateDnd: (obj) =>

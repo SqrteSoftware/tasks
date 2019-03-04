@@ -24,31 +24,23 @@ function items(state = [], action) {
             newItem.id = action.newItemId;
             // Add new item to primary list
             items.push(newItem);
-            // Add parent to new item
-            newItem.parents.push({
-                id: action.parentItemId,
-                prev: action.prevItemId,
-                next: action.nextItemId
-            });
-            // Find and point previous item to new item
-            if (action.prevItemId !== null) {
-                let prevItemIndex = items.findIndex(item => item.id === action.prevItemId);
-                let prevItem = clone(items[prevItemIndex]);
-                let prevItemParentMeta = prevItem.parents.find(parent => parent.id === action.parentItemId);
-                prevItemParentMeta.next = newItem.id;
-                items[prevItemIndex] = prevItem;
-            }
-            // Find and point next item to new item
-            if (action.nextItemId !== null) {
-                let nextItemIndex = items.findIndex(item => item.id === action.nextItemId);
-                let nextItem = clone(items[nextItemIndex]);
-                let nextItemParentMeta = nextItem.parents.find(parent => parent.id === action.parentItemId);
-                nextItemParentMeta.prev = newItem.id;
-                items[nextItemIndex] = nextItem;
-            }
-            return items;
+            return attachItemToParent(
+                action.newItemId,
+                action.parentItemId,
+                action.prevItemId,
+                action.nextItemId,
+                items
+            );
         case 'DETACH_ITEM_FROM_PARENT':
             return detachItemFromParent(action.itemId, action.parentId, state);
+        case 'ATTACH_ITEM_TO_PARENT':
+            return attachItemToParent(
+                action.itemId,
+                action.parentId,
+                action.prevItemId,
+                action.nextItemId,
+                state
+            );
         default:
             return state;
     }
@@ -76,9 +68,33 @@ function detachItemFromParent(itemId, parentId, items) {
             i.id === oldNextItem.id ? {...i, parents: newParents} : i);
     }
     // Remove old parent from item
-    let newParents = oldNextItem.parents.filter(p => p.id !== parentId);
+    let newParents = item.parents.filter(p => p.id !== parentId);
     items = items.map(i =>
         i.id === item.id ? {...i, parents: newParents} : i);
+    return items;
+}
+
+function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
+    // Add new parent to item
+    let item = clone(items.find(i => i.id === itemId));
+    item.parents.push({id: parentId, prev: prevItemId, next: nextItemId});
+    items = items.map(i => i.id === itemId ? item : i);
+    // Find previous item and mutate parent to point to inserted item
+    if (prevItemId) {
+        let prevItem = clone(items.find(i => i.id === prevItemId));
+        let newParents = prevItem.parents.map(p =>
+            (p.id === parentId && p.next === nextItemId) ? {...p, next: itemId} : p);
+        items = items.map(i =>
+            i.id === prevItemId ? {...i, parents: newParents} : i);
+    }
+    // Find next item and mutate parent to point to inserted item
+    if (nextItemId) {
+        let nextItem = clone(items.find(i => i.id === nextItemId));
+        let newParents = nextItem.parents.map(p =>
+            (p.id === parentId && p.prev === prevItemId) ? {...p, prev: itemId} : p);
+        items = items.map(i =>
+            i.id === nextItemId ? {...i, parents: newParents} : i);
+    }
     return items;
 }
 
