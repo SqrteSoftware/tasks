@@ -38,13 +38,14 @@ export function getChildrenItems(parentId, items) {
     let sortedChildren = [];
     let child = firstChild;
     let parent;
+    const matchNextItem = item => item.id === parent.next;
     while (child) {
         sortedChildren.push(child);
         parent = child.parents.find(parent => parent.id === parentId);
         if (!parent || parent.next === null) {
             break;
         }
-        child = children.find(item => item.id === parent.next);
+        child = children.find(matchNextItem);
     }
     return sortedChildren;
 }

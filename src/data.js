@@ -8,6 +8,7 @@ export default function generateTestData()
     let itemStore = [];
     let parentId = null;
     let lastItem = null;
+    const matchParent = parent => parent.id === parentId;
     for (let i = 0; i < 40; i++) {
         let item = createItem("item" + itemId++,"item value " + i);
         if (i % 5 === 0) {
@@ -18,7 +19,7 @@ export default function generateTestData()
             lastItem = item;
         } else {
             item.parents.push({id: parentId, prev: lastItem.id, next: null});
-            let lastItemParent = lastItem.parents.find(parent => parent.id === parentId);
+            let lastItemParent = lastItem.parents.find(matchParent);
             lastItemParent.next = item.id;
             lastItem = item;
         }
