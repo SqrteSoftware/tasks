@@ -127,18 +127,25 @@ class App extends Component {
         let overlappedItemId = this.props.dnd.overlappedItemId;
         let overlappedItemPos = this.props.dnd.overlappedItemPos;
         let overlappedListId = this.props.dnd.overlappedListId;
-
         if (overlappedItemId) {
             // Find the dragged item's new prev and next
             let overlappedItem = items.find(item => item.id === overlappedItemId);
             let overlappedItemParent = overlappedItem.parents.find(parent => parent.id === overlappedListId);
-            let draggedItemPrev = overlappedItemPos === 'above' ? overlappedItemParent.prev : overlappedItemId;
-            let draggedItemNext = overlappedItemPos === 'above' ? overlappedItemId : overlappedItemParent.next;
-
-            this.props.detachItemFromParent(draggedItemId, currentListId);
-            this.props.attachItemToParent(draggedItemId, overlappedListId, draggedItemPrev, draggedItemNext);
+            let draggedItemNewPrev = overlappedItemPos === 'above' ? overlappedItemParent.prev : overlappedItemId;
+            let draggedItemNewNext = overlappedItemPos === 'above' ? overlappedItemId : overlappedItemParent.next;
+            // Only insert dragged item into new position if the dragged item is
+            // NOT the same as the new next or new prev item. If it is the same,
+            // then we're dropping the item into the same place it was in.
+            if (draggedItemId !== draggedItemNewPrev && draggedItemId !== draggedItemNewNext) {
+                this.props.detachItemFromParent(draggedItemId, currentListId);
+                this.props.attachItemToParent(
+                    draggedItemId,
+                    overlappedListId,
+                    draggedItemNewPrev,
+                    draggedItemNewNext
+                );
+            }
         }
-
         this.props.updateDnd({
             'overlappedItemId': null,
             'activeDragParentId': null
