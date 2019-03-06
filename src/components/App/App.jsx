@@ -5,7 +5,7 @@ import 'react-resizable/css/styles.css'
 
 import './App.css';
 import List from '../List/List';
-import { createViewData, getChildrenItems } from '../utils';
+import { createViewData, getChildrenItems } from '../../utils';
 
 
 class App extends Component {

@@ -5,7 +5,7 @@ import { createStore } from 'redux'
 import rootReducer from './reducers'
 import './index.css';
 
-import AppContainer from './App/AppContainer';
+import AppContainer from './components/App/AppContainer';
 import * as serviceWorker from './serviceWorker';
 import generateTestData from './data';
 

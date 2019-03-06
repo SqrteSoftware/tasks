@@ -8,7 +8,7 @@ import {
     updateDnd,
     detachItemFromParent,
     attachItemToParent
-} from '../actions';
+} from '../../actions';
 
 import App from './App';
 
