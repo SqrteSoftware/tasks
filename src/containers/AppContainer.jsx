@@ -8,9 +8,9 @@ import {
     updateDnd,
     detachItemFromParent,
     attachItemToParent
-} from '../../actions';
+} from '../actions';
 
-import App from './App';
+import App from '../components/App/App';
 
 const mapStateToProps = (state) => {
     return {
