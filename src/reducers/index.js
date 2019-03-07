@@ -41,9 +41,18 @@ function items(state = [], action) {
                 action.nextItemId,
                 state
             );
+        case 'REMOVE_ITEM_FROM_PARENT':
+            return removeItemFromParent(action.itemId, action.parentId, state);
         default:
             return state;
     }
+}
+
+function removeItemFromParent(itemId, parentId, items) {
+    items = detachItemFromParent(itemId, parentId, items);
+    // Delete the item if it now has 0 parents
+    items = items.filter(i => i.id !== itemId || i.parents.length > 0);
+    return items;
 }
 
 function detachItemFromParent(itemId, parentId, items) {

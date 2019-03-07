@@ -38,7 +38,7 @@ class List extends Component {
                                         onDragStop={this.onItemDragStop.bind(this)}
                                         onItemRef={this.onItemRef.bind(this)}
                                         onChange={this.onItemChange.bind(this)}
-                                        onKeyUp={this.onItemKeyUp.bind(this)}
+                                        onKeyDown={this.props.onItemKeyDown.bind(this)}
                                         onCheckboxChange={this.onItemCheckboxChange.bind(this)}
                                     />
                                 )
@@ -52,10 +52,6 @@ class List extends Component {
 
     onItemChange(itemId, value) {
         this.props.onItemChange(itemId, value);
-    }
-
-    onItemKeyUp(itemId, parentId, event) {
-        this.props.onItemKeyUp(itemId, parentId, event);
     }
 
     onItemDragStart(itemId, parentId) {

@@ -7,7 +7,8 @@ import {
     updateFocus,
     updateDnd,
     detachItemFromParent,
-    attachItemToParent
+    attachItemToParent,
+    removeItemFromParent
 } from '../actions';
 
 import App from '../components/App/App';
@@ -27,7 +28,8 @@ const mapDispatchToProps = {
     detachItemFromParent,
     attachItemToParent,
     updateFocus,
-    updateDnd
+    updateDnd,
+    removeItemFromParent
 };
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);

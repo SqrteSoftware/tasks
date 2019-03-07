@@ -42,13 +42,12 @@ class Item extends Component {
                         type="text"
                         value={item.value}
                         onChange={ this.onChange.bind(this)}
-                        onKeyUp={this.onKeyUp.bind(this)}
+                        onKeyDown={this.onKeyDown.bind(this)}
                         onFocus={this.onInputFocus.bind(this)}/>
                 </li>
             </DraggableCore>
         );
     }
-
 
     getListItemStyles(activeDrag, position, width) {
         if (activeDrag) {
@@ -70,16 +69,13 @@ class Item extends Component {
         }
     }
 
+    onKeyDown(event) {
+        this.props.onKeyDown(this.props.item.id, this.props.parentId, event);
+    }
 
     onChange(e, data) {
         this.props.onChange(this.props.item.id, e.target.value);
     }
-
-
-    onKeyUp(event) {
-        this.props.onKeyUp(this.props.item.id, this.props.parentId, event);
-    }
-
 
     onDragStart(e, data) {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
@@ -92,7 +88,6 @@ class Item extends Component {
         });
     }
 
-
     onDrag(e, meta) {
         this.setState({
             'position': {x: meta.x, y: meta.y}
@@ -102,7 +97,6 @@ class Item extends Component {
         });
     }
 
-
     onDragStop() {
         this.setState({
             'activeDrag': false,
@@ -111,11 +105,9 @@ class Item extends Component {
         this.props.onDragStop(this.props.item.id, this.props.parentId);
     }
 
-
     onCheckboxChange(event) {
         this.props.onCheckboxChange(this.props.item.id, event.target.checked);
     }
-
 
     // Fired when item DOM element is mounted/unmounted
     onRef(ref) {
@@ -126,7 +118,6 @@ class Item extends Component {
             this.props.onItemRef({'id': this.props.item.id, 'ref': null});
         }
     }
-
 
     onInputRef(ref) {
         if (ref !== null && this.props.giveFocus) {

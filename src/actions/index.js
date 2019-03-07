@@ -32,6 +32,12 @@ export const attachItemToParent = (itemId, parentId, prevItemId, nextItemId) => 
     nextItemId
 });
 
+export const removeItemFromParent = (itemId, parentId) => ({
+    type: 'REMOVE_ITEM_FROM_PARENT',
+    itemId,
+    parentId
+});
+
 export const updateFocus = (parentId=null, itemId=null) => ({
     type: 'UPDATE_FOCUS',
     parentId,

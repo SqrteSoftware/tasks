@@ -51,7 +51,7 @@ class App extends Component {
                                     overlappedItemId={this.props.dnd.overlappedItemId}
                                     overlappedItemPos={this.props.dnd.overlappedItemPos}
                                     onItemChange={this.props.updateItemText.bind(this)}
-                                    onItemKeyUp={this.onItemKeyUp.bind(this)}
+                                    onItemKeyDown={this.onItemKeyDown.bind(this)}
                                     onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
                                     onItemFocus={this.onItemFocus.bind(this)}
                                 />
@@ -63,11 +63,22 @@ class App extends Component {
         );
     }
 
-    onItemKeyUp(itemId, parentId, event) {
+    onItemKeyDown(itemId, parentId, event) {
         if (event.key === "Enter") {
             let currentItem = this.props.items.find(i => {return i.id === itemId});
             let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
             this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
+        }
+        else if (event.key === "Backspace" && event.target.value === "") {
+            let currentItem = this.props.items.find(i => {return i.id === itemId});
+            let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
+            this.props.removeItemFromParent(itemId, parentId);
+            if (currentItemParentMeta.prev !== null) {
+                this.props.updateFocus(parentId, currentItemParentMeta.prev);
+                // If we don't prevent default action here, the cursor will
+                // move up to the next item and delete the last character there.
+                event.preventDefault();
+            }
         }
     }
 
