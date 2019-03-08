@@ -3,6 +3,7 @@ import {createItem} from "../utils";
 
 
 function items(state = [], action) {
+    let items = state;
     switch (action.type) {
         case 'UPDATE_ITEM_TEXT':
             return state.map(item => {
@@ -19,7 +20,7 @@ function items(state = [], action) {
                 return item;
             });
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
-            let items = state.slice();
+            items = state.slice();
             let newItem = createItem(action.id);
             newItem.id = action.newItemId;
             // Add new item to primary list
@@ -31,16 +32,20 @@ function items(state = [], action) {
                 action.nextItemId,
                 items
             );
-        case 'DETACH_ITEM_FROM_PARENT':
-            return detachItemFromParent(action.itemId, action.parentId, state);
-        case 'ATTACH_ITEM_TO_PARENT':
-            return attachItemToParent(
+        case 'MOVE_ITEM':
+            items = detachItemFromParent(
                 action.itemId,
-                action.parentId,
-                action.prevItemId,
-                action.nextItemId,
-                state
+                action.oldParentId,
+                items
             );
+            items = attachItemToParent(
+                action.itemId,
+                action.newParentId,
+                action.newPrevItemId,
+                action.newNextItemId,
+                items
+            );
+            return items;
         case 'REMOVE_ITEM_FROM_PARENT':
             return removeItemFromParent(action.itemId, action.parentId, state);
         default:

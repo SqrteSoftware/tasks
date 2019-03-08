@@ -1,15 +1,6 @@
 import {connect} from 'react-redux';
 
-import {
-    createNewItemWithFocus,
-    updateItemText,
-    updateItemComplete,
-    updateFocus,
-    updateDnd,
-    detachItemFromParent,
-    attachItemToParent,
-    removeItemFromParent
-} from '../actions';
+import * as actions from '../actions';
 
 import App from '../components/App/App';
 
@@ -21,16 +12,7 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = {
-    updateItemText,
-    updateItemComplete,
-    createNewItemWithFocus,
-    detachItemFromParent,
-    attachItemToParent,
-    updateFocus,
-    updateDnd,
-    removeItemFromParent
-};
+const mapDispatchToProps = {...actions};
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
 

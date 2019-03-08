@@ -147,10 +147,11 @@ class App extends Component {
             // Only insert dragged item into new position if the dragged item is
             // NOT the same as the new next or new prev item. If it is the same,
             // then we're dropping the item into the same place it was in.
-            if (draggedItemId !== draggedItemNewPrev && draggedItemId !== draggedItemNewNext) {
-                this.props.detachItemFromParent(draggedItemId, currentListId);
-                this.props.attachItemToParent(
+            if (draggedItemId !== draggedItemNewPrev &&
+                draggedItemId !== draggedItemNewNext) {
+                this.props.moveItem(
                     draggedItemId,
+                    currentListId,
                     overlappedListId,
                     draggedItemNewPrev,
                     draggedItemNewNext

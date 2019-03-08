@@ -18,18 +18,13 @@ export const createNewItemWithFocus = (parentItemId, prevItemId, nextItemId) => 
     nextItemId
 });
 
-export const detachItemFromParent = (itemId, parentId) => ({
-    type: 'DETACH_ITEM_FROM_PARENT',
+export const moveItem = (itemId, oldParentId, newParentId, newPrevItemId, newNextItemId) => ({
+    type: 'MOVE_ITEM',
     itemId,
-    parentId
-});
-
-export const attachItemToParent = (itemId, parentId, prevItemId, nextItemId) => ({
-    type: 'ATTACH_ITEM_TO_PARENT',
-    itemId,
-    parentId,
-    prevItemId,
-    nextItemId
+    oldParentId,
+    newParentId,
+    newPrevItemId,
+    newNextItemId
 });
 
 export const removeItemFromParent = (itemId, parentId) => ({
