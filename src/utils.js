@@ -1,6 +1,6 @@
 
 
-export function createItem(id=null, value="", complete=false, parents=[]) {
+export function createItem(id=null, value="", complete=false, parents={}) {
     return {
         id,
         value,
@@ -12,8 +12,9 @@ export function createItem(id=null, value="", complete=false, parents=[]) {
 export function createViewData(items) {
     let listData = [];
     let index = 0;
-    items.forEach((item) => {
-        if (item.parents.length <= 0) {
+    Object.keys(items).forEach(itemId => {
+        let item = items[itemId];
+        if (Object.keys(item.parents).length <= 0) {
             let parentItem = item;
             listData.push({
                 'parent': parentItem,
@@ -28,12 +29,14 @@ export function createViewData(items) {
 }
 
 export function getChildrenItems(parentId, items) {
-    let children = items.filter(item => {
-        return item.parents.find(parent => parent.id === parentId);
+    let children = [];
+    Object.keys(items).forEach(itemId => {
+       if (items[itemId].parents[parentId]) {
+           children.push(items[itemId]);
+       }
     });
     let firstChild = children.find(item => {
-        let parent = item.parents.find(parent => parent.id === parentId);
-        return parent.prev === null;
+        return item.parents[parentId].prev === null;
     });
     let sortedChildren = [];
     let child = firstChild;
@@ -41,7 +44,7 @@ export function getChildrenItems(parentId, items) {
     const matchNextItem = item => item.id === parent.next;
     while (child) {
         sortedChildren.push(child);
-        parent = child.parents.find(parent => parent.id === parentId);
+        parent = child.parents[parentId];
         if (!parent || parent.next === null) {
             break;
         }
