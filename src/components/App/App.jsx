@@ -65,13 +65,13 @@ class App extends Component {
 
     onItemKeyDown(itemId, parentId, event) {
         if (event.key === "Enter") {
-            let currentItem = this.props.items.find(i => {return i.id === itemId});
-            let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
+            let currentItem = this.props.items[itemId];
+            let currentItemParentMeta = currentItem.parents[parentId];
             this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
         }
         else if (event.key === "Backspace" && event.target.value === "") {
-            let currentItem = this.props.items.find(i => {return i.id === itemId});
-            let currentItemParentMeta = currentItem.parents.find(parent => parent.id === parentId);
+            let currentItem = this.props.items[itemId];
+            let currentItemParentMeta = currentItem.parents[parentId];
             this.props.removeItemFromParent(itemId, parentId);
             if (currentItemParentMeta.prev !== null) {
                 this.props.updateFocus(parentId, currentItemParentMeta.prev);
@@ -134,14 +134,13 @@ class App extends Component {
     }
 
     onItemDragStop(draggedItemId, currentListId) {
-        let items = this.props.items.slice();
         let overlappedItemId = this.props.dnd.overlappedItemId;
         let overlappedItemPos = this.props.dnd.overlappedItemPos;
         let overlappedListId = this.props.dnd.overlappedListId;
         if (overlappedItemId) {
             // Find the dragged item's new prev and next
-            let overlappedItem = items.find(item => item.id === overlappedItemId);
-            let overlappedItemParent = overlappedItem.parents.find(parent => parent.id === overlappedListId);
+            let overlappedItem = this.props.items[overlappedItemId];
+            let overlappedItemParent = overlappedItem.parents[overlappedListId];
             let draggedItemNewPrev = overlappedItemPos === 'above' ? overlappedItemParent.prev : overlappedItemId;
             let draggedItemNewNext = overlappedItemPos === 'above' ? overlappedItemId : overlappedItemParent.next;
             // Only insert dragged item into new position if the dragged item is

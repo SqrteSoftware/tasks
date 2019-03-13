@@ -2,29 +2,18 @@ import {combineReducers} from "redux";
 import {createItem} from "../utils";
 
 
-function items(state = [], action) {
+function items(state = {}, action) {
+    let item = null;
     let items = state;
     switch (action.type) {
         case 'UPDATE_ITEM_TEXT':
-            return state.map(item => {
-                if (item.id === action.itemId) {
-                    return {...item, value: action.text}
-                }
-                return item;
-            });
+            return set(items, action.itemId, 'value', action.text);
         case 'UPDATE_ITEM_COMPLETE':
-            return state.map(item => {
-                if (item.id === action.itemId) {
-                    return {...item, complete: action.complete}
-                }
-                return item;
-            });
+            return set(items, action.itemId, 'complete', action.complete);
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
-            items = state.slice();
             let newItem = createItem(action.id);
             newItem.id = action.newItemId;
-            // Add new item to primary list
-            items.push(newItem);
+            items = set(items, newItem.id, newItem);
             return attachItemToParent(
                 action.newItemId,
                 action.parentItemId,
@@ -53,63 +42,67 @@ function items(state = [], action) {
     }
 }
 
-function removeItemFromParent(itemId, parentId, items) {
-    items = detachItemFromParent(itemId, parentId, items);
-    // Delete the item if it now has 0 parents
-    items = items.filter(i => i.id !== itemId || i.parents.length > 0);
+function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
+    // Add new parent to item
+    let newParent = {id: parentId, prev: prevItemId, next: nextItemId};
+    items = set(items, itemId, 'parents', parentId, newParent);
+    // Find previous item and mutate parent to point to inserted item
+    if (prevItemId) {
+        items = set(items, prevItemId, 'parents', parentId, 'next', itemId);
+    }
+    // Find next item and mutate parent to point to inserted item
+    if (nextItemId) {
+        items = set(items, nextItemId, 'parents', parentId, 'prev', itemId);
+    }
     return items;
 }
 
 function detachItemFromParent(itemId, parentId, items) {
-    let item = items.find(i => i.id === itemId);
-    let itemParent = item.parents.find(p => p.id === parentId);
-    let oldPrevItem = items.find(i => i.id === itemParent.prev);
-    let oldNextItem = items.find(i => i.id === itemParent.next);
+    let item = items[itemId];
+    let itemParent = item.parents[parentId];
+    let oldPrevItem = items[itemParent.prev];
+    let oldNextItem = items[itemParent.next];
+    // Remove parent from item
+    let newParents = {...item.parents};
+    delete newParents[parentId];
+    items = set(items, itemId, 'parents', newParents);
     // Remove item from prev item and attach next item instead
     if (oldPrevItem) {
         let newNextId = oldNextItem ? oldNextItem.id : null;
-        let newParents = oldPrevItem.parents.map(p =>
-            p.id === parentId ? {...p, next: newNextId} : p);
-        items = items.map(i =>
-            i.id === oldPrevItem.id ? {...i, parents: newParents} : i);
+        items = set(items, oldPrevItem.id, 'parents', parentId, 'next', newNextId);
     }
     // Remove item from next item and attach prev item instead
     if (oldNextItem) {
         let newPrevId = oldPrevItem ? oldPrevItem.id : null;
-        let newParents = oldNextItem.parents.map(p =>
-            p.id === parentId ? {...p, prev: newPrevId} : p);
-        items = items.map(i =>
-            i.id === oldNextItem.id ? {...i, parents: newParents} : i);
+        items = set(items, oldNextItem.id, 'parents', parentId, 'prev', newPrevId);
     }
-    // Remove old parent from item
-    let newParents = item.parents.filter(p => p.id !== parentId);
-    items = items.map(i =>
-        i.id === item.id ? {...i, parents: newParents} : i);
     return items;
 }
 
-function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
-    // Add new parent to item
-    let item = clone(items.find(i => i.id === itemId));
-    item.parents.push({id: parentId, prev: prevItemId, next: nextItemId});
-    items = items.map(i => i.id === itemId ? item : i);
-    // Find previous item and mutate parent to point to inserted item
-    if (prevItemId) {
-        let prevItem = clone(items.find(i => i.id === prevItemId));
-        let newParents = prevItem.parents.map(p =>
-            (p.id === parentId && p.next === nextItemId) ? {...p, next: itemId} : p);
-        items = items.map(i =>
-            i.id === prevItemId ? {...i, parents: newParents} : i);
-    }
-    // Find next item and mutate parent to point to inserted item
-    if (nextItemId) {
-        let nextItem = clone(items.find(i => i.id === nextItemId));
-        let newParents = nextItem.parents.map(p =>
-            (p.id === parentId && p.prev === prevItemId) ? {...p, prev: itemId} : p);
-        items = items.map(i =>
-            i.id === nextItemId ? {...i, parents: newParents} : i);
+function removeItemFromParent(itemId, parentId, items) {
+    items = detachItemFromParent(itemId, parentId, items);
+    // Delete the item if it now has 0 parents
+    if (Object.keys(items[itemId].parents).length <= 0) {
+        delete items[itemId];
     }
     return items;
+}
+
+function set() {
+    let args = Array.prototype.slice.call(arguments);
+    // last arg is value to set
+    let value = args.pop();
+    // second to last arg is key to set the value to
+    let key = args.pop();
+    // first arg it the toplevel object to be modified
+    let newObj = Object.assign({}, args[0]);
+    let retVal = newObj;
+    for (let i = 1; i < args.length; i++) {
+        newObj[args[i]] = Object.assign({}, newObj[args[i]]);
+        newObj = newObj[args[i]];
+    }
+    newObj[key] = value;
+    return retVal;
 }
 
 function focus(state = {'parentId': null, 'itemId': null}, action) {
@@ -144,10 +137,6 @@ function dnd(state = {
         default:
             return state;
     }
-}
-
-function clone(object) {
-    return JSON.parse(JSON.stringify(object));
 }
 
 const rootReducer = combineReducers({
