@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import './List.css'
-import Item from '../Item/Item';
+import Item from '../Item';
 
 
 class List extends Component {

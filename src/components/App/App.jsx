@@ -4,7 +4,7 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
 import './App.css';
-import List from '../List/List';
+import List from '../List';
 import { createViewData, getChildrenItems } from '../../utils';
 
 

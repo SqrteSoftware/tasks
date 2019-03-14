@@ -52,3 +52,20 @@ export function getChildrenItems(parentId, items) {
     }
     return sortedChildren;
 }
+
+export function set() {
+    let args = Array.prototype.slice.call(arguments);
+    // last arg is value to set
+    let value = args.pop();
+    // second to last arg is key to set the value to
+    let key = args.pop();
+    // first arg it the toplevel object to be modified
+    let newObj = Object.assign({}, args[0]);
+    let retVal = newObj;
+    for (let i = 1; i < args.length; i++) {
+        newObj[args[i]] = Object.assign({}, newObj[args[i]]);
+        newObj = newObj[args[i]];
+    }
+    newObj[key] = value;
+    return retVal;
+}
