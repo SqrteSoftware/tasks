@@ -8,8 +8,7 @@ export function items(state = {}, action) {
         case 'UPDATE_ITEM_COMPLETE':
             return set(items, action.itemId, 'complete', action.complete);
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
-            let newItem = createItem(action.id);
-            newItem.id = action.newItemId;
+            let newItem = createItem(action.newItemId);
             items = set(items, newItem.id, newItem);
             return attachItemToParent(
                 action.newItemId,
@@ -34,6 +33,12 @@ export function items(state = {}, action) {
             return items;
         case 'REMOVE_ITEM_FROM_PARENT':
             return removeItemFromParent(action.itemId, action.parentId, state);
+        case 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS':
+            return createNewParentItem(
+                state,
+                action.newParentItemId,
+                action.newChildItemId
+            );
         default:
             return state;
     }
@@ -82,5 +87,14 @@ function removeItemFromParent(itemId, parentId, items) {
     if (Object.keys(items[itemId].parents).length <= 0) {
         delete items[itemId];
     }
+    return items;
+}
+
+function createNewParentItem(items, newParentItemId, newChildItemId) {
+    let newParentItem = createItem(newParentItemId);
+    let newChildItem = createItem(newChildItemId);
+    items = set(items, newParentItemId, newParentItem);
+    items = set(items, newChildItemId, newChildItem);
+    items = attachItemToParent(newChildItemId, newParentItemId, null, null, items);
     return items;
 }
