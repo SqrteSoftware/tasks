@@ -8,7 +8,8 @@ const mapStateToProps = (state) => {
     return {
         items: state.items,
         focus: state.focus,
-        dnd: state.dnd
+        dnd: state.dnd,
+        layouts: state.layouts
     }
 };
 

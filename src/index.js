@@ -10,7 +10,7 @@ import * as serviceWorker from './serviceWorker';
 import generateTestData from './data';
 
 
-let initialState = {items: generateTestData()};
+let initialState = generateTestData();
 
 const store = createStore(
     rootReducer,

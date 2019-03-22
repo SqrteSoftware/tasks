@@ -5,14 +5,18 @@ let itemId = 0;
 export default function generateTestData()
 {
     // Generate testing items
-    let itemStore = {};
+    let items= {};
+    let layouts={lg: []};
     let parentId = null;
     let lastItem = null;
+    let parentIndex = 0;
     for (let i = 0; i < 40; i++) {
         let item = createItem("item" + itemId++,"item value " + i);
         if (i % 5 === 0) {
             lastItem = null;
             parentId = "item" + i;
+            layouts.lg.push({i: parentId, x: parentIndex%4*3, y: Math.floor(parentIndex/4)*6, w: 3, h: 6, minW: 3, maxW: 4})
+            parentIndex++;
         } else if (lastItem === null) {
             item.parents[parentId] = {id: parentId, prev: null, next: null};
             lastItem = item;
@@ -21,8 +25,8 @@ export default function generateTestData()
             lastItem.parents[parentId].next = item.id;
             lastItem = item;
         }
-        itemStore[item.id] = item;
+        items[item.id] = item;
     }
-    console.log(itemStore);
-    return itemStore;
+    console.log(items, layouts);
+    return {items, layouts};
 }

@@ -11,18 +11,15 @@ export function createItem(id=null, value="", complete=false, parents={}) {
 
 export function createViewData(items) {
     let listData = [];
-    let index = 0;
     Object.keys(items).forEach(itemId => {
         let item = items[itemId];
         if (Object.keys(item.parents).length <= 0) {
             let parentItem = item;
             listData.push({
                 'parent': parentItem,
-                'children': getChildrenItems(parentItem.id, items),
-                'layout':  {x: index%3*4, y: 0, w: 4, h: 6, minW: 4, maxW: 4}
+                'children': getChildrenItems(parentItem.id, items)
             });
             listData.push();
-            index++;
         }
     });
     return listData;

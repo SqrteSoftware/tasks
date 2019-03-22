@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import ReactGridLayout from 'react-grid-layout';
+import {Responsive, WidthProvider} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
@@ -7,6 +7,7 @@ import './App.css';
 import List from '../List';
 import { createViewData, getChildrenItems } from '../../utils';
 
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class App extends Component {
 
@@ -27,16 +28,17 @@ class App extends Component {
         let itemIdWithFocus = this.props.focus.itemId;
         return (
             <div className="App">
-                <ReactGridLayout
+                <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
+                <ResponsiveGridLayout
                     className="layout"
-                    cols={12}
                     rowHeight={30}
-                    width={1200}
+                    breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+                    cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
+                    layouts={this.props.layouts}
                     draggableCancel=".list">
                     {
                         listData.map(item => { return (
                             <div key={item.parent.id}
-                                 data-grid={item.layout}
                                  className="App-list"
                                  style={this.props.dnd.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
@@ -58,7 +60,7 @@ class App extends Component {
                             </div>
                         )})
                     }
-                </ReactGridLayout>
+                </ResponsiveGridLayout>
             </div>
         );
     }
