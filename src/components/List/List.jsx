@@ -18,7 +18,12 @@ class List extends Component {
         return (
             <div className="listContainer">
                 <div className="listTitleContainer noDrag">
-                    <input className="listTitle" placeholder="Title" value={this.props.parent.value}/>
+                    <input
+                        className="listTitle"
+                        type="text"
+                        placeholder="Title"
+                        value={this.props.parent.value}
+                        onChange={this.onTitleChange.bind(this)}/>
                 </div>
                 <ul className="list noDrag"
                     ref={this.onRef.bind(this)}>
@@ -50,6 +55,10 @@ class List extends Component {
                 </ul>
             </div>
         );
+    }
+
+    onTitleChange(e, data) {
+        this.props.onItemChange(this.props.parent.id, e.target.value);
     }
 
     onItemChange(itemId, value) {
