@@ -17,8 +17,10 @@ class List extends Component {
 
         return (
             <div className="listContainer">
-                <h1 className="listTitle">{this.props.parent.value}</h1>
-                <ul className="list"
+                <div className="listTitleContainer noDrag">
+                    <input className="listTitle" placeholder="Title" value={this.props.parent.value}/>
+                </div>
+                <ul className="list noDrag"
                     ref={this.onRef.bind(this)}>
                     {items.map((item) =>
                         {

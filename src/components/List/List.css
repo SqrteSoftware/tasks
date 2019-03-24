@@ -9,9 +9,16 @@
     margin: 0px;
 }
 
+.listTitleContainer {
+    padding: 10px 10px 0px 10px;
+}
+
 .listTitle {
     font-size: 20px;
     text-align: left;
-    margin: 0px;
-    padding: 15px 0 0 15px;
+    border: none;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    outline: none;
 }
