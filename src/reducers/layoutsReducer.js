@@ -1,3 +1,5 @@
+import {clone} from '../utils'
+
 export function layouts(state={}, action) {
     let layouts = state;
     switch (action.type) {
@@ -10,6 +12,8 @@ export function layouts(state={}, action) {
                   {i: action.newParentItemId, x: 0, y: 0, w: 3, h: 6, minW: 3, maxW: 4}
               ]
             };
+        case 'UPDATE_ALL_LAYOUTS':
+            return clone(action.allLayouts);
         default:
             return state;
     }

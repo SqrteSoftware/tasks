@@ -35,6 +35,7 @@ class App extends Component {
                     breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                     cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
                     layouts={this.props.layouts}
+                    onLayoutChange={this.onLayoutChange.bind(this)}
                     draggableCancel=".noDrag">
                     {
                         listData.map(item => { return (
@@ -63,6 +64,10 @@ class App extends Component {
                 </ResponsiveGridLayout>
             </div>
         );
+    }
+
+    onLayoutChange(currentLayout, allLayouts) {
+        this.props.updateAllLayouts(allLayouts);
     }
 
     onItemKeyDown(itemId, parentId, event) {

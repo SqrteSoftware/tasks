@@ -66,3 +66,7 @@ export function set() {
     newObj[key] = value;
     return retVal;
 }
+
+export function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
