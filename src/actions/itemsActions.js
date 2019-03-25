@@ -33,6 +33,11 @@ export const removeItemFromParent = (itemId, parentId) => ({
     parentId
 });
 
+export const deleteItem = (itemId) => ({
+   type: 'DELETE_ITEM',
+   itemId
+});
+
 export const createNewParentItem = () => ({
     type: 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS',
     newParentItemId: "item-" + Math.floor(Math.random() * 1000000000),

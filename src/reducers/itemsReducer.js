@@ -33,6 +33,8 @@ export function items(state = {}, action) {
             return items;
         case 'REMOVE_ITEM_FROM_PARENT':
             return removeItemFromParent(action.itemId, action.parentId, state);
+        case 'DELETE_ITEM':
+            return deleteItem(action.itemId, items);
         case 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS':
             return createNewParentItem(
                 state,
@@ -87,6 +89,28 @@ function removeItemFromParent(itemId, parentId, items) {
     if (Object.keys(items[itemId].parents).length <= 0) {
         delete items[itemId];
     }
+    return items;
+}
+
+function deleteItem(itemId, items) {
+    items = {...items};
+    // If this item has any children, detach them
+    // all and delete them if they have no other parents
+    Object.keys(items).forEach(id =>{
+        let i = items[id];
+        if (i.parents.hasOwnProperty(itemId)) {
+            let newParents = {...i.parents};
+            delete newParents[itemId];
+            if (Object.keys(newParents).length > 0) {
+                items[id] = {...i, parents: newParents};
+            } else {
+                delete items[id];
+            }
+
+        }
+    });
+    // Delete the item
+    delete items[itemId];
     return items;
 }
 
