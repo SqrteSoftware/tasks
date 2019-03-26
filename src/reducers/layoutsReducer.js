@@ -1,6 +1,6 @@
 import {clone} from '../utils'
 
-export function layouts(state={}, action) {
+export function layouts(state={lg: []}, action) {
     let layouts = state;
     switch (action.type) {
         case 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS':

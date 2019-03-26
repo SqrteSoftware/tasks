@@ -2,21 +2,29 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import rootReducer from './reducers'
-import './index.css';
 
 import App from './components/App';
+import rootReducer from './reducers'
 import * as serviceWorker from './serviceWorker';
 import generateTestData from './data';
+import {
+    loadStateFromLocalStorage,
+    saveStateToLocalStorage
+} from './utils'
+
+import './index.css';
 
 
 let initialState = generateTestData();
+// let initialState = loadStateFromLocalStorage();
 
 const store = createStore(
     rootReducer,
     initialState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
+
+// store.subscribe(() => saveStateToLocalStorage(store.getState()));
 
 ReactDOM.render(
     <Provider store={store}>

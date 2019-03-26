@@ -70,3 +70,27 @@ export function set() {
 export function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
+
+export function loadStateFromLocalStorage() {
+    try {
+        let state = localStorage.getItem('appState');
+        if (state === null) {
+            return undefined;
+        }
+        return JSON.parse(state);
+    }
+    catch (e) {
+        return undefined;
+    }
+}
+
+export function saveStateToLocalStorage(state) {
+    console.log("save:",state)
+    try {
+        let serializedState = JSON.stringify(state);
+        localStorage.setItem('appState', serializedState);
+    }
+    catch (e) {
+        alert("There was an error while saving");
+    }
+}
