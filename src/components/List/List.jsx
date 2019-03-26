@@ -17,6 +17,9 @@ class List extends Component {
 
         return (
             <div className="listContainer">
+                <div className="listDelete" onClick={this.onDeleteList.bind(this)}>
+                    X
+                </div>
                 <div className="listTitleContainer noDrag">
                     <input
                         className="listTitle"
@@ -55,6 +58,10 @@ class List extends Component {
                 </ul>
             </div>
         );
+    }
+
+    onDeleteList(e) {
+        this.props.onDeleteList(this.props.parent.id);
     }
 
     onTitleChange(e, data) {

@@ -57,6 +57,7 @@ class App extends Component {
                                     onItemKeyDown={this.onItemKeyDown.bind(this)}
                                     onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
                                     onItemFocus={this.onItemFocus.bind(this)}
+                                    onDeleteList={this.props.deleteItem}
                                 />
                             </div>
                         )})
