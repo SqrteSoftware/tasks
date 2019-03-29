@@ -1,3 +1,5 @@
+import uuidv4 from 'uuid/v4'
+
 export const updateItemText = (itemId, text) => ({
     type: 'UPDATE_ITEM_TEXT',
     itemId,
@@ -12,7 +14,7 @@ export const updateItemComplete = (itemId, complete) => ({
 
 export const createNewItemWithFocus = (parentItemId, prevItemId, nextItemId) => ({
     type: 'CREATE_NEW_ITEM_WITH_FOCUS',
-    newItemId: "item-" + Math.floor(Math.random() * 1000000000),
+    newItemId: "item-" + uuidv4(),
     parentItemId,
     prevItemId,
     nextItemId
@@ -40,6 +42,6 @@ export const deleteItem = (itemId) => ({
 
 export const createNewParentItem = () => ({
     type: 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS',
-    newParentItemId: "item-" + Math.floor(Math.random() * 1000000000),
-    newChildItemId: "item-" + Math.floor(Math.random() * 1000000000),
+    newParentItemId: "item-" + uuidv4(),
+    newChildItemId: "item-" + uuidv4(),
 });
