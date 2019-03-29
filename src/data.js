@@ -2,8 +2,6 @@ import uuidv4 from 'uuid'
 
 import { createItem } from './utils';
 
-let itemId = 0;
-
 export default function generateTestData()
 {
     // Generate testing items

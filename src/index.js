@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import throttle from 'lodash/throttle'
 
 import App from './components/App';
 import rootReducer from './reducers'
@@ -15,8 +16,8 @@ import {
 import './index.css';
 
 
-let initialState = generateTestData();
-// let initialState = loadStateFromLocalStorage();
+// let initialState = generateTestData();
+let initialState = loadStateFromLocalStorage();
 
 const store = createStore(
     rootReducer,
@@ -24,7 +25,8 @@ const store = createStore(
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
-// store.subscribe(() => saveStateToLocalStorage(store.getState()));
+store.subscribe(
+    throttle(() => saveStateToLocalStorage(store.getState()) && console.log("save"), 1000));
 
 ReactDOM.render(
     <Provider store={store}>
