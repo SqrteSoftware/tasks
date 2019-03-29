@@ -85,7 +85,6 @@ export function loadStateFromLocalStorage() {
 }
 
 export function saveStateToLocalStorage(state) {
-    console.log("save:",state)
     try {
         let serializedState = JSON.stringify(state);
         localStorage.setItem('appState', serializedState);

@@ -26,7 +26,7 @@ const store = createStore(
 );
 
 store.subscribe(
-    throttle(() => saveStateToLocalStorage(store.getState()) && console.log("save"), 1000));
+    throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
 ReactDOM.render(
     <Provider store={store}>
