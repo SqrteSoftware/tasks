@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
+import logo from '../../braindump90.png'
 
 import './App.css';
 import List from '../List';
@@ -28,7 +29,10 @@ class App extends Component {
         let itemIdWithFocus = this.props.focus.itemId;
         return (
             <div className="App">
-                <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
+                <div className="sidebar">
+                    <img src={logo} width="45" height="45"/>
+                    <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
+                </div>
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}

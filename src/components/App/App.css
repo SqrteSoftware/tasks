@@ -2,6 +2,19 @@
   text-align: center;
 }
 
+.App > .sidebar {
+  position: absolute;
+  height: 100%;
+  left: 0px;
+  width: 50px;
+  border-right: 1px solid #ccc;
+  background-color: #eee;
+}
+
+.App > .layout {
+  margin-left: 50px;
+}
+
 .App-list {
   background-color: #fff;
   border: 1px solid #ccc;
