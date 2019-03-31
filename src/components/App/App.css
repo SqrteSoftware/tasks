@@ -11,6 +11,12 @@
   background-color: #eee;
 }
 
+.App > .sidebar > .logo {
+  width: 30px;
+  height: 30px;
+  padding: 10px;
+}
+
 .App > .layout {
   margin-left: 50px;
 }

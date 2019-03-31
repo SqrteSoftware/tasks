@@ -30,7 +30,7 @@ class App extends Component {
         return (
             <div className="App">
                 <div className="sidebar">
-                    <img src={logo} width="45" height="45"/>
+                    <img className="logo" src={logo}/>
                     <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
                 </div>
                 <ResponsiveGridLayout
