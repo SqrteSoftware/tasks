@@ -1,6 +1,7 @@
 .item {
     list-style-type: none;
     padding-left: 24px;
+    padding-bottom: 5px;
 }
 
 .itemHandle {
@@ -36,6 +37,7 @@
     outline: none;
     border: none;
     border-bottom: 1px solid #ccc;
+    font-size: 12px;
 }
 
 .itemInput.complete {

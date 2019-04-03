@@ -93,3 +93,23 @@ export function saveStateToLocalStorage(state) {
         alert("There was an error while saving");
     }
 }
+
+export function downloadJSON(obj, filename) {
+    // Serialize and create Blob and data URI out of data
+    let serializedItems = JSON.stringify(obj, null, 2);
+    var blob = new Blob([serializedItems], {type : 'application/json'});
+    let dataUri = URL.createObjectURL(blob);
+
+    // Create download link
+    var el = document.createElement('a');
+    el.setAttribute('href', dataUri);
+    el.setAttribute('download', filename);
+
+    // Add link to body and trigger download
+    document.body.appendChild(el);
+    el.click();
+
+    // Cleanup link and data URI
+    document.body.removeChild(el);
+    URL.revokeObjectURL(dataUri);
+}

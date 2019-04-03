@@ -17,6 +17,16 @@
   padding: 10px;
 }
 
+.App > .sidebar > .exportButton {
+  margin: 15px 0 0 0;
+  color: #bbb;
+  cursor: pointer;
+}
+
+.App > .sidebar > .exportButton:hover {
+  color: #999;
+}
+
 .App > .layout {
   margin-left: 50px;
 }

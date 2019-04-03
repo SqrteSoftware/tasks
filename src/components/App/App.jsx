@@ -2,12 +2,17 @@ import React, {Component} from 'react';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import logo from '../../braindump90.png'
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faDownload } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './App.css';
 import List from '../List';
-import { createViewData, getChildrenItems } from '../../utils';
+import { createViewData, getChildrenItems, downloadJSON } from '../../utils';
+import logo from '../../braindump90.png'
 
+library.add(faDownload);
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class App extends Component {
@@ -30,8 +35,11 @@ class App extends Component {
         return (
             <div className="App">
                 <div className="sidebar">
-                    <img className="logo" src={logo}/>
+                    <img className="logo" alt="logo" src={logo}/>
                     <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
+                    <div className="exportButton" title="Export Data" onClick={this.onExportData.bind(this)}>
+                        <FontAwesomeIcon icon="download"/>
+                    </div>
                 </div>
                 <ResponsiveGridLayout
                     className="layout"
@@ -69,6 +77,12 @@ class App extends Component {
                 </ResponsiveGridLayout>
             </div>
         );
+    }
+
+    onExportData(e) {
+        let state = {items: this.props.items, layouts: this.props.layouts};
+        let now = Date.now();
+        downloadJSON(state, 'braindump-backup-' + now + '.json');
     }
 
     onLayoutChange(currentLayout, allLayouts) {
