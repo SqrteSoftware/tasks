@@ -17,14 +17,22 @@
   padding: 10px;
 }
 
-.App > .sidebar > .exportButton {
+.App > .sidebar > .iconButton {
   margin: 15px 0 0 0;
   color: #bbb;
   cursor: pointer;
 }
 
-.App > .sidebar > .exportButton:hover {
+.App > .sidebar > .iconButton:hover {
   color: #999;
+}
+
+.App > .sidebar .importLabel {
+  cursor: pointer;
+}
+
+.App > .sidebar .importInput {
+  display: none;
 }
 
 .App > .layout {

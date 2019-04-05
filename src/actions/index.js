@@ -10,12 +10,16 @@ export * from './layoutActions'
 export const resetData = () => ({type: 'RESET_DATA'});
 window.resetData = resetData;
 
+export const loadData = ({items, layouts}) => {
+    return {
+        type: 'LOAD_DATA',
+        items,
+        layouts
+    };
+};
+
 export const loadTestData = () => {
     let testData = generateTestData();
-    return {
-        type: 'LOAD_TEST_DATA',
-        items: testData.items,
-        layouts: testData.layouts
-    };
+    return loadData(testData)
 };
 window.loadTestData = loadTestData;

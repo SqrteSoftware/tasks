@@ -15,7 +15,7 @@ const rootReducer = (state={}, action) => {
     switch (action.type) {
         case 'RESET_DATA':
             return childrenReducers(undefined, action);
-        case 'LOAD_TEST_DATA':
+        case 'LOAD_DATA':
             return {
                 ...state,
                 items: action.items,

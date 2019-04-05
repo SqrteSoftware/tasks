@@ -4,7 +4,7 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDownload } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './App.css';
@@ -12,7 +12,10 @@ import List from '../List';
 import { createViewData, getChildrenItems, downloadJSON } from '../../utils';
 import logo from '../../braindump90.png'
 
+// FontAwesome
 library.add(faDownload);
+library.add(faUpload);
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class App extends Component {
@@ -37,8 +40,14 @@ class App extends Component {
                 <div className="sidebar">
                     <img className="logo" alt="logo" src={logo}/>
                     <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
-                    <div className="exportButton" title="Export Data" onClick={this.onExportData.bind(this)}>
+                    <div className="export iconButton" title="Export Data" onClick={this.onExportData.bind(this)}>
                         <FontAwesomeIcon icon="download"/>
+                    </div>
+                    <div className="import iconButton" title="Import Data" onClick={this.onImportData.bind(this)}>
+                        <label className="importLabel">
+                            <input className="importInput" type="file" onChange={this.onImportData.bind(this)}/>
+                            <FontAwesomeIcon icon="upload"/>
+                        </label>
                     </div>
                 </div>
                 <ResponsiveGridLayout
@@ -83,6 +92,21 @@ class App extends Component {
         let state = {items: this.props.items, layouts: this.props.layouts};
         let now = Date.now();
         downloadJSON(state, 'braindump-backup-' + now + '.json');
+    }
+
+    onImportData(e) {
+        if (e.target.files && e.target.files.length > 0) {
+            let file = e.target.files[0];
+            if (file.type === "application/json") {
+                let fileReader = new FileReader();
+                fileReader.onload = e => {
+                    let data = JSON.parse(e.target.result);
+                    this.props.loadData(data);
+                };
+                fileReader.readAsText(file);
+            }
+            e.target.value = "";
+        }
     }
 
     onLayoutChange(currentLayout, allLayouts) {
