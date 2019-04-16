@@ -4,7 +4,7 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faUpload, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './App.css';
@@ -15,6 +15,7 @@ import logo from '../../braindump90.png'
 // FontAwesome
 library.add(faDownload);
 library.add(faUpload);
+library.add(faPlusSquare);
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -39,7 +40,9 @@ class App extends Component {
             <div className="App">
                 <div className="sidebar">
                     <img className="logo" alt="logo" src={logo}/>
-                    <button onClick={this.props.createNewParentItem.bind(this)}>Add</button>
+                    <div className="add iconButton" title="Add a List" onClick={this.props.createNewParentItem.bind(this)}>
+                        <FontAwesomeIcon icon="plus-square"/>
+                    </div>
                     <div className="export iconButton" title="Export Data" onClick={this.onExportData.bind(this)}>
                         <FontAwesomeIcon icon="download"/>
                     </div>
