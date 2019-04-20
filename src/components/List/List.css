@@ -30,3 +30,13 @@
     overflow: hidden;
     outline: none;
 }
+
+.history {
+    text-align: left;
+}
+
+.historyTitle {
+    font-size: 12px;
+    color: #aaa;
+    padding: 0px 10px;
+}

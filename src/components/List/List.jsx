@@ -9,6 +9,7 @@ class List extends Component {
     render() {
         let itemIdWithFocus = this.props.itemIdWithFocus;
         let items = this.props.children.slice(0);
+        let history = this.props.history;
         let overlappedItemIndex = items.findIndex(item => item.id === this.props.overlappedItemId);
         if (overlappedItemIndex >= 0) {
             if (this.props.overlappedItemPos === 'below') overlappedItemIndex++;
@@ -28,36 +29,69 @@ class List extends Component {
                         value={this.props.parent.value}
                         onChange={this.onTitleChange.bind(this)}/>
                 </div>
-                <ul className="list noDrag"
-                    ref={this.onRef.bind(this)}>
+                {this.activeItems(items, itemIdWithFocus)}
+                {this.completedItems(history)}
+            </div>
+        );
+    }
+
+    activeItems(items, itemIdWithFocus) {
+        return (
+            <ul className="list noDrag"
+                ref={this.onRef.bind(this)}>
+                {items.map((item) =>
+                    {
+                        if (item.placeholder) {
+                            return <li key={"placeholder"} style={{backgroundColor: 'lightyellow', listStyleType: 'none'}}>&nbsp;</li>
+                        }
+                        else {
+                            return (
+                                <Item
+                                    key={item.id}
+                                    item={item}
+                                    parentId={this.props.parent.id}
+                                    giveFocus={itemIdWithFocus === item.id}
+                                    onItemFocus={this.onItemFocus.bind(this)}
+                                    onDragStart={this.onItemDragStart.bind(this)}
+                                    onDrag={this.onItemDrag.bind(this)}
+                                    onDragStop={this.onItemDragStop.bind(this)}
+                                    onItemRef={this.onItemRef.bind(this)}
+                                    onChange={this.onItemChange.bind(this)}
+                                    onKeyDown={this.props.onItemKeyDown.bind(this)}
+                                    onCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                />
+                            )
+                        }
+                    }
+                )}
+            </ul>
+        )
+    }
+
+    completedItems(items) {
+        if (items.length <= 0) {
+            return null;
+        }
+        return (
+            <div className="history">
+                <span className="historyTitle">History</span>
+                <ul className="list noDrag">
                     {items.map((item) =>
                         {
-                            if (item.placeholder) {
-                                return <li key={"placeholder"} style={{backgroundColor: 'lightyellow', listStyleType: 'none'}}>&nbsp;</li>
-                            }
-                            else {
-                                return (
-                                    <Item
-                                        key={item.id}
-                                        item={item}
-                                        parentId={this.props.parent.id}
-                                        giveFocus={itemIdWithFocus === item.id}
-                                        onItemFocus={this.onItemFocus.bind(this)}
-                                        onDragStart={this.onItemDragStart.bind(this)}
-                                        onDrag={this.onItemDrag.bind(this)}
-                                        onDragStop={this.onItemDragStop.bind(this)}
-                                        onItemRef={this.onItemRef.bind(this)}
-                                        onChange={this.onItemChange.bind(this)}
-                                        onKeyDown={this.props.onItemKeyDown.bind(this)}
-                                        onCheckboxChange={this.onItemCheckboxChange.bind(this)}
-                                    />
-                                )
-                            }
+                            return (
+                                <Item
+                                    key={item.id}
+                                    item={item}
+                                    parentId={this.props.parent.id}
+                                    onItemRef={this.onItemRef.bind(this)}
+                                    onCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                />
+                            )
                         }
                     )}
                 </ul>
             </div>
-        );
+        )
     }
 
     onDeleteList(e) {

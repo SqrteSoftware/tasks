@@ -23,6 +23,7 @@ class Item extends Component {
 
         return (
             <DraggableCore
+                disabled={item.complete}
                 onDrag={this.onDrag.bind(this)}
                 onStart={this.onDragStart.bind(this)}
                 onStop={this.onDragStop.bind(this)}
@@ -30,7 +31,7 @@ class Item extends Component {
                 <li className="item"
                     ref={this.onRef.bind(this)}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
-                    <span className="itemHandle"></span>
+                    {item.complete ? '' : <span className="itemHandle"></span>}
                     <input
                         className="itemCheckbox"
                         type="checkbox"
@@ -40,6 +41,7 @@ class Item extends Component {
                         className={"itemInput" + (item.complete ? " complete" : "")}
                         ref={this.onInputRef.bind(this)}
                         type="text"
+                        disabled={item.complete}
                         value={item.value}
                         onChange={ this.onChange.bind(this)}
                         onKeyDown={this.onKeyDown.bind(this)}

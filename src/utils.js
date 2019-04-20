@@ -15,9 +15,11 @@ export function createViewData(items) {
         let item = items[itemId];
         if (Object.keys(item.parents).length <= 0) {
             let parentItem = item;
+            let children = getChildrenItems(parentItem.id, items);
             listData.push({
                 'parent': parentItem,
-                'children': getChildrenItems(parentItem.id, items)
+                'children': children.filter(i => !i.complete),
+                'history': children.filter(i => i.complete)
             });
             listData.push();
         }

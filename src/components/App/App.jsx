@@ -69,6 +69,7 @@ class App extends Component {
                                 <List
                                     parent={item.parent}
                                     children={item.children}
+                                    history={item.history}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
                                     onListRef={this.onListRef.bind(this)}
                                     onItemRef={this.onItemRef.bind(this)}
