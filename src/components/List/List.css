@@ -31,11 +31,11 @@
     outline: none;
 }
 
-.history {
+.completed {
     text-align: left;
 }
 
-.historyTitle {
+.completedTitle {
     font-size: 12px;
     color: #aaa;
     padding: 0px 10px;

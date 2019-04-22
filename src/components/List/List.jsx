@@ -73,8 +73,8 @@ class List extends Component {
             return null;
         }
         return (
-            <div className="history">
-                <span className="historyTitle">History</span>
+            <div className="completed">
+                <span className="completedTitle">Completed ({items.length})</span>
                 <ul className="list noDrag">
                     {items.map((item) =>
                         {
