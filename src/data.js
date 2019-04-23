@@ -10,10 +10,10 @@ export default function generateTestData()
     let parentId = null;
     let lastItem = null;
     let parentIndex = 0;
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 500; i++) {
         let itemId = "item-" + uuidv4();
         let item = createItem(itemId, "item value " + i);
-        if (i % 5 === 0) {
+        if (i % 25 === 0) {
             lastItem = null;
             parentId = itemId;
             layouts.lg.push({i: parentId, x: parentIndex%4*3, y: Math.floor(parentIndex/4)*6, w: 3, h: 6, minW: 3, maxW: 4})
