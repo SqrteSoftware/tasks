@@ -29,8 +29,10 @@ class List extends Component {
                         value={this.props.parent.value}
                         onChange={this.onTitleChange.bind(this)}/>
                 </div>
-                {this.activeItems(items, itemIdWithFocus)}
-                {this.completedItems(history)}
+                <div className="listContent">
+                    {this.activeItems(items, itemIdWithFocus)}
+                    {this.completedItems(history)}
+                </div>
             </div>
         );
     }

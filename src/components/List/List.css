@@ -31,6 +31,15 @@
     outline: none;
 }
 
+.listContent {
+    position: absolute;
+    top: 35px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    overflow: auto;
+}
+
 .completed {
     text-align: left;
 }
