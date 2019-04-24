@@ -21,9 +21,9 @@ class List extends Component {
                 <div className="listDelete" onClick={this.onDeleteList}>
                     X
                 </div>
-                <div className="listTitleContainer noDrag">
+                <div className="listTitleContainer">
                     <input
-                        className="listTitle"
+                        className="listTitle noDrag"
                         type="text"
                         placeholder="Title"
                         value={this.props.parent.value}
