@@ -33,7 +33,7 @@ class App extends Component {
     }
 
     render() {
-        var listData = createViewData(this.props.items);
+        let listData = createViewData(this.props.items);
         let listIdWithFocus = this.props.focus.parentId;
         let itemIdWithFocus = this.props.focus.itemId;
         return (
@@ -71,17 +71,17 @@ class App extends Component {
                                     children={item.children}
                                     history={item.history}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
-                                    onListRef={this.onListRef.bind(this)}
-                                    onItemRef={this.onItemRef.bind(this)}
-                                    onItemDragStart={this.onItemDragStart.bind(this)}
-                                    onItemDrag={this.onItemDrag.bind(this)}
-                                    onItemDragStop={this.onItemDragStop.bind(this)}
+                                    onListRef={this.onListRef}
+                                    onItemRef={this.onItemRef}
+                                    onItemDragStart={this.onItemDragStart}
+                                    onItemDrag={this.onItemDrag}
+                                    onItemDragStop={this.onItemDragStop}
                                     overlappedItemId={this.props.dnd.overlappedItemId}
                                     overlappedItemPos={this.props.dnd.overlappedItemPos}
-                                    onItemChange={this.props.updateItemText.bind(this)}
-                                    onItemKeyDown={this.onItemKeyDown.bind(this)}
-                                    onItemCheckboxChange={this.props.updateItemComplete.bind(this)}
-                                    onItemFocus={this.onItemFocus.bind(this)}
+                                    onItemChange={this.props.updateItemText}
+                                    onItemKeyDown={this.onItemKeyDown}
+                                    onItemCheckboxChange={this.props.updateItemComplete}
+                                    onItemFocus={this.onItemFocus}
                                     onDeleteList={this.props.deleteItem}
                                 />
                             </div>
@@ -92,13 +92,13 @@ class App extends Component {
         );
     }
 
-    onExportData(e) {
+    onExportData = (e) => {
         let state = {items: this.props.items, layouts: this.props.layouts};
         let now = Date.now();
         downloadJSON(state, 'braindump-backup-' + now + '.json');
-    }
+    };
 
-    onImportData(e) {
+    onImportData = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             let file = e.target.files[0];
             if (file.type === "application/json") {
@@ -111,13 +111,13 @@ class App extends Component {
             }
             e.target.value = "";
         }
-    }
+    };
 
-    onLayoutChange(currentLayout, allLayouts) {
+    onLayoutChange = (currentLayout, allLayouts) => {
         this.props.updateAllLayouts(allLayouts);
-    }
+    };
 
-    onItemKeyDown(itemId, parentId, event) {
+    onItemKeyDown = (itemId, parentId, event) => {
         if (event.key === "Enter") {
             let currentItem = this.props.items[itemId];
             let currentItemParentMeta = currentItem.parents[parentId];
@@ -134,18 +134,18 @@ class App extends Component {
                 event.preventDefault();
             }
         }
-    }
+    };
 
-    onItemFocus(itemId) {
+    onItemFocus = (itemId) => {
         // If the item was given focus through state,
         // clear the state so that focus can now shift to
         // other elements again.
         if (this.props.focus.itemId !== null) {
-            this.props.updateFocus()
+            this.props.updateFocus();
         }
-    }
+    };
 
-    onItemDragStart(itemId, parentId) {
+    onItemDragStart = (itemId, parentId) => {
         // Update the bounds of all items
         Object.keys(this.itemRefsById).forEach(itemId => {
             let itemRef = this.itemRefsById[itemId];
@@ -157,9 +157,9 @@ class App extends Component {
             this.listBoundsById[listId] = listRef.getBoundingClientRect();
         });
         this.props.updateDnd({'activeDragParentId': parentId});
-    }
+    };
 
-    onItemDrag(itemId) {
+    onItemDrag = (itemId) => {
         // Update bound of dragged item
         let itemRef = this.itemRefsById[itemId];
         let itemBound = itemRef.getBoundingClientRect();
@@ -185,9 +185,9 @@ class App extends Component {
                 'overlappedItemPos': null
             });
         }
-    }
+    };
 
-    onItemDragStop(draggedItemId, currentListId) {
+    onItemDragStop = (draggedItemId, currentListId) => {
         let overlappedItemId = this.props.dnd.overlappedItemId;
         let overlappedItemPos = this.props.dnd.overlappedItemPos;
         let overlappedListId = this.props.dnd.overlappedListId;
@@ -215,25 +215,25 @@ class App extends Component {
             'overlappedItemId': null,
             'activeDragParentId': null
         });
-    }
+    };
 
-    onItemRef(obj) {
+    onItemRef = (obj) => {
         if (obj.ref !== null) {
             this.itemRefsById[obj.id] = obj.ref;
         }
         else {
             delete this.itemRefsById[obj.id];
         }
-    }
+    };
 
-    onListRef(obj) {
+    onListRef = (obj) => {
         if (obj.ref !== null) {
             this.listRefsById[obj.id] = obj.ref;
         }
         else {
             delete this.listRefsById[obj.id];
         }
-    }
+    };
 
     findCoveredId(hoverId, hoverBound, boundsById) {
         let hoverMidX = hoverBound.x + (hoverBound.width / 2);

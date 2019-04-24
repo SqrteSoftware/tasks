@@ -18,7 +18,7 @@ class List extends Component {
 
         return (
             <div className="listContainer">
-                <div className="listDelete" onClick={this.onDeleteList.bind(this)}>
+                <div className="listDelete" onClick={this.onDeleteList}>
                     X
                 </div>
                 <div className="listTitleContainer noDrag">
@@ -27,7 +27,7 @@ class List extends Component {
                         type="text"
                         placeholder="Title"
                         value={this.props.parent.value}
-                        onChange={this.onTitleChange.bind(this)}/>
+                        onChange={this.onTitleChange}/>
                 </div>
                 <div className="listContent">
                     {this.activeItems(items, itemIdWithFocus)}
@@ -40,7 +40,7 @@ class List extends Component {
     activeItems(items, itemIdWithFocus) {
         return (
             <ul className="list noDrag"
-                ref={this.onRef.bind(this)}>
+                ref={this.onRef}>
                 {items.map((item) =>
                     {
                         if (item.placeholder) {
@@ -53,14 +53,14 @@ class List extends Component {
                                     item={item}
                                     parentId={this.props.parent.id}
                                     giveFocus={itemIdWithFocus === item.id}
-                                    onItemFocus={this.onItemFocus.bind(this)}
-                                    onDragStart={this.onItemDragStart.bind(this)}
-                                    onDrag={this.onItemDrag.bind(this)}
-                                    onDragStop={this.onItemDragStop.bind(this)}
-                                    onItemRef={this.onItemRef.bind(this)}
-                                    onChange={this.onItemChange.bind(this)}
-                                    onKeyDown={this.props.onItemKeyDown.bind(this)}
-                                    onCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                    onItemFocus={this.onItemFocus}
+                                    onDragStart={this.onItemDragStart}
+                                    onDrag={this.onItemDrag}
+                                    onDragStop={this.onItemDragStop}
+                                    onItemRef={this.onItemRef}
+                                    onChange={this.onItemChange}
+                                    onKeyDown={this.props.onItemKeyDown}
+                                    onCheckboxChange={this.onItemCheckboxChange}
                                 />
                             )
                         }
@@ -85,8 +85,8 @@ class List extends Component {
                                     key={item.id}
                                     item={item}
                                     parentId={this.props.parent.id}
-                                    onItemRef={this.onItemRef.bind(this)}
-                                    onCheckboxChange={this.onItemCheckboxChange.bind(this)}
+                                    onItemRef={this.onItemRef}
+                                    onCheckboxChange={this.onItemCheckboxChange}
                                 />
                             )
                         }
@@ -96,51 +96,51 @@ class List extends Component {
         )
     }
 
-    onDeleteList(e) {
+    onDeleteList = (e) => {
         this.props.onDeleteList(this.props.parent.id);
-    }
+    };
 
-    onTitleChange(e, data) {
+    onTitleChange = (e, data) => {
         this.props.onItemChange(this.props.parent.id, e.target.value);
-    }
+    };
 
-    onItemChange(itemId, value) {
+    onItemChange = (itemId, value) => {
         this.props.onItemChange(itemId, value);
-    }
+    };
 
-    onItemDragStart(itemId, parentId) {
+    onItemDragStart = (itemId, parentId) => {
         this.props.onItemDragStart(itemId, parentId);
-    }
+    };
 
-    onItemDrag(meta) {
+    onItemDrag = (meta) => {
         this.props.onItemDrag(meta.id);
-    }
+    };
 
-    onItemDragStop(itemId, parentId) {
+    onItemDragStop = (itemId, parentId) => {
         this.props.onItemDragStop(itemId, parentId);
-    }
+    };
 
-    onItemRef(obj) {
+    onItemRef = (obj) => {
         this.props.onItemRef(obj);
-    }
+    };
 
-    onItemCheckboxChange(itemId, value) {
+    onItemCheckboxChange = (itemId, value) => {
         this.props.onItemCheckboxChange(itemId, value);
-    }
+    };
 
-    onItemFocus(itemId) {
+    onItemFocus = (itemId) => {
         this.props.onItemFocus(itemId);
-    }
+    };
 
     // Fired when item DOM element is mounted/unmounted
-    onRef(ref) {
+    onRef = (ref) => {
         if (ref !== null) {
             this.props.onListRef({'id': this.props.parent.id, 'ref': ref});
         }
         else {
             this.props.onListRef({'id': this.props.parent.id, 'ref': null});
         }
-    }
-};
+    };
+}
 
 export default List;

@@ -1,20 +1,33 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {DraggableCore} from 'react-draggable';
 
 import './Item.css';
 
-class Item extends Component {
-
+class Item extends PureComponent {
 
     constructor(props) {
         super(props);
         this.widthOnDragStart = null;
+        this.inputRef = null;
         this.state = {
             'activeDrag': false,
             'position': {x: 0, y: 0}
         };
     }
 
+    componentDidMount() {
+        this.handleFocus();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.handleFocus();
+    }
+
+    handleFocus() {
+        if (this.inputRef !== null && this.props.giveFocus) {
+            this.inputRef.focus();
+        }
+    }
 
     render() {
         let item = this.props.item;
@@ -24,28 +37,28 @@ class Item extends Component {
         return (
             <DraggableCore
                 disabled={item.complete}
-                onDrag={this.onDrag.bind(this)}
-                onStart={this.onDragStart.bind(this)}
-                onStop={this.onDragStop.bind(this)}
+                onDrag={this.onDrag}
+                onStart={this.onDragStart}
+                onStop={this.onDragStop}
                 handle={'.itemHandle'}>
                 <li className="item"
-                    ref={this.onRef.bind(this)}
+                    ref={this.onRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     {item.complete ? '' : <span className="itemHandle"></span>}
                     <input
                         className="itemCheckbox"
                         type="checkbox"
                         checked={item.complete}
-                        onChange={this.onCheckboxChange.bind(this)}/>
+                        onChange={this.onCheckboxChange}/>
                     <input
                         className={"itemInput" + (item.complete ? " complete" : "")}
-                        ref={this.onInputRef.bind(this)}
+                        ref={ref => this.inputRef = ref}
                         type="text"
                         disabled={item.complete}
                         value={item.value}
-                        onChange={ this.onChange.bind(this)}
-                        onKeyDown={this.onKeyDown.bind(this)}
-                        onFocus={this.onInputFocus.bind(this)}/>
+                        onChange={ this.onChange}
+                        onKeyDown={this.onKeyDown}
+                        onFocus={this.onInputFocus}/>
                 </li>
             </DraggableCore>
         );
@@ -71,15 +84,15 @@ class Item extends Component {
         }
     }
 
-    onKeyDown(event) {
+    onKeyDown = (event) => {
         this.props.onKeyDown(this.props.item.id, this.props.parentId, event);
-    }
+    };
 
-    onChange(e, data) {
+    onChange = (e, data) => {
         this.props.onChange(this.props.item.id, e.target.value);
-    }
+    };
 
-    onDragStart(e, data) {
+    onDragStart = (e, data) => {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
@@ -88,48 +101,42 @@ class Item extends Component {
             // fire onDragStart only AFTER the item has re-rendered with absolute positioning
             this.props.onDragStart(this.props.item.id, this.props.parentId);
         });
-    }
+    };
 
-    onDrag(e, meta) {
+    onDrag = (e, meta) => {
         this.setState({
             'position': {x: meta.x, y: meta.y}
         }, () => {
             meta.id = this.props.item.id;
             this.props.onDrag(meta);
         });
-    }
+    };
 
-    onDragStop() {
+    onDragStop = () => {
         this.setState({
             'activeDrag': false,
             'position': {x: 0, y: 0}
         });
         this.props.onDragStop(this.props.item.id, this.props.parentId);
-    }
+    };
 
-    onCheckboxChange(event) {
+    onCheckboxChange = (event) => {
         this.props.onCheckboxChange(this.props.item.id, event.target.checked);
-    }
+    };
 
     // Fired when item DOM element is mounted/unmounted
-    onRef(ref) {
+    onRef = (ref) => {
         if (ref !== null) {
             this.props.onItemRef({'id': this.props.item.id, 'ref': ref});
         }
         else {
             this.props.onItemRef({'id': this.props.item.id, 'ref': null});
         }
-    }
+    };
 
-    onInputRef(ref) {
-        if (ref !== null && this.props.giveFocus) {
-            ref.focus();
-        }
-    }
-
-    onInputFocus() {
+    onInputFocus = () => {
         this.props.onItemFocus(this.props.item.id);
-    }
-};
+    };
+}
 
 export default Item;
