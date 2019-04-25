@@ -22,6 +22,7 @@ class List extends Component {
                     X
                 </div>
                 <div className="listTitleContainer">
+                    <span className="listTitleHandle dragHandle"></span>
                     <input
                         className="listTitle noDrag"
                         type="text"

@@ -44,7 +44,7 @@ class Item extends PureComponent {
                 <li className="item"
                     ref={this.onRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
-                    {item.complete ? '' : <span className="itemHandle"></span>}
+                    {item.complete ? '' : <span className="itemHandle dragHandle"></span>}
                     <input
                         className="itemCheckbox"
                         type="checkbox"
