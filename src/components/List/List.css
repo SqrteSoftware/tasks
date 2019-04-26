@@ -1,11 +1,12 @@
 .listContainer {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow: hidden;
 }
 
 .list {
     padding: 0;
-    padding: 10px;
+    padding: 0px 10px;
     margin: 0px;
 }
 
@@ -18,7 +19,7 @@
 }
 
 .listTitleContainer {
-    padding: 10px 30px 0px 15px;
+    padding: 10px 30px 10px 15px;
 }
 
 .listTitleContainer > .listTitleHandle {
@@ -39,12 +40,10 @@
 }
 
 .listContent {
-    position: absolute;
-    top: 35px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    flex-grow: 1;
     overflow: auto;
+    margin-bottom: 5px;
+
 }
 
 .completed {
