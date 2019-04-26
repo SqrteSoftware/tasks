@@ -2,12 +2,14 @@
     list-style-type: none;
     padding-left: 24px;
     padding-bottom: 5px;
+    touch-action: pan-y!important;
 }
 
 .item > .itemHandle {
     position: absolute;
     left: -9px;
     top: 6px;
+    touch-action: none;
 }
 
 .itemInput {
