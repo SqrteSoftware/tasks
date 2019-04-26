@@ -53,5 +53,6 @@
 .completedTitle {
     font-size: 12px;
     color: #aaa;
-    padding: 0px 10px;
+    display: inline-block;
+    padding: 10px;
 }
