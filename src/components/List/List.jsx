@@ -30,7 +30,7 @@ class List extends Component {
                         value={this.props.parent.value}
                         onChange={this.onTitleChange}/>
                 </div>
-                <div className="listContent">
+                <div className="listContent noDrag">
                     {this.activeItems(items, itemIdWithFocus)}
                     {this.completedItems(history)}
                 </div>
@@ -40,7 +40,7 @@ class List extends Component {
 
     activeItems(items, itemIdWithFocus) {
         return (
-            <ul className="list noDrag"
+            <ul className="list"
                 ref={this.onRef}>
                 {items.map((item) =>
                     {
