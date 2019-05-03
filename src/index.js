@@ -23,6 +23,26 @@ const store = createStore(
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
+function observeStore(store) {
+    let currentItems = store.getState().items;
+
+    function handleChange() {
+        let newItems = store.getState().items;
+        if (newItems !== currentItems) {
+            Object.keys(newItems).forEach(itemId => {
+               if (newItems[itemId] !== currentItems[itemId]) {
+                   console.log("ITEM CHANGED:", newItems[itemId]);
+               }
+            });
+            currentItems = newItems;
+        }
+    }
+
+    let unsubscribe = store.subscribe(handleChange);
+    return unsubscribe;
+}
+observeStore(store);
+
 ReactDOM.render(
     <Provider store={store}>
         <App />
