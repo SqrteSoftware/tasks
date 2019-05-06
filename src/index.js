@@ -23,6 +23,10 @@ const store = createStore(
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
+store.subscribe(() => {
+   console.log("sync: ", store.getState().sync)
+});
+
 ReactDOM.render(
     <Provider store={store}>
         <App />
