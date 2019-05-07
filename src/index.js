@@ -8,7 +8,7 @@ import App from './components/App';
 import rootReducer from './reducers'
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils'
-
+import {sync} from './sync';
 import './index.css';
 
 
@@ -23,8 +23,20 @@ const store = createStore(
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
-store.subscribe(() => {
-   console.log("sync: ", store.getState().sync)
+store.subscribe(throttle(() => {
+    if (navigator.onLine) {
+        sync(store.getState().sync);
+    }
+}, 1000));
+
+window.addEventListener('online', () => {
+    sync(store.getState().sync);
+});
+
+window.addEventListener('visibilitychange', () => {
+    if (navigator.onLine && !document.hidden) {
+        sync(store.getState().sync);
+    }
 });
 
 ReactDOM.render(
