@@ -2,6 +2,8 @@
 export const sync = (state={}, action, oldRootState={}, newRootState={}) => {
     let oldItem, oldItemParent;
     switch (action.type) {
+        case 'CLEAR_SYNC':
+            return {};
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             return {
                 ...state,

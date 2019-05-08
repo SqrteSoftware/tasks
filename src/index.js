@@ -25,17 +25,17 @@ store.subscribe(
 
 store.subscribe(throttle(() => {
     if (navigator.onLine) {
-        sync(store.getState().sync);
+        sync(store);
     }
 }, 1000));
 
 window.addEventListener('online', () => {
-    sync(store.getState().sync);
+    sync(store);
 });
 
 window.addEventListener('visibilitychange', () => {
     if (navigator.onLine && !document.hidden) {
-        sync(store.getState().sync);
+        sync(store);
     }
 });
 
