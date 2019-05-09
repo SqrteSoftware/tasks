@@ -1,6 +1,10 @@
 import {clearSync} from './actions/syncActions'
+import {syncItems} from './actions/itemsActions'
 
-export function sync(store) {
+
+let apiUrl = "https://u9ncjz9oza.execute-api.us-east-1.amazonaws.com/default/bdProcessItems";
+
+export function syncUp(store) {
     let changes = store.getState().sync;
     let items = store.getState().items;
     let apiKey = localStorage.getItem('apiKey');
@@ -27,8 +31,7 @@ export function sync(store) {
 
     updates.forEach((item) => {
         let wrappedItem = {Item: item};
-        let url = "https://u9ncjz9oza.execute-api.us-east-1.amazonaws.com/default/bdProcessItems";
-        fetch(url, {
+        fetch(apiUrl, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -43,8 +46,7 @@ export function sync(store) {
 
     deletions.forEach((itemId) => {
         let wrappedItem = {Key: {id: itemId}};
-        let url = "https://u9ncjz9oza.execute-api.us-east-1.amazonaws.com/default/bdProcessItems";
-        fetch(url, {
+        fetch(apiUrl, {
             method: "DELETE",
             mode: "cors",
             headers: {
@@ -55,5 +57,27 @@ export function sync(store) {
         }).then((res) => {
             console.log("DELETE:", itemId, res);
         });
+    });
+}
+
+export function syncDown(store) {
+    let apiKey = localStorage.getItem('apiKey');
+    if (apiKey === null) return;
+
+    fetch(apiUrl, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey
+        }
+    }).then((res) => {
+        return res.json();
+    }).then((json) => {
+        let items = {};
+        json.Items.forEach((item) => {
+           items[item.id] = item;
+        });
+        store.dispatch(syncItems(items));
     });
 }

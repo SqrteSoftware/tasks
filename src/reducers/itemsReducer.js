@@ -41,6 +41,8 @@ export function items(state = {}, action) {
                 action.newParentItemId,
                 action.newChildItemId
             );
+        case 'SYNC_ITEMS':
+            return {...state, ...action.items};
         default:
             return state;
     }

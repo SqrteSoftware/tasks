@@ -45,3 +45,8 @@ export const createNewParentItem = () => ({
     newParentItemId: "item-" + uuidv4(),
     newChildItemId: "item-" + uuidv4(),
 });
+
+export const syncItems = (items) => ({
+    type: 'SYNC_ITEMS',
+    items
+});
