@@ -2,6 +2,12 @@
 export const sync = (state={}, action, oldRootState={}, newRootState={}) => {
     let oldItem, oldItemParent;
     switch (action.type) {
+        case 'FORCE_SYNC':
+            let allItems = {};
+            Object.keys(newRootState.items).forEach(itemId => {
+                allItems[itemId] = 'UPDATED';
+            });
+            return allItems;
         case 'CLEAR_SYNC':
             return {};
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
