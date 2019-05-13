@@ -34,21 +34,29 @@ export function getChildrenItems(parentId, items) {
            children.push(items[itemId]);
        }
     });
-    let firstChild = children.find(item => {
+    let childIndex = children.findIndex(item => {
         return item.parents[parentId].prev === null;
     });
+    let child = children[childIndex];
     let sortedChildren = [];
-    let child = firstChild;
     let parent;
     const matchNextItem = item => item.id === parent.next;
-    while (child) {
+    while (child && childIndex >= 0) {
+        // Remove child from children list
+        children.splice(childIndex, 1);
+        // Add child to sorted children list
         sortedChildren.push(child);
+        // Should we exit?
         parent = child.parents[parentId];
         if (!parent || parent.next === null) {
             break;
         }
-        child = children.find(matchNextItem);
+        // Get the next child
+        childIndex = children.findIndex(matchNextItem);
+        child = children[childIndex];
     }
+    // Append any leftover children we couldn't sort
+    sortedChildren = sortedChildren.concat(children);
     return sortedChildren;
 }
 
