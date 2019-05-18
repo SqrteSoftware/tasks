@@ -50,3 +50,7 @@ export const syncItems = (items) => ({
     type: 'SYNC_ITEMS',
     items
 });
+
+export const repairItemLinks = () => ({
+    type: 'REPAIR_ITEM_LINKS'
+});

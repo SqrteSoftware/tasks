@@ -42,7 +42,9 @@ export function items(state = {}, action) {
                 action.newChildItemId
             );
         case 'SYNC_ITEMS':
-            return {...state, ...action.items};
+            return mergeItems(state, action.items);
+        case 'REPAIR_ITEM_LINKS':
+            return repairItemLinks(state);
         default:
             return state;
     }
@@ -122,5 +124,119 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
     items = set(items, newParentItemId, newParentItem);
     items = set(items, newChildItemId, newChildItem);
     items = attachItemToParent(newChildItemId, newParentItemId, null, null, items);
+    return items;
+}
+
+function mergeItems(currentItems, incomingItems) {
+    let newItems = currentItems;
+    let incomingItem, parent;
+    Object.keys(incomingItems).forEach(incomingItemId => {
+        incomingItem = incomingItems[incomingItemId];
+        Object.keys(incomingItem.parents).forEach(parentId => {
+            parent = incomingItem.parents[parentId];
+            let prevItem = currentItems[parent.prev];
+            let nextItem = currentItems[parent.next];
+            let prevItemId = prevItem ? prevItem.id : null;
+            let nextItemId = nextItem ? nextItem.id : null;
+            let prevNextId = prevItem ? prevItem.parents[parentId].next : null;
+            let nextPrevId = nextItem ? nextItem.parents[parentId].prev : null;
+
+            if (prevItemId === null) {
+                let currentFirstItemId = Object.keys(currentItems).find(id => {
+                    let item = currentItems[id];
+                    return item.parents[parentId] && item.parents[parentId].prev === null
+                });
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, prevItemId, currentFirstItemId, newItems);
+            }
+            else if (nextItemId === null) {
+                let currentLastItemId = Object.keys(currentItems).find(id => {
+                    let item = currentItems[id];
+                    return item.parents[parentId] && item.parents[parentId].next === null
+                });
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, currentLastItemId, nextItemId, newItems);
+            }
+            else if (prevNextId === nextItemId && nextPrevId === prevItemId) {
+                // Item needs to be inserted between two already connected items
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, prevItem.id, nextItem.id, newItems);
+            }
+            else if (prevNextId === incomingItemId && nextPrevId === incomingItemId) {
+                // Both prevNextId and nextPrevId are already pointing at the incoming item.
+                // Just insert the item directly into the list to update its other values.
+                newItems = set(newItems, incomingItemId, incomingItem);
+            }
+            else if (prevNextId === incomingItemId) {
+                // Insert incoming item between prev and prev's next.
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, prevItem.id, prevItem.next, newItems);
+            }
+            else if (nextPrevId === incomingItemId) {
+                // Insert incoming item between next and next's prev.
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, nextItem.id, nextItem.prev, newItems);
+            }
+            else {
+                // The prev/next items are not connected to each other and are not
+                // already connected in any way to the incoming item. Since the incoming
+                // item claims relation to both, we must pick which to associate it with.
+                // By convention, we will insert the incoming item between prev and prev's next.
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, prevItem.id, prevItem.next, newItems);
+            }
+
+        });
+    });
+    return newItems;
+}
+
+function repairItemLinks(items) {
+    items = {...items};
+    let itemsByParent = {};
+
+    Object.keys(items).forEach(itemId => {
+        let item = items[itemId];
+        if (Object.keys(item.parents).length <= 0) {
+            if (itemsByParent[item.id]) {
+                itemsByParent[item.id].parent = item;
+            }
+            else {
+                itemsByParent[item.id] = {
+                    'parent': item,
+                    'children': []
+                };
+            }
+        }
+        else {
+            Object.keys(item.parents).forEach(parentItemId => {
+                if (itemsByParent[parentItemId]) {
+                    itemsByParent[parentItemId].children.push(item);
+                }
+                else {
+                    itemsByParent[parentItemId] = {
+                        'parent': null,
+                        'children': [item]
+                    };
+                }
+            })
+        }
+    });
+
+    Object.keys(itemsByParent).forEach(parentId => {
+        let lastChild = null;
+        itemsByParent[parentId].children.forEach(child => {
+            if (lastChild) {
+                child.parents[parentId].prev = lastChild.id;
+                lastChild.parents[parentId].next = child.id;
+            }
+            else {
+                child.parents[parentId].prev = null;
+            }
+            child.parents[parentId].next = null;
+            lastChild = child;
+        });
+    });
+
     return items;
 }
