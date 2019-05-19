@@ -155,8 +155,9 @@ function mergeItems(currentItems, incomingItems) {
                 newItems = detachItemFromParent(incomingItemId, parentId, newItems);
             }
 
+            // SCENARIO: Incoming item specifies null prev peer.
+            // ACTION: Make incoming item new FIRST item in list.
             if (incomingItemParent.prev === null) {
-                // Attach incoming item as first item in list
                 let currentFirstItemId = Object.keys(newItems).find(id => {
                     let item = newItems[id];
                     return item.parents[parentId] && item.parents[parentId].prev === null
@@ -164,9 +165,12 @@ function mergeItems(currentItems, incomingItems) {
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, null, currentFirstItemId, newItems);
+                return;
             }
-            else if (incomingItemParent.next === null) {
-                // Attach incoming item as last item in list
+
+            // SCENARIO: Incoming item specifies null next peer.
+            // ACTION: Make incoming item new LAST item in list.
+            if (incomingItemParent.next === null) {
                 let currentLastItemId = Object.keys(newItems).find(id => {
                     let item = newItems[id];
                     return item.parents[parentId] && item.parents[parentId].next === null
@@ -174,9 +178,12 @@ function mergeItems(currentItems, incomingItems) {
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, currentLastItemId, null, newItems);
+                return;
             }
-            else if (incomingItemPrev === undefined && incomingItemNext === undefined) {
-                // None of the peers exist yet in the list. Attach item arbitrarily to top.
+
+            // SCENARIO: Incoming item specifies non-null peers that don't exist in list yet
+            // ACTION: Make incoming item the arbitrarily FIRST item in list.
+            if (incomingItemPrev === undefined && incomingItemNext === undefined) {
                 let currentFirstItemId = Object.keys(newItems).find(id => {
                     let item = newItems[id];
                     return item.parents[parentId] && item.parents[parentId].prev === null
@@ -184,42 +191,56 @@ function mergeItems(currentItems, incomingItems) {
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, null, currentFirstItemId, newItems);
+                return;
             }
-            else if (incomingItemPrev === undefined) {
-                // Only next peer exists. Insert between next peer and its adjacent peer.
+
+            // SCENARIO: Incoming item specifies non-null peers but only the next peer exists.
+            // ACTION: Insert incoming item between its next peer and next's prev.
+            if (incomingItemPrev === undefined) {
                 let nextPrevId = incomingItemNext.parents[parentId].prev;
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
-                    incomingItemId, parentId, nextPrevId, incomingItemNext, newItems);
+                    incomingItemId, parentId, nextPrevId, incomingItemNext.id, newItems);
+                return;
             }
-            else if (incomingItemNext === undefined) {
+
+            // SCENARIO: Incoming item specifies non-null peers but only the prev peer exists.
+            // ACTION: Insert incoming item between its prev peer and prev's next.
+            if (incomingItemNext === undefined) {
                 // Only prev peers exists. Insert between prev peer and its adjacent peer.
                 let prevNextId = incomingItemPrev.parents[parentId].next;
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
+                return;
             }
-            else if (incomingItemPrev.parents[parentId].next === incomingItem.id &&
+
+            // SCENARIO: Incoming item already exists between its existing peers.
+            // ACTION: Simply reattach incoming item and update in place.
+            if (incomingItemPrev.parents[parentId].next === incomingItem.id &&
                      incomingItemNext.parents[parentId].prev === incomingItem.id) {
-                // Incoming item already exists between its peers. Update in place and reattach.
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, incomingItemParent.prev, incomingItemParent.next, newItems);
+                return;
             }
-            else if (incomingItemPrev.parents[parentId].next === incomingItemNext.id &&
+
+            // SCENARIO: Incoming item both exist and are adjacent
+            // ACTION: Insert incoming item in between peers.
+            if (incomingItemPrev.parents[parentId].next === incomingItemNext.id &&
                      incomingItemNext.parents[parentId].prev === incomingItemPrev.id) {
-                // Incoming item peers are adjacent. Insert incoming item between.
                 newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
                     incomingItemId, parentId, incomingItemPrev.id, incomingItemNext.id, newItems);
+                return;
             }
-            else {
-                // Both peers exist, but are not adjacent. Arbitrarily attach incoming item to prev and its next.
-                let prevNextId = incomingItemPrev.parents[parentId].next;
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
-            }
+
+            // SCENARIO: Both peers exist, but are not adjacent.
+            // ACTION: Arbitrarily insert incoming item between prev and prev's next.
+            let prevNextId = incomingItemPrev.parents[parentId].next;
+            newItems = set(newItems, incomingItemId, incomingItem);
+            newItems = attachItemToParent(
+                incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
         });
     });
     return newItems;
