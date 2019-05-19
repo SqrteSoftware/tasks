@@ -52,7 +52,11 @@ export function items(state = {}, action) {
 
 function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
     // Add new parent to item
-    let newParent = {id: parentId, prev: prevItemId, next: nextItemId};
+    let newParent = {
+        id: parentId ? parentId : null,
+        prev: prevItemId ? prevItemId : null,
+        next: nextItemId ? nextItemId : null
+    };
     items = set(items, itemId, 'parents', parentId, newParent);
     // Find previous item and mutate parent to point to inserted item
     if (prevItemId) {
@@ -129,63 +133,93 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
 
 function mergeItems(currentItems, incomingItems) {
     let newItems = currentItems;
-    let incomingItem, parent;
+    let incomingItem, incomingItemParent, incomingItemParentIds;
     Object.keys(incomingItems).forEach(incomingItemId => {
         incomingItem = incomingItems[incomingItemId];
-        Object.keys(incomingItem.parents).forEach(parentId => {
-            parent = incomingItem.parents[parentId];
-            let prevItem = currentItems[parent.prev];
-            let nextItem = currentItems[parent.next];
-            let prevItemId = prevItem ? prevItem.id : null;
-            let nextItemId = nextItem ? nextItem.id : null;
-            let prevNextId = prevItem ? prevItem.parents[parentId].next : null;
-            let nextPrevId = nextItem ? nextItem.parents[parentId].prev : null;
+        incomingItemParentIds = Object.keys(incomingItem.parents);
 
-            if (prevItemId === null) {
-                let currentFirstItemId = Object.keys(currentItems).find(id => {
-                    let item = currentItems[id];
+        if (incomingItemParentIds.length <= 0) {
+            // Root items have no references and need no further processing
+            newItems = set(newItems, incomingItemId, incomingItem);
+            return;
+        }
+
+        incomingItemParentIds.forEach(parentId => {
+            incomingItemParent = incomingItem.parents[parentId];
+            let incomingItemPrev = newItems[incomingItemParent.prev];
+            let incomingItemNext = newItems[incomingItemParent.next];
+
+            if (newItems[incomingItemId] !== undefined) {
+                // The incoming item already exists in the current list.
+                // Detach it from the current parent list so it can move around.
+                newItems = detachItemFromParent(incomingItemId, parentId, newItems);
+            }
+
+            if (incomingItemParent.prev === null) {
+                // Attach incoming item as first item in list
+                let currentFirstItemId = Object.keys(newItems).find(id => {
+                    let item = newItems[id];
                     return item.parents[parentId] && item.parents[parentId].prev === null
                 });
+                newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
-                    incomingItemId, parentId, prevItemId, currentFirstItemId, newItems);
+                    incomingItemId, parentId, null, currentFirstItemId, newItems);
             }
-            else if (nextItemId === null) {
-                let currentLastItemId = Object.keys(currentItems).find(id => {
-                    let item = currentItems[id];
+            else if (incomingItemParent.next === null) {
+                // Attach incoming item as last item in list
+                let currentLastItemId = Object.keys(newItems).find(id => {
+                    let item = newItems[id];
                     return item.parents[parentId] && item.parents[parentId].next === null
                 });
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, currentLastItemId, nextItemId, newItems);
-            }
-            else if (prevNextId === nextItemId && nextPrevId === prevItemId) {
-                // Item needs to be inserted between two already connected items
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, prevItem.id, nextItem.id, newItems);
-            }
-            else if (prevNextId === incomingItemId && nextPrevId === incomingItemId) {
-                // Both prevNextId and nextPrevId are already pointing at the incoming item.
-                // Just insert the item directly into the list to update its other values.
                 newItems = set(newItems, incomingItemId, incomingItem);
-            }
-            else if (prevNextId === incomingItemId) {
-                // Insert incoming item between prev and prev's next.
                 newItems = attachItemToParent(
-                    incomingItemId, parentId, prevItem.id, prevItem.next, newItems);
+                    incomingItemId, parentId, currentLastItemId, null, newItems);
             }
-            else if (nextPrevId === incomingItemId) {
-                // Insert incoming item between next and next's prev.
+            else if (incomingItemPrev === undefined && incomingItemNext === undefined) {
+                // None of the peers exist yet in the list. Attach item arbitrarily to top.
+                let currentFirstItemId = Object.keys(newItems).find(id => {
+                    let item = newItems[id];
+                    return item.parents[parentId] && item.parents[parentId].prev === null
+                });
+                newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
-                    incomingItemId, parentId, nextItem.id, nextItem.prev, newItems);
+                    incomingItemId, parentId, null, currentFirstItemId, newItems);
+            }
+            else if (incomingItemPrev === undefined) {
+                // Only next peer exists. Insert between next peer and its adjacent peer.
+                let nextPrevId = incomingItemNext.parents[parentId].prev;
+                newItems = set(newItems, incomingItemId, incomingItem);
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, nextPrevId, incomingItemNext, newItems);
+            }
+            else if (incomingItemNext === undefined) {
+                // Only prev peers exists. Insert between prev peer and its adjacent peer.
+                let prevNextId = incomingItemPrev.parents[parentId].next;
+                newItems = set(newItems, incomingItemId, incomingItem);
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
+            }
+            else if (incomingItemPrev.parents[parentId].next === incomingItem.id &&
+                     incomingItemNext.parents[parentId].prev === incomingItem.id) {
+                // Incoming item already exists between its peers. Update in place and reattach.
+                newItems = set(newItems, incomingItemId, incomingItem);
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, incomingItemParent.prev, incomingItemParent.next, newItems);
+            }
+            else if (incomingItemPrev.parents[parentId].next === incomingItemNext.id &&
+                     incomingItemNext.parents[parentId].prev === incomingItemPrev.id) {
+                // Incoming item peers are adjacent. Insert incoming item between.
+                newItems = set(newItems, incomingItemId, incomingItem);
+                newItems = attachItemToParent(
+                    incomingItemId, parentId, incomingItemPrev.id, incomingItemNext.id, newItems);
             }
             else {
-                // The prev/next items are not connected to each other and are not
-                // already connected in any way to the incoming item. Since the incoming
-                // item claims relation to both, we must pick which to associate it with.
-                // By convention, we will insert the incoming item between prev and prev's next.
+                // Both peers exist, but are not adjacent. Arbitrarily attach incoming item to prev and its next.
+                let prevNextId = incomingItemPrev.parents[parentId].next;
+                newItems = set(newItems, incomingItemId, incomingItem);
                 newItems = attachItemToParent(
-                    incomingItemId, parentId, prevItem.id, prevItem.next, newItems);
+                    incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
             }
-
         });
     });
     return newItems;

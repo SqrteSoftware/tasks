@@ -66,7 +66,7 @@ export function set() {
     let value = args.pop();
     // second to last arg is key to set the value to
     let key = args.pop();
-    // first arg it the toplevel object to be modified
+    // first arg is the toplevel object to be modified
     let newObj = Object.assign({}, args[0]);
     let retVal = newObj;
     for (let i = 1; i < args.length; i++) {
