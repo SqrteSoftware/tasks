@@ -144,7 +144,13 @@ function mergeItems(currentItems, incomingItems) {
             return;
         }
 
-        // Item does not exist. Add to top of list(s).
+        if (Object.keys(incomingItem.parents).length <= 0) {
+            // Item does not exist and is a parent. Can be added verbatim.
+            newItems = set(newItems, incomingItemId, incomingItem);
+            return;
+        }
+
+        // Item does not exist, and is a child. Add to top of list(s).
         Object.keys(incomingItem.parents).forEach(parentId => {
             let currentFirstItemId = Object.keys(newItems).find(id => {
                 let item = newItems[id];
