@@ -133,114 +133,25 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
 
 function mergeItems(currentItems, incomingItems) {
     let newItems = currentItems;
-    let incomingItem, incomingItemParent, incomingItemParentIds;
+    let incomingItem;
     Object.keys(incomingItems).forEach(incomingItemId => {
         incomingItem = incomingItems[incomingItemId];
-        incomingItemParentIds = Object.keys(incomingItem.parents);
-
-        if (incomingItemParentIds.length <= 0) {
-            // Root items have no references and need no further processing
-            newItems = set(newItems, incomingItemId, incomingItem);
+        debugger;
+        if (newItems[incomingItemId]) {
+            // Item already exists. Just leave it where it is adn update its values.
+            newItems = set(newItems, incomingItemId, 'value', incomingItem.value);
+            newItems = set(newItems, incomingItemId, 'complete', incomingItem.complete);
             return;
         }
 
-        incomingItemParentIds.forEach(parentId => {
-            incomingItemParent = incomingItem.parents[parentId];
-            let incomingItemPrev = newItems[incomingItemParent.prev];
-            let incomingItemNext = newItems[incomingItemParent.next];
-
-            if (newItems[incomingItemId] !== undefined) {
-                // The incoming item already exists in the current list.
-                // Detach it from the current parent list so it can move around.
-                newItems = detachItemFromParent(incomingItemId, parentId, newItems);
-            }
-
-            // SCENARIO: Incoming item specifies null prev peer.
-            // ACTION: Make incoming item new FIRST item in list.
-            if (incomingItemParent.prev === null) {
-                let currentFirstItemId = Object.keys(newItems).find(id => {
-                    let item = newItems[id];
-                    return item.parents[parentId] && item.parents[parentId].prev === null
-                });
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, null, currentFirstItemId, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item specifies null next peer.
-            // ACTION: Make incoming item new LAST item in list.
-            if (incomingItemParent.next === null) {
-                let currentLastItemId = Object.keys(newItems).find(id => {
-                    let item = newItems[id];
-                    return item.parents[parentId] && item.parents[parentId].next === null
-                });
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, currentLastItemId, null, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item specifies non-null peers that don't exist in list yet
-            // ACTION: Make incoming item the arbitrarily FIRST item in list.
-            if (incomingItemPrev === undefined && incomingItemNext === undefined) {
-                let currentFirstItemId = Object.keys(newItems).find(id => {
-                    let item = newItems[id];
-                    return item.parents[parentId] && item.parents[parentId].prev === null
-                });
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, null, currentFirstItemId, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item specifies non-null peers but only the next peer exists.
-            // ACTION: Insert incoming item between its next peer and next's prev.
-            if (incomingItemPrev === undefined) {
-                let nextPrevId = incomingItemNext.parents[parentId].prev;
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, nextPrevId, incomingItemNext.id, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item specifies non-null peers but only the prev peer exists.
-            // ACTION: Insert incoming item between its prev peer and prev's next.
-            if (incomingItemNext === undefined) {
-                // Only prev peers exists. Insert between prev peer and its adjacent peer.
-                let prevNextId = incomingItemPrev.parents[parentId].next;
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item already exists between its existing peers.
-            // ACTION: Simply reattach incoming item and update in place.
-            if (incomingItemPrev.parents[parentId].next === incomingItem.id &&
-                     incomingItemNext.parents[parentId].prev === incomingItem.id) {
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, incomingItemParent.prev, incomingItemParent.next, newItems);
-                return;
-            }
-
-            // SCENARIO: Incoming item both exist and are adjacent
-            // ACTION: Insert incoming item in between peers.
-            if (incomingItemPrev.parents[parentId].next === incomingItemNext.id &&
-                     incomingItemNext.parents[parentId].prev === incomingItemPrev.id) {
-                newItems = set(newItems, incomingItemId, incomingItem);
-                newItems = attachItemToParent(
-                    incomingItemId, parentId, incomingItemPrev.id, incomingItemNext.id, newItems);
-                return;
-            }
-
-            // SCENARIO: Both peers exist, but are not adjacent.
-            // ACTION: Arbitrarily insert incoming item between prev and prev's next.
-            let prevNextId = incomingItemPrev.parents[parentId].next;
+        // Item does not exist. Add to top of list(s).
+        Object.keys(incomingItem.parents).forEach(parentId => {
+            let currentFirstItemId = Object.keys(newItems).find(id => {
+                let item = newItems[id];
+                return item.parents[parentId] && item.parents[parentId].prev === null
+            });
             newItems = set(newItems, incomingItemId, incomingItem);
-            newItems = attachItemToParent(
-                incomingItemId, parentId, incomingItemPrev.id, prevNextId, newItems);
+            newItems = attachItemToParent(incomingItemId, parentId, null, currentFirstItemId, newItems);
         });
     });
     return newItems;
