@@ -136,7 +136,6 @@ function mergeItems(currentItems, incomingItems) {
     let incomingItem;
     Object.keys(incomingItems).forEach(incomingItemId => {
         incomingItem = incomingItems[incomingItemId];
-        debugger;
         if (newItems[incomingItemId]) {
             // Item already exists. Just leave it where it is adn update its values.
             newItems = set(newItems, incomingItemId, 'value', incomingItem.value);
