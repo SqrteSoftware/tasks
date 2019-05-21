@@ -74,9 +74,9 @@ export function syncDown(store) {
     }).then((res) => {
         return res.json();
     }).then((json) => {
-        let items = {};
+        let items = [];
         json.Items.forEach((item) => {
-           items[item.id] = item;
+           items.push(item);
         });
         store.dispatch(syncItems(items));
     });

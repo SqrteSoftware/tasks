@@ -131,35 +131,107 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
     return items;
 }
 
+// The following merging algorithm assumes that the lists
+// we're merging items into have referential integrity. Each
+// merge operation must also yield a list with the same integrity.
+// Incoming data is not trusted as it may not be intact referentially.
+// We do our best to place it. If a good placement can't be found,
+// we place the incoming item at the top of the list by default.
 function mergeItems(currentItems, incomingItems) {
-    let newItems = currentItems;
-    let incomingItem;
-    Object.keys(incomingItems).forEach(incomingItemId => {
-        incomingItem = incomingItems[incomingItemId];
-        if (newItems[incomingItemId]) {
-            // Item already exists. Just leave it where it is adn update its values.
-            newItems = set(newItems, incomingItemId, 'value', incomingItem.value);
-            newItems = set(newItems, incomingItemId, 'complete', incomingItem.complete);
-            return;
-        }
+    let modifiedItems = currentItems;
 
-        if (Object.keys(incomingItem.parents).length <= 0) {
-            // Item does not exist and is a parent. Can be added verbatim.
-            newItems = set(newItems, incomingItemId, incomingItem);
-            return;
-        }
+    let parents = incomingItems.filter(i => Object.keys(i.parents).length <= 0);
+    parents.forEach(incomingParent => {
+        // Root items can be added verbatim since they have no references to maintain
+        modifiedItems = set(modifiedItems, incomingParent.id, incomingParent);
 
-        // Item does not exist, and is a child. Add to top of list(s).
-        Object.keys(incomingItem.parents).forEach(parentId => {
-            let currentFirstItemId = Object.keys(newItems).find(id => {
-                let item = newItems[id];
-                return item.parents[parentId] && item.parents[parentId].prev === null
+        // Now handle root's children
+        getSortedChildren(incomingParent.id, incomingItems).forEach(incomingItem => {
+            // If item exists in list, it must be detached before being moved
+            if (modifiedItems[incomingItem.id]) {
+                modifiedItems = detachItemFromParent(incomingItem.id, incomingParent.id, modifiedItems);
+            }
+
+            let incomingItemNextId = incomingItem.parents[incomingParent.id].next;
+            let incomingItemPrevId = incomingItem.parents[incomingParent.id].prev;
+            let incomingItemPrev = modifiedItems[incomingItemPrevId];
+
+            // If incoming item's prev is null, attach as first item in list
+            if (incomingItemPrevId === null) {
+                let currentFirstItemId = Object.keys(modifiedItems).find(id => {
+                    let item = modifiedItems[id];
+                    return item.parents[incomingParent.id] && item.parents[incomingParent.id].prev === null
+                });
+                modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+                modifiedItems = attachItemToParent(incomingItem.id, incomingParent.id, null, currentFirstItemId, modifiedItems);
+                return;
+            }
+
+            // If incoming item's next is null, attach as last item in list
+            if (incomingItemNextId === null) {
+                let currentLastItemId = Object.keys(modifiedItems).find(id => {
+                    let item = modifiedItems[id];
+                    return item.parents[incomingParent.id] && item.parents[incomingParent.id].next === null
+                });
+                modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+                modifiedItems = attachItemToParent(incomingItem.id, incomingParent.id, currentLastItemId, null, modifiedItems);
+                return;
+            }
+
+            // If incoming item's prev exists, attach item between prev and prev's next
+            if (incomingItemPrev) {
+                let incomingItemPrevNextId = incomingItemPrev.parents[incomingParent.id].next;
+                modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+                modifiedItems = attachItemToParent(incomingItem.id, incomingParent.id, incomingItemPrevId, incomingItemPrevNextId, modifiedItems);
+                return;
+            }
+
+            // We failed to find a sane placement for the incoming item.
+            // Just place it at the top of the list.
+            let currentFirstItemId = Object.keys(modifiedItems).find(id => {
+                let item = modifiedItems[id];
+                return item.parents[incomingParent.id] && item.parents[incomingParent.id].prev === null
             });
-            newItems = set(newItems, incomingItemId, incomingItem);
-            newItems = attachItemToParent(incomingItemId, parentId, null, currentFirstItemId, newItems);
+            modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+            modifiedItems = attachItemToParent(incomingItem.id, incomingParent.id, null, currentFirstItemId, modifiedItems);
         });
+
     });
-    return newItems;
+
+    return modifiedItems;
+}
+
+function getSortedChildren(parentId, items) {
+    let sortedChildren = [];
+
+    let children = items.filter(i => i.parents && i.parents[parentId]);
+    let childrenHash = {};
+    children.forEach(i => childrenHash[i.id] = i);
+    let firstItems = children.filter(i => !childrenHash[i.parents[parentId].prev]);
+
+    let nextChildId;
+    let findChild = i => i.id === nextChildId;
+    firstItems.forEach(item => {
+        let child = item;
+        let childIndex = children.findIndex(i => i.id === child.id);
+        while (true) {
+            sortedChildren.push(child);
+            // Remove processed child from list
+            children.splice(childIndex, 1);
+            // Proceed to the next child
+            nextChildId = child.parents[parentId].next;
+            if (nextChildId === null) break;
+            // Find next child
+            childIndex = children.findIndex(findChild);
+            if (childIndex < 0) break;
+            child = children[childIndex]
+        }
+    });
+    // There may be children left that we could not sort.
+    // Add them to the end of the list.
+    sortedChildren = sortedChildren.concat(children);
+    
+    return sortedChildren;
 }
 
 function repairItemLinks(items) {
