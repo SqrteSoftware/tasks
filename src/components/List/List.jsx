@@ -98,7 +98,11 @@ class List extends Component {
     }
 
     onDeleteList = (e) => {
-        this.props.onDeleteList(this.props.parent.id);
+        let msg = "Are you sure you want to delete? This cannot be undone!";
+        let confirmed = window.confirm(msg);
+        if (confirmed) {
+            this.props.onDeleteList(this.props.parent.id);
+        }
     };
 
     onTitleChange = (e, data) => {
