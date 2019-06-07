@@ -76,8 +76,8 @@ class App extends Component {
                                     onItemDragStart={this.onItemDragStart}
                                     onItemDrag={this.onItemDrag}
                                     onItemDragStop={this.onItemDragStop}
-                                    overlappedItemId={this.props.dnd.overlappedItemId}
-                                    overlappedItemPos={this.props.dnd.overlappedItemPos}
+                                    nearestItemId={this.props.dnd.nearestItemId}
+                                    nearestItemPos={this.props.dnd.nearestItemPos}
                                     onItemChange={this.props.updateItemText}
                                     onItemKeyDown={this.onItemKeyDown}
                                     onItemCheckboxChange={this.props.updateItemComplete}
@@ -157,6 +157,8 @@ class App extends Component {
             this.listBoundsById[listId] = listRef.getBoundingClientRect();
         });
         this.props.updateDnd({'activeDragParentId': parentId});
+
+        this.setNearestItem(itemId);
     };
 
     onItemDrag = (itemId) => {
@@ -165,38 +167,53 @@ class App extends Component {
         let itemBound = itemRef.getBoundingClientRect();
         this.itemBoundsById[itemId] = itemBound;
 
+        this.setNearestItem(itemId);
+    };
+
+    setNearestItem = (itemId) => {
+        let itemRef = this.itemRefsById[itemId];
+        let itemBound = itemRef.getBoundingClientRect();
+
         // Find the currently overlapped list if any
-        let overlappedListId = this.findCoveredId(itemId, itemBound, this.listBoundsById);
+        let overlappedListId = this.findOverlappedBoundId(itemId, itemBound, this.listBoundsById);
         if (this.props.dnd.overlappedListId !== overlappedListId) {
             this.props.updateDnd({'overlappedListId': overlappedListId});
         }
 
         if (overlappedListId) {
             let listItems = getChildrenItems(overlappedListId, this.props.items);
+            this.updateItemBounds(listItems);
             let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
             this.props.updateDnd({
-                'overlappedItemId': nearestItem.id,
-                'overlappedItemPos': nearestItem.position
+                'nearestItemId': nearestItem.id,
+                'nearestItemPos': nearestItem.position
             });
         }
         else {
             this.props.updateDnd({
-                'overlappedItemId': null,
-                'overlappedItemPos': null
+                'nearestItemId': null,
+                'nearestItemPos': null
             });
         }
     };
 
+    updateItemBounds(items) {
+        items.forEach(item => {
+            let itemRef = this.itemRefsById[item.id];
+            this.itemBoundsById[item.id] = itemRef.getBoundingClientRect();
+        });
+    }
+
     onItemDragStop = (draggedItemId, currentListId) => {
-        let overlappedItemId = this.props.dnd.overlappedItemId;
-        let overlappedItemPos = this.props.dnd.overlappedItemPos;
+        let nearestItemId = this.props.dnd.nearestItemId;
+        let nearestItemPos = this.props.dnd.nearestItemPos;
         let overlappedListId = this.props.dnd.overlappedListId;
-        if (overlappedItemId) {
+        if (nearestItemId) {
             // Find the dragged item's new prev and next
-            let overlappedItem = this.props.items[overlappedItemId];
-            let overlappedItemParent = overlappedItem.parents[overlappedListId];
-            let draggedItemNewPrev = overlappedItemPos === 'above' ? overlappedItemParent.prev : overlappedItemId;
-            let draggedItemNewNext = overlappedItemPos === 'above' ? overlappedItemId : overlappedItemParent.next;
+            let nearestItem = this.props.items[nearestItemId];
+            let nearestItemParent = nearestItem.parents[overlappedListId];
+            let draggedItemNewPrev = nearestItemPos === 'above' ? nearestItemParent.prev : nearestItemId;
+            let draggedItemNewNext = nearestItemPos === 'above' ? nearestItemId : nearestItemParent.next;
             // Only insert dragged item into new position if the dragged item is
             // NOT the same as the new next or new prev item. If it is the same,
             // then we're dropping the item into the same place it was in.
@@ -212,7 +229,7 @@ class App extends Component {
             }
         }
         this.props.updateDnd({
-            'overlappedItemId': null,
+            'nearestItemId': null,
             'activeDragParentId': null
         });
     };
@@ -235,7 +252,7 @@ class App extends Component {
         }
     };
 
-    findCoveredId(hoverId, hoverBound, boundsById) {
+    findOverlappedBoundId(hoverId, hoverBound, boundsById) {
         let hoverMidX = hoverBound.x + (hoverBound.width / 2);
         let hoverMidY = hoverBound.y + (hoverBound.height / 2);
         let coveredId = null;
@@ -266,7 +283,7 @@ class App extends Component {
                 || currentLeastDistance === null) {
                 currentLeastDistance = Math.abs(draggedMidY - itemMidY);
                 nearestItem.id = itemId;
-                nearestItem.position = draggedMidY < itemMidY ? 'above' : 'below';
+                nearestItem.position = draggedMidY <= itemMidY ? 'above' : 'below';
             }
         });
         return nearestItem;

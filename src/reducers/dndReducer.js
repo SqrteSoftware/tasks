@@ -1,8 +1,8 @@
 export function dnd(state = {
     'activeDragParentId': null,
     'overlappedListId': null,
-    'overlappedItemId': null,
-    'overlappedItemPos': null
+    'nearestItemId': null,
+    'nearestItemPos': null
 }, action) {
     switch (action.type) {
         case 'UPDATE_DND':

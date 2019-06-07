@@ -72,6 +72,7 @@ function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
 function detachItemFromParent(itemId, parentId, items) {
     let item = items[itemId];
     let itemParent = item.parents[parentId];
+    if (itemParent === undefined) return;
     let oldPrevItem = items[itemParent.prev];
     let oldNextItem = items[itemParent.next];
     // Remove parent from item

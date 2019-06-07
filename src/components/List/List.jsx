@@ -10,10 +10,10 @@ class List extends Component {
         let itemIdWithFocus = this.props.itemIdWithFocus;
         let items = this.props.children.slice(0);
         let history = this.props.history;
-        let overlappedItemIndex = items.findIndex(item => item.id === this.props.overlappedItemId);
-        if (overlappedItemIndex >= 0) {
-            if (this.props.overlappedItemPos === 'below') overlappedItemIndex++;
-            items.splice(overlappedItemIndex, 0, {'placeholder': true});
+        let nearestItemIndex = items.findIndex(item => item.id === this.props.nearestItemId);
+        if (nearestItemIndex >= 0) {
+            if (this.props.nearestItemPos === 'below') nearestItemIndex++;
+            items.splice(nearestItemIndex, 0, {'placeholder': true});
         }
 
         return (
@@ -45,7 +45,7 @@ class List extends Component {
                 {items.map((item) =>
                     {
                         if (item.placeholder) {
-                            return <li key={"placeholder"} style={{backgroundColor: 'lightyellow', listStyleType: 'none'}}>&nbsp;</li>
+                            return <li key={"placeholder"} style={{height: 24, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
                         }
                         else {
                             return (

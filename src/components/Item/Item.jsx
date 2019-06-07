@@ -93,22 +93,27 @@ class Item extends PureComponent {
     };
 
     onDragStart = (e, data) => {
+        // Propagate event BEFORE re-rendering item with absolute positioning
+        this.props.onDragStart(this.props.item.id, this.props.parentId);
+        // Save current width
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
             'position': {x: data.node.offsetLeft, y: data.node.offsetTop}
         }, () => {
-            // fire onDragStart only AFTER the item has re-rendered with absolute positioning
-            this.props.onDragStart(this.props.item.id, this.props.parentId);
+            if (this.props.onAfterDragStart) {
+                // fire onAfterDragStart only AFTER the item has re-rendered with absolute positioning
+                this.props.onAfterDragStart(this.props.item.id, this.props.parentId);
+            }
         });
     };
 
-    onDrag = (e, meta) => {
+    onDrag = (e, data) => {
         this.setState({
-            'position': {x: meta.x, y: meta.y}
+            'position': {x: data.x, y: data.y}
         }, () => {
-            meta.id = this.props.item.id;
-            this.props.onDrag(meta);
+            data.id = this.props.item.id;
+            this.props.onDrag(data);
         });
     };
 

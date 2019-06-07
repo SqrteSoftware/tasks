@@ -1,14 +1,14 @@
 export const updateDnd = ({
                               activeDragParentId = undefined,
                               overlappedListId = undefined,
-                              overlappedItemId = undefined,
-                              overlappedItemPos = undefined
+                              nearestItemId = undefined,
+                              nearestItemPos = undefined
                           }) => {
     let values = Object.assign({},
         activeDragParentId !== undefined && {activeDragParentId},
         overlappedListId !== undefined && {overlappedListId},
-        overlappedItemId !== undefined && {overlappedItemId},
-        overlappedItemPos !== undefined && {overlappedItemPos},
+        nearestItemId !== undefined && {nearestItemId},
+        nearestItemPos !== undefined && {nearestItemPos},
     );
     return {
         type: 'UPDATE_DND',
