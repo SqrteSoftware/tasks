@@ -149,8 +149,11 @@ function mergeItems(currentItems, incomingItems) {
         // Now handle root's children
         getSortedChildren(incomingParent.id, incomingItems).forEach(incomingItem => {
             // If item exists in list, it must be detached before being moved
-            if (modifiedItems[incomingItem.id]) {
-                modifiedItems = detachItemFromParent(incomingItem.id, incomingParent.id, modifiedItems);
+            let existingItem = modifiedItems[incomingItem.id];
+            if (existingItem) {
+                Object.keys(existingItem.parents).forEach(parentId => {
+                    modifiedItems = detachItemFromParent(incomingItem.id, parentId, modifiedItems);
+                });
             }
 
             let incomingItemNextId = incomingItem.parents[incomingParent.id].next;
