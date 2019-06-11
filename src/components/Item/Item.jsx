@@ -9,6 +9,7 @@ class Item extends PureComponent {
         super(props);
         this.widthOnDragStart = null;
         this.inputRef = null;
+        this.itemMiddle = 0;
         this.state = {
             'activeDrag': false,
             'position': {x: 0, y: 0}
@@ -42,7 +43,7 @@ class Item extends PureComponent {
                 onStop={this.onDragStop}
                 handle={'.itemHandle'}>
                 <li className="item"
-                    ref={this.onRef}
+                    ref={this.onItemRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     {item.complete ? '' : <span className="itemHandle dragHandle"></span>}
                     <input
@@ -99,7 +100,7 @@ class Item extends PureComponent {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
-            'position': {x: data.x, y: data.y}
+            'position': {x: data.x, y: data.y - this.itemMiddle}
         }, () => {
             if (this.props.onAfterDragStart) {
                 // fire onAfterDragStart only AFTER the item has re-rendered with absolute positioning
@@ -110,7 +111,7 @@ class Item extends PureComponent {
 
     onDrag = (e, data) => {
         this.setState({
-            'position': {x: data.x, y: data.y}
+            'position': {x: data.x, y: data.y - this.itemMiddle}
         }, () => {
             data.id = this.props.item.id;
             this.props.onDrag(data);
@@ -130,13 +131,9 @@ class Item extends PureComponent {
     };
 
     // Fired when item DOM element is mounted/unmounted
-    onRef = (ref) => {
-        if (ref !== null) {
-            this.props.onItemRef({'id': this.props.item.id, 'ref': ref});
-        }
-        else {
-            this.props.onItemRef({'id': this.props.item.id, 'ref': null});
-        }
+    onItemRef = (ref) => {
+        this.props.onItemRef({'id': this.props.item.id, 'ref': ref});
+        this.itemMiddle = ref === null ? this.itemHeight : (ref.offsetHeight / 2) - 2;
     };
 
     onInputFocus = () => {
