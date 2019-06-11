@@ -9,13 +9,13 @@ export function syncUp(store) {
     let items = store.getState().items;
     let apiKey = localStorage.getItem('apiKey');
 
+    // Being overly optimistic here!
+    store.dispatch(clearSync());
+
     if (!changes || Object.keys(changes).length <= 0 || apiKey === null) {
         console.log("No changes, skipping sync...")
         return;
     }
-
-    // Being overly optimistic here!
-    store.dispatch(clearSync());
 
     let updates = [];
     let deletions = [];
