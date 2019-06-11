@@ -99,7 +99,7 @@ class Item extends PureComponent {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
-            'position': {x: data.node.offsetLeft, y: data.node.offsetTop}
+            'position': {x: data.x, y: data.y}
         }, () => {
             if (this.props.onAfterDragStart) {
                 // fire onAfterDragStart only AFTER the item has re-rendered with absolute positioning
