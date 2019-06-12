@@ -9,11 +9,15 @@ export function syncUp(store) {
     let items = store.getState().items;
     let apiKey = localStorage.getItem('apiKey');
 
-    // Being overly optimistic here!
-    store.dispatch(clearSync());
+    if (!changes || Object.keys(changes).length <= 0) {
+        console.log("No changes, skipping sync...");
+        return;
+    }
 
-    if (!changes || Object.keys(changes).length <= 0 || apiKey === null) {
-        console.log("No changes, skipping sync...")
+    if (apiKey === null) {
+        // Being overly optimistic here!
+        console.log("No API Key, skipping sync...")
+        store.dispatch(clearSync());
         return;
     }
 
