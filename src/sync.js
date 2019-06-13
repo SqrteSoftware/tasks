@@ -14,10 +14,12 @@ export function syncUp(store) {
         return;
     }
 
+    // Being overly optimistic here! Calling this will cause syncUp to
+    // be invoked again, but without changes so it will exit immediately.
+    store.dispatch(clearSync());
+
     if (apiKey === null) {
-        // Being overly optimistic here!
-        console.log("No API Key, skipping sync...")
-        store.dispatch(clearSync());
+        console.log("No API Key, skipping sync...");
         return;
     }
 
