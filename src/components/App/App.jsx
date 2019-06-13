@@ -71,6 +71,7 @@ class App extends Component {
                                     children={item.children}
                                     history={item.history}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
+                                    freezeScroll={this.shouldFreezeListScroll(item.parent.id)}
                                     onListRef={this.onListRef}
                                     onItemRef={this.onItemRef}
                                     onItemDragStart={this.onItemDragStart}
@@ -91,6 +92,13 @@ class App extends Component {
             </div>
         );
     }
+
+    shouldFreezeListScroll = (listId) => {
+        // Freeze list scrolling when a list's item that is currently
+        // being dragged is not over its parent list.
+        return this.props.dnd.activeDragParentId === listId &&
+            this.props.dnd.activeDragParentId !== this.props.dnd.overlappedListId;
+    };
 
     onExportData = (e) => {
         let state = {items: this.props.items, layouts: this.props.layouts};

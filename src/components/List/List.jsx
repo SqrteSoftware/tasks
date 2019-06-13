@@ -15,7 +15,6 @@ class List extends Component {
             if (this.props.nearestItemPos === 'below') nearestItemIndex++;
             items.splice(nearestItemIndex, 0, {'placeholder': true});
         }
-
         return (
             <div className="listContainer">
                 <div className="listDelete" onClick={this.onDeleteList}>
@@ -30,7 +29,7 @@ class List extends Component {
                         value={this.props.parent.value}
                         onChange={this.onTitleChange}/>
                 </div>
-                <div className="listContent noDrag">
+                <div className="listContent noDrag" style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
                     {this.activeItems(items, itemIdWithFocus)}
                     {this.completedItems(history)}
                 </div>
