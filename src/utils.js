@@ -28,6 +28,7 @@ export function createViewData(items) {
 }
 
 export function getChildrenItems(parentId, items) {
+    if (!parentId) return [];
     let children = [];
     Object.keys(items).forEach(itemId => {
        if (items[itemId].parents[parentId]) {
