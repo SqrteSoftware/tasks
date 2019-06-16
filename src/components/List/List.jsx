@@ -111,8 +111,10 @@ class List extends Component {
 
     onTitleKeyDown = (e) => {
         if (e.key === "Enter") {
-            let childId = this.props.children[0] ? this.props.children[0].id : null;
-            this.props.createNewItemWithFocus(this.props.parent.id, null, childId);
+            let firstChild = this.props.children[0];
+            let nextId = firstChild ? firstChild.id : null;
+            let prevId = firstChild ? firstChild.parents[this.props.parent.id].prev : null;
+            this.props.createNewItemWithFocus(this.props.parent.id, prevId, nextId);
         }
     };
 
