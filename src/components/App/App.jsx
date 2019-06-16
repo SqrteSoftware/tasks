@@ -84,6 +84,7 @@ class App extends Component {
                                     onItemCheckboxChange={this.props.updateItemComplete}
                                     onItemFocus={this.onItemFocus}
                                     onDeleteList={this.props.deleteItem}
+                                    createNewItemWithFocus={this.props.createNewItemWithFocus}
                                 />
                             </div>
                         )})

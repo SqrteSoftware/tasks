@@ -27,7 +27,8 @@ class List extends Component {
                         type="text"
                         placeholder="Title"
                         value={this.props.parent.value}
-                        onChange={this.onTitleChange}/>
+                        onChange={this.onTitleChange}
+                        onKeyDown={this.onTitleKeyDown}/>
                 </div>
                 <div className="listContent noDrag" style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
                     {this.activeItems(items, itemIdWithFocus)}
@@ -106,6 +107,13 @@ class List extends Component {
 
     onTitleChange = (e, data) => {
         this.props.onItemChange(this.props.parent.id, e.target.value);
+    };
+
+    onTitleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            let childId = this.props.children[0] ? this.props.children[0].id : null;
+            this.props.createNewItemWithFocus(this.props.parent.id, null, childId);
+        }
     };
 
     onItemChange = (itemId, value) => {
