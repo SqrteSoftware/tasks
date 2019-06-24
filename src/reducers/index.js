@@ -1,24 +1,14 @@
-import {combineReducers} from "redux";
 import {items} from "./itemsReducer";
 import {focus} from "./focusReducer";
 import {dnd} from "./dndReducer";
 import {layouts} from "./layoutsReducer";
 import {sync} from "./syncReducer";
 
-const childrenReducers = combineReducers({
-    items,
-    focus,
-    dnd,
-    layouts
-});
 
 const rootReducer = (state={}, action) => {
     switch (action.type) {
         case 'RESET_DATA':
-            return {
-                ...childrenReducers(undefined, action),
-                sync: sync(undefined, action)
-            };
+            return customCombine(undefined, action);
         case 'LOAD_DATA':
             return {
                 ...state,
@@ -26,13 +16,19 @@ const rootReducer = (state={}, action) => {
                 layouts: action.layouts
             };
         default:
-            let newState = childrenReducers(state, action);
-            return {
-                ...newState,
-                sync: sync(state.sync, action, state, newState)
-            }
-
+            return customCombine(state, action);
     }
 };
+
+function customCombine(state={}, action) {
+    let newState = {
+        items: items(state.items, action),
+        focus: focus(state.focus, action),
+        dnd: dnd(state.dnd, action),
+        layouts: layouts(state.layouts, action)
+    };
+    newState["sync"] = sync(state.sync, action, state, newState);
+    return newState;
+}
 
 export default rootReducer;
