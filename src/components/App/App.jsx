@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './App.css';
 import List from '../List';
-import { createViewData, getChildrenItems, downloadJSON } from '../../utils';
+import { createViewData, getSortedListItems, downloadJSON } from '../../utils';
 import logo from '../../braindump90.png'
 
 // FontAwesome
@@ -167,7 +167,7 @@ class App extends Component {
         });
 
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
-        let listItems = getChildrenItems(overlappedListId, this.props.items);
+        let listItems = getSortedListItems(overlappedListId, this.props.items);
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
         this.props.updateDnd({
             'activeDragParentId': parentId,
@@ -185,7 +185,7 @@ class App extends Component {
 
         // Update bounds of items for currently overlapped list
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
-        let listItems = getChildrenItems(overlappedListId, this.props.items);
+        let listItems = getSortedListItems(overlappedListId, this.props.items);
         this.updateItemBounds(listItems);
 
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
