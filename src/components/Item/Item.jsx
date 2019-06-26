@@ -37,7 +37,7 @@ class Item extends PureComponent {
 
         return (
             <DraggableCore
-                disabled={item.complete}
+                disabled={!!item.complete}
                 onDrag={this.onDrag}
                 onStart={this.onDragStart}
                 onStop={this.onDragStop}

@@ -1,6 +1,6 @@
 
 
-export function createItem(id=null, value="", complete=false, parents={}) {
+export function createItem(id=null, value="", complete=null, parents={}) {
     return {
         id,
         value,
@@ -19,7 +19,7 @@ export function createViewData(items) {
             listData.push({
                 'parent': parentItem,
                 'children': children.filter(i => !i.complete),
-                'history': children.filter(i => i.complete)
+                'history': children.filter(i => i.complete).sort((a, b) => b.complete - a.complete)
             });
             listData.push();
         }

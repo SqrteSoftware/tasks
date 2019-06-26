@@ -6,10 +6,10 @@ export const updateItemText = (itemId, text) => ({
     text
 });
 
-export const updateItemComplete = (itemId, complete) => ({
+export const updateItemComplete = (itemId, complete, ts = Date.now()) => ({
     type: 'UPDATE_ITEM_COMPLETE',
     itemId,
-    complete
+    complete: complete ? ts : null
 });
 
 export const createNewItemWithFocus = (parentItemId, prevItemId, nextItemId) => ({
