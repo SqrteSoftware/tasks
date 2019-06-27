@@ -1,4 +1,4 @@
-import {createItem, set} from "../utils";
+import {createItem, getFirstItemInList, set} from "../utils";
 
 export function items(state = {}, action) {
     let items = state;
@@ -6,6 +6,11 @@ export function items(state = {}, action) {
         case 'UPDATE_ITEM_TEXT':
             return set(items, action.itemId, 'value', action.text);
         case 'UPDATE_ITEM_COMPLETE':
+            if (action.complete === null) {
+                Object.keys(items[action.itemId].parents).forEach(parentId => {
+                    items = moveItemToTop(action.itemId, parentId, items);
+                });
+            }
             return set(items, action.itemId, 'complete', action.complete);
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             let newItem = createItem(action.newItemId);
@@ -48,6 +53,25 @@ export function items(state = {}, action) {
         default:
             return state;
     }
+}
+
+function moveItemToTop(itemId, parentId, items) {
+    let item = items[itemId];
+    if (item.parents[parentId].prev === null) return items;
+    items = detachItemFromParent(
+        itemId,
+        parentId,
+        items
+    );
+    let firstItem = getFirstItemInList(parentId, items);
+    items = attachItemToParent(
+        itemId,
+        parentId,
+        null,
+        firstItem.id,
+        items
+    );
+    return items;
 }
 
 function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {

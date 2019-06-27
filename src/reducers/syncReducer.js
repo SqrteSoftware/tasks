@@ -26,7 +26,21 @@ export const sync = (state={}, action, oldRootState={}, newRootState={}) => {
         case 'UPDATE_ITEM_TEXT':
             return {...state, [action.itemId]: 'UPDATED'};
         case 'UPDATE_ITEM_COMPLETE':
-            return {...state, [action.itemId]: 'UPDATED'};
+            let oldItem = oldRootState.items[action.itemId];
+            let newItem = newRootState.items[action.itemId];
+            let newState = {...state, [action.itemId]: 'UPDATED'};
+            if (oldItem.complete) {
+                Object.keys(oldItem.parents).forEach(parentId => {
+                    let parent = oldItem.parents[parentId];
+                    if (parent.prev) newState[parent.prev] = 'UPDATED';
+                    if (parent.next) newState[parent.next] = 'UPDATED';
+                });
+                Object.keys(newItem.parents).forEach(parentId => {
+                    let parent = newItem.parents[parentId];
+                    if (parent.next) newState[parent.next] = 'UPDATED';
+                });
+            }
+            return newState;
         case 'MOVE_ITEM':
             oldItem = oldRootState.items[action.itemId];
             oldItemParent = oldItem.parents[action.oldParentId];

@@ -39,9 +39,11 @@ export function getItemsInList(parentId, items) {
 }
 
 export function getFirstItemInList(parentId, items) {
-    return items.findIndex(item => {
-        return item.parents[parentId].prev === null;
+    let firstItemId = Object.keys(items).find(itemId => {
+        let item = items[itemId];
+        return item.parents[parentId] && item.parents[parentId].prev === null;
     });
+    return items[firstItemId];
 }
 
 export function getSortedListItems(parentId, items) {
