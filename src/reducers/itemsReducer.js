@@ -11,7 +11,9 @@ export function items(state = {}, action) {
                     items = moveItemToTop(action.itemId, parentId, items);
                 });
             }
-            return set(items, action.itemId, 'complete', action.complete);
+            items = set(items, action.itemId, 'complete', action.complete);
+            items = set(items, action.itemId, 'completeDate', action.completeDate);
+            return items;
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             let newItem = createItem(action.newItemId);
             items = set(items, newItem.id, newItem);
