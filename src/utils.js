@@ -1,10 +1,11 @@
 
 
-export function createItem(id=null, value="", complete=null, parents={}) {
+export function createItem(id=null, value="", complete=false, completeDate=new Date().toISOString(), parents={}) {
     return {
         id,
         value,
         complete,
+        completeDate: complete ? completeDate : null,
         parents
     };
 }
@@ -19,12 +20,23 @@ export function createViewData(items) {
             listData.push({
                 'parent': parentItem,
                 'children': children.filter(i => !i.complete),
-                'history': children.filter(i => i.complete).sort((a, b) => b.complete - a.complete)
+                'history': children.filter(i => i.complete)
+                    .sort((a, b) => compareDates(a.completeDate, b.completeDate))
             });
             listData.push();
         }
     });
     return listData;
+}
+
+function compareDates(date1, date2) {
+    if (!date1) return 1;
+    if (!date2) return -1;
+
+    if (date1 > date2) return -1;
+    if (date1 < date2) return 1;
+
+    return 0;
 }
 
 export function getItemsInList(parentId, items) {

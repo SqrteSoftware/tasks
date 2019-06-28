@@ -6,10 +6,11 @@ export const updateItemText = (itemId, text) => ({
     text
 });
 
-export const updateItemComplete = (itemId, complete, ts = Date.now()) => ({
+export const updateItemComplete = (itemId, complete, completeDate = new Date().toISOString()) => ({
     type: 'UPDATE_ITEM_COMPLETE',
     itemId,
-    complete: complete ? ts : null
+    complete,
+    completeDate: complete ? completeDate : null
 });
 
 export const createNewItemWithFocus = (parentItemId, prevItemId, nextItemId) => ({

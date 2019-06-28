@@ -6,7 +6,7 @@ export function items(state = {}, action) {
         case 'UPDATE_ITEM_TEXT':
             return set(items, action.itemId, 'value', action.text);
         case 'UPDATE_ITEM_COMPLETE':
-            if (action.complete === null) {
+            if (!action.complete) {
                 Object.keys(items[action.itemId].parents).forEach(parentId => {
                     items = moveItemToTop(action.itemId, parentId, items);
                 });
