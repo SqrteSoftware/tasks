@@ -133,14 +133,26 @@ class App extends Component {
             this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
         }
         else if (event.key === "Backspace" && event.target.value === "") {
-            let currentItem = this.props.items[itemId];
-            let currentItemParentMeta = currentItem.parents[parentId];
-            this.props.removeItemFromParent(itemId, parentId);
-            if (currentItemParentMeta.prev !== null) {
-                this.props.updateFocus(parentId, currentItemParentMeta.prev);
-                // If we don't prevent default action here, the cursor will
-                // move up to the next item and delete the last character there.
-                event.preventDefault();
+            let activeChildren = [];
+            Object.keys(this.props.items).forEach(otherItemId => {
+                let item = this.props.items[otherItemId];
+                if (item.complete) return;
+                if (otherItemId === itemId) return;
+                if (!item.parents) return;
+                if (!item.parents[parentId]) return;
+                activeChildren.push(item);
+            });
+            // Only remove the item if it's NOT the last active item in the list
+            if (activeChildren.length > 0) {
+                let currentItem = this.props.items[itemId];
+                let currentItemParentMeta = currentItem.parents[parentId];
+                this.props.removeItemFromParent(itemId, parentId);
+                if (currentItemParentMeta.prev !== null) {
+                    this.props.updateFocus(parentId, currentItemParentMeta.prev);
+                    // If we don't prevent default action here, the cursor will
+                    // move up to the next item and delete the last character there.
+                    event.preventDefault();
+                }
             }
         }
     };
