@@ -39,36 +39,46 @@ class List extends Component {
     }
 
     activeItems(items, itemIdWithFocus) {
-        return (
-            <ul className="list"
-                ref={this.onRef}>
-                {items.map((item) =>
-                    {
-                        if (item.placeholder) {
-                            return <li key={"placeholder"} style={{height: 24, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
+        if (items.length > 0) {
+            return (
+                <ul className="list"
+                    ref={this.onRef}>
+                    {items.map((item) =>
+                        {
+                            if (item.placeholder) {
+                                return <li key={"placeholder"} style={{height: 24, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
+                            }
+                            else {
+                                return (
+                                    <Item
+                                        key={item.id}
+                                        item={item}
+                                        parentId={this.props.parent.id}
+                                        giveFocus={itemIdWithFocus === item.id}
+                                        onItemFocus={this.onItemFocus}
+                                        onDragStart={this.onItemDragStart}
+                                        onDrag={this.onItemDrag}
+                                        onDragStop={this.onItemDragStop}
+                                        onItemRef={this.onItemRef}
+                                        onChange={this.onItemChange}
+                                        onKeyDown={this.props.onItemKeyDown}
+                                        onCheckboxChange={this.onItemCheckboxChange}
+                                    />
+                                )
+                            }
                         }
-                        else {
-                            return (
-                                <Item
-                                    key={item.id}
-                                    item={item}
-                                    parentId={this.props.parent.id}
-                                    giveFocus={itemIdWithFocus === item.id}
-                                    onItemFocus={this.onItemFocus}
-                                    onDragStart={this.onItemDragStart}
-                                    onDrag={this.onItemDrag}
-                                    onDragStop={this.onItemDragStop}
-                                    onItemRef={this.onItemRef}
-                                    onChange={this.onItemChange}
-                                    onKeyDown={this.props.onItemKeyDown}
-                                    onCheckboxChange={this.onItemCheckboxChange}
-                                />
-                            )
-                        }
-                    }
-                )}
-            </ul>
-        )
+                    )}
+                </ul>
+            )
+        }
+        else {
+            return (
+                <span className="listEmptyNotice">
+                    Click list title and press enter to insert item
+                </span>
+            )
+
+        }
     }
 
     completedItems(items) {

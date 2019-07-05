@@ -45,6 +45,15 @@
     margin-bottom: 5px;
 }
 
+.listEmptyNotice {
+    color: #ccc;
+    text-align: center;
+    display: inline-block;
+    font-size: 12px;
+    width: 100%;
+    padding: 10px 0;
+}
+
 .completed {
     text-align: left;
 }
