@@ -86,7 +86,17 @@ class Item extends PureComponent {
     }
 
     onKeyDown = (event) => {
-        this.props.onKeyDown(this.props.item.id, this.props.parentId, event);
+        let cursorPosition = event.target.selectionStart;
+        let inputValue = event.target.value;
+        let keyPressed = event.key;
+        this.props.onKeyDown(
+            this.props.item.id,
+            this.props.parentId,
+            keyPressed,
+            inputValue,
+            cursorPosition,
+            event
+        );
     };
 
     onChange = (e, data) => {

@@ -126,13 +126,21 @@ class App extends Component {
         this.props.updateAllLayouts(allLayouts);
     };
 
-    onItemKeyDown = (itemId, parentId, event) => {
-        if (event.key === "Enter") {
+    onItemKeyDown = (itemId, parentId, keyPressed, itemValue, cursorPosition, event) => {
+        if (keyPressed === "Enter") {
+
             let currentItem = this.props.items[itemId];
             let currentItemParentMeta = currentItem.parents[parentId];
-            this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
+            if (cursorPosition > 0 || itemValue.length === 0) {
+                // Insert new item AFTER current item
+                this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
+            }
+            else {
+                // Insert new item BEFORE current item
+                this.props.createNewItemWithFocus(parentId, currentItemParentMeta.prev, itemId);
+            }
         }
-        else if (event.key === "Backspace" && event.target.value === "") {
+        else if (keyPressed === "Backspace" && itemValue === "") {
             let currentItem = this.props.items[itemId];
             let currentItemParentMeta = currentItem.parents[parentId];
             this.props.removeItemFromParent(itemId, parentId);
