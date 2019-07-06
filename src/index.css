@@ -14,22 +14,13 @@ code {
 }
 
 .dragHandle {
-  content: '....';
-  width: 10px;
-  height: 20px;
-  display: inline-block;
-  overflow: hidden;
-  line-height: 5px;
-  padding: 3px 4px;
-  cursor: move;
-  vertical-align: middle;
-  margin-top: -.7em;
-  margin-right: .3em;
   font-size: 18px;
-  font-family: sans-serif;
-  letter-spacing: -1px;
-  color: #cccccc;
+  color: #dedede;
+  cursor: move;
 }
-.dragHandle::after {
-  content: '.. .. ..';
+
+@media (min-width: 576px) and (orientation: landscape) {
+  .dragHandle {
+    font-size: 16px;
+  }
 }

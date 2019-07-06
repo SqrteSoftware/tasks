@@ -1,7 +1,15 @@
 import React, {PureComponent} from 'react';
 import {DraggableCore} from 'react-draggable';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import './Item.css';
+
+
+// FontAwesome
+library.add(faGripVertical);
 
 class Item extends PureComponent {
 
@@ -45,7 +53,7 @@ class Item extends PureComponent {
                 <li className="item"
                     ref={this.onItemRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
-                    {item.complete ? '' : <span className="itemHandle dragHandle"></span>}
+                    {item.complete ? '' : <FontAwesomeIcon icon="grip-vertical" className="dragHandle itemHandle"></FontAwesomeIcon>}
                     <input
                         className="itemCheckbox"
                         type="checkbox"
@@ -142,8 +150,9 @@ class Item extends PureComponent {
 
     // Fired when item DOM element is mounted/unmounted
     onItemRef = (ref) => {
-        this.props.onItemRef({'id': this.props.item.id, 'ref': ref});
-        this.itemMiddle = ref === null ? this.itemHeight : (ref.offsetHeight / 2) - 2;
+        let totalHeight = ref ? ref.offsetHeight : 0;
+        this.props.onItemRef({'id': this.props.item.id, totalHeight, 'ref': ref});
+        this.itemMiddle = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
     };
 
     onInputFocus = () => {

@@ -1,10 +1,21 @@
 import React, {Component} from 'react';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './List.css'
 import Item from '../Item';
 
 
+// FontAwesome
+library.add(faGripVertical);
+
 class List extends Component {
+
+    constructor(props) {
+        super(props);
+        this.itemPlaceholderHeight = 0;
+    }
 
     render() {
         let itemIdWithFocus = this.props.itemIdWithFocus;
@@ -21,7 +32,7 @@ class List extends Component {
                     X
                 </div>
                 <div className="listTitleContainer">
-                    <span className="listTitleHandle dragHandle"></span>
+                    <FontAwesomeIcon icon="grip-vertical" className="listTitleHandle dragHandle"></FontAwesomeIcon>
                     <input
                         className="listTitle noDrag"
                         type="text"
@@ -46,7 +57,7 @@ class List extends Component {
                     {items.map((item) =>
                         {
                             if (item.placeholder) {
-                                return <li key={"placeholder"} style={{height: 24, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
+                                return <li key={"placeholder"} style={{height: this.itemPlaceholderHeight, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
                             }
                             else {
                                 return (
@@ -145,6 +156,7 @@ class List extends Component {
     };
 
     onItemRef = (obj) => {
+        this.itemPlaceholderHeight = obj.totalHeight;
         this.props.onItemRef(obj);
     };
 

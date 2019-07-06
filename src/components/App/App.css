@@ -50,32 +50,25 @@
   border-radius: 5px;
 }
 
-@media (orientation: landscape) {
+@media (min-width: 576px) and (orientation: landscape) {
   .App {
     text-align: center;
   }
 
   .App > .sidebar {
-    position: fixed;
     height: 100%;
-    left: 0px;
     width: 50px;
     border-right: 1px solid #ccc;
   }
 
   .App > .sidebar > .logo {
     display: block;
-    width: 30px;
-    height: 30px;
-    padding: 10px 10px 0 10px;
   }
 
   .App > .sidebar > .iconButton {
     display: block;
     margin: 15px 0 0 0;
     font-size: 24px;
-    color: #bbb;
-    cursor: pointer;
   }
 
   .App > .layout {
