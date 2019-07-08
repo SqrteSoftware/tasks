@@ -24,8 +24,9 @@
 
 .listTitleContainer > .listTitleHandle {
     position: absolute;
-    left: 3px;
+    left: 1px;
     top: 12px;
+    padding: 0 2px 0 2px;
     font-size: 20px;
 }
 
