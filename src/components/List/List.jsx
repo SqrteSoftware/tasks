@@ -18,6 +18,8 @@ class List extends Component {
     }
 
     render() {
+        let settings = this.props.settings || {};
+        let showCompletedItems = settings.showCompletedItems === undefined ? true : settings.showCompletedItems;
         let itemIdWithFocus = this.props.itemIdWithFocus;
         let items = this.props.children.slice(0);
         let history = this.props.history;
@@ -43,7 +45,7 @@ class List extends Component {
                 </div>
                 <div className="listContent noDrag" style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
                     {this.activeItems(items, itemIdWithFocus)}
-                    {this.completedItems(history)}
+                    {this.completedItems(history, showCompletedItems)}
                 </div>
             </div>
         );
@@ -92,31 +94,45 @@ class List extends Component {
         }
     }
 
-    completedItems(items) {
+    completedItems(items, show) {
         if (items.length <= 0) {
             return null;
         }
         return (
             <div className="completed">
-                <span className="completedTitle">Completed ({items.length})</span>
-                <ul className="list noDrag">
-                    {items.map((item) =>
-                        {
-                            return (
-                                <Item
-                                    key={item.id}
-                                    item={item}
-                                    parentId={this.props.parent.id}
-                                    onItemRef={this.onItemRef}
-                                    onCheckboxChange={this.onItemCheckboxChange}
-                                />
-                            )
-                        }
-                    )}
-                </ul>
+                <span className="completedTitle" onClick={this.onToggleCompleted}>
+                    Completed ({items.length})
+                </span>
+                {this.completedItemsList(items, show)}
             </div>
         )
     }
+
+    completedItemsList(items, show) {
+        if (!show) return null;
+        return (
+            <ul className="list noDrag">
+                {items.map((item) =>
+                    {
+                        return (
+                            <Item
+                                key={item.id}
+                                item={item}
+                                parentId={this.props.parent.id}
+                                onItemRef={this.onItemRef}
+                                onCheckboxChange={this.onItemCheckboxChange}
+                            />
+                        )
+                    }
+                )}
+            </ul>
+        )
+    }
+
+    onToggleCompleted = (e) => {
+        let showCompletedItems = this.props.settings ? this.props.settings.showCompletedItems : true;
+        this.props.onToggleCompleted(this.props.parent.id, !showCompletedItems);
+    };
 
     onDeleteList = (e) => {
         let msg = "Are you sure you want to delete? This cannot be undone!";

@@ -9,7 +9,8 @@ const mapStateToProps = (state) => {
         items: state.items,
         focus: state.focus,
         dnd: state.dnd,
-        layouts: state.layouts
+        layouts: state.layouts,
+        lists: state.lists
     }
 };
 

@@ -37,6 +37,8 @@ class App extends Component {
         let listData = createViewData(this.props.items);
         let listIdWithFocus = this.props.focus.parentId;
         let itemIdWithFocus = this.props.focus.itemId;
+        let listSettings = this.props.lists || {};
+
         return (
             <div className="App">
                 <div className="sidebar">
@@ -73,6 +75,7 @@ class App extends Component {
                                     history={item.history}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
                                     freezeScroll={this.shouldFreezeListScroll(item.parent.id)}
+                                    settings={listSettings[item.parent.id]}
                                     onListRef={this.onListRef}
                                     onItemRef={this.onItemRef}
                                     onItemDragStart={this.onItemDragStart}
@@ -85,6 +88,7 @@ class App extends Component {
                                     onItemCheckboxChange={this.props.updateItemComplete}
                                     onItemFocus={this.onItemFocus}
                                     onDeleteList={this.props.deleteItem}
+                                    onToggleCompleted={this.props.showCompletedItems}
                                     createNewItemWithFocus={this.props.createNewItemWithFocus}
                                 />
                             </div>
