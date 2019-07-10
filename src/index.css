@@ -13,6 +13,23 @@ code {
     monospace;
 }
 
+.collapseIndicator {
+  display: inline-block;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.collapseIndicatorToggle {
+  display: inline-block;
+  width: .75em;
+  top: -1px;
+  position: relative;
+}
+
+
 .dragHandle {
   font-size: 18px;
   color: #dedede;

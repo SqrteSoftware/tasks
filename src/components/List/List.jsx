@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './List.css'
 import Item from '../Item';
+import {CollapseIndicator} from "../Shared/collapseIndicator";
 
 
 // FontAwesome
@@ -101,7 +102,9 @@ class List extends Component {
         return (
             <div className="completed">
                 <span className="completedTitle" onClick={this.onToggleCompleted}>
-                    Completed ({items.length})
+                    <CollapseIndicator expanded={show}>
+                        {'Completed (' + items.length + ')'}
+                    </CollapseIndicator>
                 </span>
                 {this.completedItemsList(items, show)}
             </div>
