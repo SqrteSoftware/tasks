@@ -16,7 +16,7 @@ export function createViewData(items) {
         let item = items[itemId];
         if (Object.keys(item.parents).length <= 0) {
             let parentItem = item;
-            let children = getSortedListItems(parentItem.id, items);
+            let children = getSortedListItems(parentItem.id, items, false);
             listData.push({
                 'parent': parentItem,
                 'children': children.filter(i => !i.complete),
@@ -58,13 +58,15 @@ export function getFirstItemInList(parentId, items) {
     return items[firstItemId];
 }
 
-export function getSortedListItems(parentId, items) {
+export function getSortedListItems(parentId, items, activeOnly=true) {
     if (!parentId) return [];
     let children = [];
     Object.keys(items).forEach(itemId => {
-       if (items[itemId].parents[parentId]) {
-           children.push(items[itemId]);
-       }
+        let item = items[itemId]
+        if (item.parents[parentId]) {
+            if (activeOnly && item.complete) return;
+            children.push(items[itemId]);
+        }
     });
     let childIndex = children.findIndex(item => {
         return item.parents[parentId].prev === null;

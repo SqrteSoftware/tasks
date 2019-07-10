@@ -30,7 +30,6 @@ class App extends Component {
 
         this.listRefsById = {};
         this.listBoundsById = {};
-        this.listBoundsById = {};
     }
 
     render() {
@@ -261,6 +260,7 @@ class App extends Component {
         }
         else {
             delete this.itemRefsById[obj.id];
+            delete this.itemBoundsById[obj.id];
         }
     };
 
@@ -270,6 +270,7 @@ class App extends Component {
         }
         else {
             delete this.listRefsById[obj.id];
+            delete this.listBoundsById[obj.id];
         }
     };
 
