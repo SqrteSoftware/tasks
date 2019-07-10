@@ -172,7 +172,11 @@ class List extends Component {
     };
 
     onItemRef = (obj) => {
-        this.itemPlaceholderHeight = obj.totalHeight;
+        if (obj.ref !== null) {
+            // Save the height of items so we know how
+            // tall a placeholder should be
+            this.itemPlaceholderHeight = obj.totalHeight;
+        }
         this.props.onItemRef(obj);
     };
 
