@@ -44,7 +44,7 @@ class List extends Component {
                         onChange={this.onTitleChange}
                         onKeyDown={this.onTitleKeyDown}/>
                 </div>
-                <div className="listContent noDrag" style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
+                <div className="listContent noDrag" ref={this.onRef} style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
                     {this.activeItems(items, itemIdWithFocus)}
                     {this.completedItems(history, showCompletedItems)}
                 </div>
@@ -55,8 +55,7 @@ class List extends Component {
     activeItems(items, itemIdWithFocus) {
         if (items.length > 0) {
             return (
-                <ul className="list"
-                    ref={this.onRef}>
+                <ul className="list">
                     {items.map((item) =>
                         {
                             if (item.placeholder) {
