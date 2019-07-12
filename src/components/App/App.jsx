@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
+import throttle from 'lodash/throttle'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faDownload, faUpload, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
@@ -30,7 +31,17 @@ class App extends Component {
 
         this.listRefsById = {};
         this.listBoundsById = {};
+
+        this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
     }
+
+    componentDidMount = () => {
+        window.addEventListener('scroll', this.throttledUpdateBoundCache);
+    };
+
+    componentWillUnmount = () => {
+        window.removeEventListener('scroll', this.throttledUpdateBoundCache);
+    };
 
     render() {
         let listData = createViewData(this.props.items);
@@ -168,16 +179,7 @@ class App extends Component {
     };
 
     onItemDragStart = (itemId, parentId) => {
-        // Update the bounds of all items
-        Object.keys(this.itemRefsById).forEach(itemId => {
-            let itemRef = this.itemRefsById[itemId];
-            this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
-        });
-        // Update the bounds of all lists
-        Object.keys(this.listRefsById).forEach(listId => {
-            let listRef = this.listRefsById[listId];
-            this.listBoundsById[listId] = listRef.getBoundingClientRect();
-        });
+        this.updateBoundCache();
 
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
         let listItems = getSortedListItems(overlappedListId, this.props.items);
@@ -187,6 +189,19 @@ class App extends Component {
             'overlappedListId': overlappedListId,
             'nearestItemId': nearestItem.id,
             'nearestItemPos': nearestItem.position
+        });
+    };
+
+    updateBoundCache = () => {
+        // Update the bounds of all items
+        Object.keys(this.itemRefsById).forEach(itemId => {
+            let itemRef = this.itemRefsById[itemId];
+            this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
+        });
+        // Update the bounds of all lists
+        Object.keys(this.listRefsById).forEach(listId => {
+            let listRef = this.listRefsById[listId];
+            this.listBoundsById[listId] = listRef.getBoundingClientRect();
         });
     };
 
