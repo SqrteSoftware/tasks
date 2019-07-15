@@ -26,7 +26,7 @@ export const sync = (state={}, action, oldRootState={}, newRootState={}) => {
         case 'UPDATE_ITEM_TEXT':
             return {...state, [action.itemId]: 'UPDATED'};
         case 'UPDATE_ITEM_COMPLETE':
-            let oldItem = oldRootState.items[action.itemId];
+            oldItem = oldRootState.items[action.itemId];
             let newItem = newRootState.items[action.itemId];
             let newState = {...state, [action.itemId]: 'UPDATED'};
             if (oldItem.complete) {

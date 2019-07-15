@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './List.css'
 import Item from '../Item';
-import {CollapseIndicator} from "../Shared/collapseIndicator";
+import {CollapseIndicator} from "../Shared/CollapseIndicator";
 
 
 // FontAwesome

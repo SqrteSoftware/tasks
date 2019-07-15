@@ -4,20 +4,16 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import throttle from 'lodash/throttle'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDownload, faUpload, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import NoteAddOutlined from "@material-ui/icons/NoteAddOutlined";
+import SaveAltOutlined from "@material-ui/icons/SaveAltOutlined";
+import OpenInBrowserOutlined from "@material-ui/icons/OpenInBrowserOutlined";
 
 import './App.css';
 import List from '../List';
 import { createViewData, getSortedListItems, downloadJSON } from '../../utils';
 import logo from '../../braindump90.png'
+import MobileMenu from "../Shared/MobileMenu";
 
-
-// FontAwesome
-library.add(faDownload);
-library.add(faUpload);
-library.add(faPlusSquare);
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -54,18 +50,19 @@ class App extends Component {
                 <div className="sidebar">
                     <img className="logo" alt="logo" src={logo}/>
                     <div className="add iconButton" title="Add a List" onClick={this.props.createNewParentItem.bind(this)}>
-                        <FontAwesomeIcon icon="plus-square"/>
+                        <NoteAddOutlined fontSize="inherit"/>
                     </div>
                     <div className="export iconButton" title="Export Data" onClick={this.onExportData.bind(this)}>
-                        <FontAwesomeIcon icon="download"/>
+                        <SaveAltOutlined fontSize="inherit"/>
                     </div>
                     <div className="import iconButton" title="Import Data" onClick={this.onImportData.bind(this)}>
                         <label className="importLabel">
                             <input className="importInput" type="file" onChange={this.onImportData.bind(this)}/>
-                            <FontAwesomeIcon icon="upload"/>
+                            <OpenInBrowserOutlined fontSize="inherit"/>
                         </label>
                     </div>
                 </div>
+                <MobileMenu/>
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}

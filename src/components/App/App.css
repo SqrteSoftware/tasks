@@ -24,7 +24,7 @@
   display: inline-block;
   margin: 0 0 0 30px;
   font-size: 28px;
-  color: #bbb;
+  color: #aaa;
   cursor: pointer;
 }
 
@@ -68,7 +68,7 @@
   .App > .sidebar > .iconButton {
     display: block;
     margin: 15px 0 0 0;
-    font-size: 24px;
+    font-size: 30px;
   }
 
   .App > .layout {
