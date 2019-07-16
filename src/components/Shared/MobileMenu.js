@@ -11,6 +11,7 @@ import SaveAltOutlined from "@material-ui/icons/SaveAltOutlined";
 import OpenInBrowserOutlined from "@material-ui/icons/OpenInBrowserOutlined";
 
 import { makeStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
 
 
 const useStyles = makeStyles(theme => ({
@@ -21,44 +22,55 @@ const useStyles = makeStyles(theme => ({
 
 export default function MobileMenu(props) {
     const classes = useStyles();
-    const [mobileOpen, setMobileOpen] = React.useState(true);
 
-    function handleDrawerToggle() {
-        setMobileOpen(!mobileOpen);
+    function handleAddListClick(e) {
+        props.onAddList(e);
+        props.onClose(e);
+    }
+
+    function handleExportClick(e) {
+        props.onExportData(e);
+        props.onClose(e);
+    }
+
+    function handleImportClick(e) {
+        props.onImportData(e);
+        props.onClose(e);
     }
 
     return (
         <Drawer
             variant="temporary"
             anchor="right"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-                paper: classes.drawerPaper
-            }}
-            ModalProps={{
-                keepMounted: true // Better open performance on mobile.
-            }}
+            open={props.open}
+            onClose={props.onClose}
+            classes={{paper: classes.drawerPaper}}
+            ModalProps={{keepMounted: true}}
         >
             <List>
-                <ListItem button key="NewList">
+                <ListItem button key="NewList" onClick={handleAddListClick}>
                     <ListItemIcon>
                         <NoteAddOutlined/>
                     </ListItemIcon>
                     <ListItemText primary="New List" />
                 </ListItem>
-                <ListItem button key="Export">
+
+                <ListItem button key="Export" onClick={handleExportClick}>
                     <ListItemIcon>
                         <SaveAltOutlined/>
                     </ListItemIcon>
                     <ListItemText primary="Export" />
                 </ListItem>
-                <ListItem button key="Import">
-                    <ListItemIcon>
+
+                <input id="fileUploadInput" type="file" style={{display: 'none'}} onChange={props.onImportData}/>
+                <label htmlFor="fileUploadInput">
+                <ListItem button key="Import" onClick={handleImportClick}>
+                    <ListItemIcon component="span">
                         <OpenInBrowserOutlined/>
                     </ListItemIcon>
                     <ListItemText primary="Import" />
                 </ListItem>
+                </label>
             </List>
         </Drawer>
     );
