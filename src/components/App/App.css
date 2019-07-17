@@ -21,12 +21,18 @@
 }
 
 .App > .sidebar > .iconButton {
-  display: inline-block;
+  display: none;
   margin: 0 0 0 30px;
   font-size: 28px;
   color: #aaa;
   cursor: pointer;
   vertical-align: top;
+}
+
+.App > .sidebar > .menu.iconButton {
+  display: inline-block;
+  position: absolute;
+  right: 20px;
 }
 
 .App > .sidebar > .iconButton:hover {
@@ -70,6 +76,10 @@
     display: block;
     margin: 15px 0 0 0;
     font-size: 30px;
+  }
+
+  .App > .sidebar > .menu.iconButton {
+    display: none;
   }
 
   .App > .layout {

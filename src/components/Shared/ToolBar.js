@@ -30,9 +30,11 @@ export default function ToolBar(props) {
                     </IconButton>
                 </label>
             </div>
-            <IconButton onClick={props.onMenuClick} edge="start">
-                <MenuIcon />
-            </IconButton>
+            <div className="menu iconButton" title="Menu">
+                <IconButton onClick={props.onMenuClick} edge="start">
+                    <MenuIcon/>
+                </IconButton>
+            </div>
         </div>
     );
 }
