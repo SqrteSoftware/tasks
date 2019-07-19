@@ -63,8 +63,8 @@ class App extends Component {
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}
-                    breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
-                    cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
+                    breakpoints={{xxs: 0, xs: 480, sm: 768, md: 996, lg: 1200}}
+                    cols={{xxs: 2, xs: 6, sm: 6, md: 9, lg: 12,}}
                     layouts={this.props.layouts}
                     onLayoutChange={this.onLayoutChange.bind(this)}
                     draggableCancel=".noDrag">
