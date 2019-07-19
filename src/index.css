@@ -13,6 +13,10 @@ code {
     monospace;
 }
 
+.react-grid-placeholder {
+  background-color: #ddd!important;
+}
+
 .collapseIndicator {
   display: inline-block;
   cursor: pointer;
