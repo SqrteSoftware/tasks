@@ -39,6 +39,22 @@ window.addEventListener('visibilitychange', () => {
     }
 });
 
+if (navigator.storage && navigator.storage.persisted && navigator.storage.persist) {
+    // Ask the browser to protect this domain's local storage
+    // from user-agent cleanup:
+    // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
+    // https://storage.spec.whatwg.org/
+    navigator.storage.persisted().then((persisted) => {
+        if (!persisted) {
+            navigator.storage.persist().then(persist => {
+                if (!persist) {
+                    alert("WARNING: Something went wrong while requesting persistent storage.");
+                }
+            })
+        }
+    });
+}
+
 syncDown(store);
 
 ReactDOM.render(
