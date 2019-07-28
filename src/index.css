@@ -40,6 +40,10 @@ code {
   cursor: move;
 }
 
+.noWrap {
+  white-space: nowrap;
+}
+
 @media (min-width: 576px) and (orientation: landscape) {
   .dragHandle {
     font-size: 16px;

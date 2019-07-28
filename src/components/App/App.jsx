@@ -99,6 +99,8 @@ class App extends Component {
                         )})
                     }
                 </ResponsiveGridLayout>
+                { listData.length <= 0 && this.entryMessage() }
+
             </div>
         );
     }
@@ -109,6 +111,14 @@ class App extends Component {
         return this.props.dnd.activeDragParentId === listId &&
             this.props.dnd.activeDragParentId !== this.props.dnd.overlappedListId;
     };
+
+    entryMessage() {
+        return (
+            <h1 className="noListTip">
+                Select the <span className="noWrap">"New List"</span> button to create a list
+            </h1>
+        )
+    }
 
     onMenuClick = (e) => {
         this.setState({"slidingMenuOpen": true});

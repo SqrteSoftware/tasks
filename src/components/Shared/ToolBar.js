@@ -12,7 +12,7 @@ export default function ToolBar(props) {
     return (
         <div className="sidebar">
             <img className="logo" alt="logo" src={logo}/>
-            <div className="add iconButton" title="Add a List" onClick={props.onAddList}>
+            <div className="add iconButton" title="New List" onClick={props.onAddList}>
                 <IconButton>
                     <NoteAddOutlined fontSize="inherit"/>
                 </IconButton>

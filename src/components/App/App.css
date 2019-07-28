@@ -57,6 +57,14 @@
   border-radius: 5px;
 }
 
+.noListTip {
+  font-size: 50px;
+  width: 75%;
+  color: #eee;
+  margin: auto;
+  text-align: center;
+}
+
 @media (min-width: 576px) and (orientation: landscape) {
   .App {
     text-align: center;
@@ -84,5 +92,10 @@
 
   .App > .layout {
     margin: 0 0 0 50px;
+  }
+
+  .noListTip {
+    font-size: 75px;
+    width: 50%;
   }
 }
