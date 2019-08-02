@@ -44,11 +44,12 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
     // from user-agent cleanup:
     // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
     // https://storage.spec.whatwg.org/
+    // https://developers.google.com/web/updates/2016/06/persistent-storage
     navigator.storage.persisted().then((persisted) => {
         if (!persisted) {
             navigator.storage.persist().then(persist => {
                 if (!persist) {
-                    alert("WARNING: Something went wrong while requesting persistent storage.");
+                    console.log("WARNING: Something went wrong while requesting persistent storage.");
                 }
             })
         }
