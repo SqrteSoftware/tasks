@@ -49,7 +49,7 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
         if (!persisted) {
             navigator.storage.persist().then(persist => {
                 if (!persist) {
-                    console.log("WARNING: Something went wrong while requesting persistent storage.");
+                    console.log("WARNING: request for persistent storage was denied.");
                 }
             })
         }
