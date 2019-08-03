@@ -6,7 +6,7 @@ import throttle from 'lodash/throttle'
 
 import './App.css';
 import List from '../List';
-import { createViewData, getSortedListItems, downloadJSON } from '../../utils';
+import {createViewData, getSortedListItems, downloadJSON, disableTouchMove, enableTouchMove} from '../../utils';
 import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
 
@@ -67,6 +67,8 @@ class App extends Component {
                     cols={{xxs: 2, xs: 6, sm: 6, md: 9, lg: 12,}}
                     layouts={this.props.layouts}
                     onLayoutChange={this.onLayoutChange.bind(this)}
+                    onDragStart={ disableTouchMove }
+                    onDragStop={ enableTouchMove }
                     draggableCancel=".noDrag">
                     {
                         listData.map(item => { return (

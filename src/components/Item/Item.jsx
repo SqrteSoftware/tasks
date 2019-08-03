@@ -6,6 +6,7 @@ import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './Item.css';
+import {disableTouchMove, enableTouchMove} from "../../utils";
 
 
 // FontAwesome
@@ -112,6 +113,7 @@ class Item extends PureComponent {
     };
 
     onDragStart = (e, data) => {
+        disableTouchMove();
         // Propagate event BEFORE re-rendering item with absolute positioning
         this.props.onDragStart(this.props.item.id, this.props.parentId);
         // Save current width
@@ -137,6 +139,7 @@ class Item extends PureComponent {
     };
 
     onDragStop = () => {
+        enableTouchMove();
         this.setState({
             'activeDrag': false,
             'position': {x: 0, y: 0}

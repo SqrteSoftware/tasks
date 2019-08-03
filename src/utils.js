@@ -157,3 +157,19 @@ export function downloadJSON(obj, filename) {
     document.body.removeChild(el);
     URL.revokeObjectURL(dataUri);
 }
+
+export function disableTouchMove() {
+    console.log('disable move')
+    // iPhone's dumb. Have to manually disable page scrolling while dragging
+    // document.addEventListener('touchmove', preventEvent, {passive: false});
+    document.ontouchmove = function(e){ e.preventDefault(); return false; }
+}
+
+export function enableTouchMove() {
+    console.log('enable move')
+    // iPhone's dumb. Have to manually re-enable page scrolling while dragging
+    // document.removeEventListener('touchmove', preventEvent);
+    document.ontouchmove = function(){ return true; }
+}
+
+export const preventEvent = (e) => { e.preventDefault(); return false; }
