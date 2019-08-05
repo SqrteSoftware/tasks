@@ -39,9 +39,9 @@ class List extends Component {
                     <input
                         className="listTitle noDrag"
                         type="text"
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="off"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
                         placeholder="Title"
                         value={this.props.parent.value}
                         onChange={this.onTitleChange}

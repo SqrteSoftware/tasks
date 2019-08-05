@@ -64,9 +64,9 @@ class Item extends PureComponent {
                         className={"itemInput" + (item.complete ? " complete" : "")}
                         ref={ref => this.inputRef = ref}
                         type="text"
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="off"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
                         disabled={item.complete}
                         value={item.value}
                         onChange={ this.onChange}
