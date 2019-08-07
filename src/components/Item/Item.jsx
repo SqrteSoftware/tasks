@@ -18,7 +18,8 @@ class Item extends PureComponent {
         super(props);
         this.widthOnDragStart = null;
         this.inputRef = null;
-        this.itemMiddle = 0;
+        this.itemMiddleY = 0;
+        this.handleMiddleX = 0;
         this.state = {
             'activeDrag': false,
             'position': {x: 0, y: 0}
@@ -51,7 +52,7 @@ class Item extends PureComponent {
                 onStart={this.onDragStart}
                 onStop={this.onDragStop}
                 handle={'.itemHandle'}>
-                <li className="item"
+                <li className={"item" + (item.complete ? " complete" : "")}
                     ref={this.onItemRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     {item.complete ? '' : <FontAwesomeIcon icon="grip-vertical" className="dragHandle itemHandle"></FontAwesomeIcon>}
@@ -61,7 +62,7 @@ class Item extends PureComponent {
                         checked={item.complete}
                         onChange={this.onCheckboxChange}/>
                     <input
-                        className={"itemInput" + (item.complete ? " complete" : "")}
+                        className="itemInput"
                         ref={ref => this.inputRef = ref}
                         type="text"
                         autoComplete="off"
@@ -123,7 +124,7 @@ class Item extends PureComponent {
         this.widthOnDragStart = getComputedStyle(data.node)['width'];
         this.setState({
             'activeDrag': true,
-            'position': {x: data.x, y: data.y - this.itemMiddle}
+            'position': {x: data.x - this.handleMiddleX, y: data.y - this.itemMiddleY}
         }, () => {
             if (this.props.onAfterDragStart) {
                 // fire onAfterDragStart only AFTER the item has re-rendered with absolute positioning
@@ -134,7 +135,7 @@ class Item extends PureComponent {
 
     onDrag = (e, data) => {
         this.setState({
-            'position': {x: data.x, y: data.y - this.itemMiddle}
+            'position': {x: data.x - this.handleMiddleX, y: data.y - this.itemMiddleY}
         }, () => {
             data.id = this.props.item.id;
             this.props.onDrag(data);
@@ -158,7 +159,8 @@ class Item extends PureComponent {
     onItemRef = (ref) => {
         let totalHeight = ref ? ref.offsetHeight : 0;
         this.props.onItemRef({'id': this.props.item.id, totalHeight, 'ref': ref});
-        this.itemMiddle = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
+        this.itemMiddleY = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
+        this.handleMiddleX = ref === null ? 0 : ref.children[0].getBoundingClientRect().width / 2;
     };
 
     onInputFocus = () => {

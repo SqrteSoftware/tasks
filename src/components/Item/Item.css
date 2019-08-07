@@ -1,20 +1,29 @@
 .item {
+    display: flex;
+    align-items: center;
     list-style-type: none;
-    padding-left: 30px;
     padding-bottom: 10px;
+    padding-right: 10px;
     touch-action: pan-y!important;
 }
 
-.item > .itemHandle {
-    position: absolute;
-    left: -10px;
-    top: -2px;
-    padding: 4px 5px 4px 5px;
+.item.complete {
+    padding-left: 10px;
+}
+
+.itemHandle {
+    padding: 4px 6px 4px 6px;
     touch-action: none;
 }
 
+.itemCheckbox {
+    padding: 0;
+    margin: 0 4px 0 0;
+    font-size: 16px;
+}
+
 .itemInput {
-    width: 100%;
+    flex-grow: 1;
     padding: 0;
     border: none;
     background-color: transparent;
@@ -22,28 +31,19 @@
     border: none;
     border-bottom: 1px solid #ccc;
     font-size: 12px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.itemInput.complete {
+.item.complete > .itemInput {
     text-decoration: line-through;
-}
-
-.itemCheckbox {
-    position: absolute;
-    top: 0px;
-    left: 8px;
-    font-size: 16px;
 }
 
 @media (min-width: 576px) and (orientation: landscape) {
     .item {
-        padding-left: 24px;
         padding-bottom: 5px;
     }
 
     .itemCheckbox {
-        top: 1px;
-        left: 6px;
         font-size: 12px;
     }
 }
