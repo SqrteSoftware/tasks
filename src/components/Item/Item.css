@@ -14,14 +14,14 @@
 .itemHandle {
     /* If padding not wide enough, iOS will
     select checkbox when tapping drag handle */
-    padding: 4px 9px 4px 9px;
+    padding: 4px 10px 4px 10px;
     margin-right: 0px;
     touch-action: none;
 }
 
 .itemCheckbox {
     padding: 0;
-    margin: 0 4px 0 0px;
+    margin: 0 4px 0 1px;
     font-size: 16px;
 }
 
