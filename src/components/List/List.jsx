@@ -30,14 +30,14 @@ class List extends Component {
             items.splice(nearestItemIndex, 0, {'placeholder': true});
         }
         return (
-            <div className="listContainer">
+            <div className="list">
                 <div className="listDelete" onClick={this.onDeleteList}>
                     X
                 </div>
-                <div className="listTitleContainer">
+                <div className="listTitle">
                     <FontAwesomeIcon icon="grip-vertical" className="listTitleHandle dragHandle"></FontAwesomeIcon>
                     <input
-                        className="listTitle noDrag"
+                        className="listTitleInput noDrag"
                         type="text"
                         autoComplete="off"
                         autoCorrect="off"
@@ -58,7 +58,7 @@ class List extends Component {
     activeItems(items, itemIdWithFocus) {
         if (items.length > 0) {
             return (
-                <ul className="list">
+                <ul className="listContentActive">
                     {items.map((item) =>
                         {
                             if (item.placeholder) {
@@ -116,7 +116,7 @@ class List extends Component {
     completedItemsList(items, show) {
         if (!show) return null;
         return (
-            <ul className="list noDrag">
+            <ul className="listContentCompleted noDrag">
                 {items.map((item) =>
                     {
                         return (

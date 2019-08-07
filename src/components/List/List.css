@@ -1,12 +1,7 @@
-.listContainer {
+.list {
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-.list {
-    padding: 0;
-    margin: 0;
 }
 
 .listDelete {
@@ -17,32 +12,42 @@
     cursor: pointer;
 }
 
-.listTitleContainer {
-    padding: 10px 30px 10px 18px;
-}
-
-.listTitleContainer > .listTitleHandle {
-    position: absolute;
-    left: 1px;
-    top: 12px;
-    padding: 0 2px 0 2px;
-    font-size: 20px;
-}
-
 .listTitle {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 10px 30px 10px 0px;
+}
+
+.listTitleHandle.dragHandle {
+    padding: 0 10px 0 10px;
     font-size: 20px;
-    text-align: left;
+}
+
+.listTitleInput {
+    flex-grow: 1;
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
     border: none;
-    width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
     outline: none;
+    /* Prevent highlight during DnD in iOS */
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .listContent {
     flex-grow: 1;
     overflow: auto;
     margin-bottom: 5px;
+}
+
+.listContentActive,
+.listContentCompleted {
+    padding: 0;
+    margin: 0;
 }
 
 .listEmptyNotice {
@@ -66,8 +71,7 @@
 }
 
 @media (min-width: 576px) and (orientation: landscape) {
-    .listTitleContainer > .listTitleHandle {
-        top: 13px;
-        font-size: 20px;
+    .listTitleHandle.dragHandle {
+        padding: 0 10px 0 5px;
     }
 }
