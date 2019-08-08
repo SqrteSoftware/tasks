@@ -141,7 +141,7 @@ export function saveStateToLocalStorage(state) {
 export function downloadJSON(obj, filename) {
     // Serialize and create Blob and data URI out of data
     let serializedItems = JSON.stringify(obj, null, 2);
-    var blob = new Blob([serializedItems], {type : 'application/json'});
+    var blob = new Blob([serializedItems], {type : 'application/octet-stream'});
     let dataUri = URL.createObjectURL(blob);
 
     // Create download link
@@ -154,8 +154,11 @@ export function downloadJSON(obj, filename) {
     el.click();
 
     // Cleanup link and data URI
-    document.body.removeChild(el);
-    URL.revokeObjectURL(dataUri);
+    // Delay required to work around iOS bug
+    setTimeout(function(){
+        document.body.removeChild(el);
+        URL.revokeObjectURL(dataUri);
+    }, 500);
 }
 
 export function disableTouchMove() {
