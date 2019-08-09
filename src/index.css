@@ -46,15 +46,19 @@ code {
 
 .react-grid-item > .react-resizable-handle {
   background: none;
+  padding: 0;
+  bottom: -2px;
+  right: -2px;
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  right: 2px;
-  bottom: 2px;
+  right: 4px;
+  bottom: 4px;
   width: 8px;
   height: 8px;
   border-right: 4px solid rgba(0, 0, 0, 0.1);
   border-bottom: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 2px 2px 0;
 }
 
 @media (min-width: 576px) and (orientation: landscape) {
