@@ -24,6 +24,6 @@ function shiftAndAddLayout(layouts, breakpoint, newParentItemId) {
         // move existing leftmost lists down to make space for new list
         ...layoutsForBreakpoint.map(l => l.x === 0 ? {...l, y: l.y + 6} : l),
         // add new layout for new list
-        {i: newParentItemId, x: 0, y: 0, w: 3, h: 6, minW: 3, maxW: 4}
+        {i: newParentItemId, x: 0, y: 0, w: 3, h: 6, minW: 3, maxW: 4, minH: 3}
     ]
 }

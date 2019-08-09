@@ -44,6 +44,19 @@ code {
   white-space: nowrap;
 }
 
+.react-grid-item > .react-resizable-handle {
+  background: none;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  right: 2px;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  border-right: 4px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.1);
+}
+
 @media (min-width: 576px) and (orientation: landscape) {
   .dragHandle {
     font-size: 16px;
