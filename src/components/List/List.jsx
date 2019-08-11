@@ -1,15 +1,10 @@
 import React, {Component} from 'react';
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import DragIndicator from '@material-ui/icons/DragIndicatorOutlined'
 
 import './List.css'
 import Item from '../Item';
-import {CollapseIndicator} from "../Shared/CollapseIndicator";
+import {CollapseIndicator} from "../Shared/CollapseIndicator"
 
-
-// FontAwesome
-library.add(faGripVertical);
 
 class List extends Component {
 
@@ -35,7 +30,7 @@ class List extends Component {
                     X
                 </div>
                 <div className="listTitle">
-                    <FontAwesomeIcon icon="grip-vertical" className="listTitleHandle dragHandle"></FontAwesomeIcon>
+                    <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
                     <input
                         className="listTitleInput noDrag"
                         type="text"

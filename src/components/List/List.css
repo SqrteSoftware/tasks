@@ -21,8 +21,8 @@
 }
 
 .listTitleHandle.dragHandle {
-    padding: 0 10px 0 10px;
-    font-size: 20px;
+    padding: 0 5px 0 5px;
+    font-size: 28px;
 }
 
 .listTitleInput {
@@ -72,6 +72,6 @@
 
 @media (min-width: 576px) and (orientation: landscape) {
     .listTitleHandle.dragHandle {
-        padding: 0 10px 0 5px;
+        padding: 0;
     }
 }

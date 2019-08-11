@@ -1,16 +1,10 @@
-import React, {PureComponent} from 'react';
-import {DraggableCore} from 'react-draggable';
+import React, {PureComponent} from 'react'
+import {DraggableCore} from 'react-draggable'
+import DragIndicator from '@material-ui/icons/DragIndicatorOutlined'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import './Item.css'
+import {disableTouchMove, enableTouchMove} from "../../utils"
 
-import './Item.css';
-import {disableTouchMove, enableTouchMove} from "../../utils";
-
-
-// FontAwesome
-library.add(faGripVertical);
 
 class Item extends PureComponent {
 
@@ -55,7 +49,7 @@ class Item extends PureComponent {
                 <li className={"item" + (item.complete ? " complete" : "")}
                     ref={this.onItemRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
-                    {item.complete ? '' : <FontAwesomeIcon icon="grip-vertical" className="dragHandle itemHandle"></FontAwesomeIcon>}
+                    {item.complete ? '' : <DragIndicator className="dragHandle itemHandle"></DragIndicator>}
                     <input
                         className="itemCheckbox"
                         type="checkbox"
