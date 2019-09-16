@@ -4,7 +4,7 @@ export function items(state = {}, action) {
     let items = state;
     switch (action.type) {
         case 'UPDATE_ITEM_TEXT':
-            return set(items, action.itemId, 'value', action.text);
+            return updateItemText(items, action.itemId, action.text);
         case 'UPDATE_ITEM_COMPLETE':
             if (!action.complete) {
                 Object.keys(items[action.itemId].parents).forEach(parentId => {
@@ -55,6 +55,11 @@ export function items(state = {}, action) {
         default:
             return state;
     }
+}
+
+function updateItemText(items, itemId, text) {
+    if (items[itemId] === undefined) return items;
+    return set(items, itemId, 'value', text);
 }
 
 function moveItemToTop(itemId, parentId, items) {

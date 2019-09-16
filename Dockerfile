@@ -11,7 +11,7 @@ RUN apk update && \
         nodejs-npm \
         bash
 
-WORKDIR /braindump/app
+WORKDIR /tasks/app
 
 
 ############################################################
@@ -20,11 +20,11 @@ WORKDIR /braindump/app
 FROM base as develop
 
 # Only run npm install if package.json has changed
-ADD ./package.json /braindump/app
+ADD ./package.json /tasks/app
 RUN npm install
 
 # Add the rest of the source
-ADD . /braindump/app
+ADD . /tasks/app
 
 ENTRYPOINT "./entrypoint.sh"
 
