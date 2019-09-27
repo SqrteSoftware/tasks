@@ -1,5 +1,5 @@
-import * as ia from './itemsActions'
-import rootReducer from '../reducers'
+import * as ia from '../actions/itemsActions'
+import rootReducer from './index'
 import {createItem} from '../utils'
 
 describe('UPDATE_ITEM_TEXT', () => {
