@@ -1,16 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import throttle from 'lodash/throttle'
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import throttle from 'lodash/throttle';
 
 import App from './components/App';
-import rootReducer from './reducers'
+import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
-import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils'
+import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
 import {syncUp, syncDown} from './sync';
 import './index.css';
 
+import {testCrypto} from './crypto';
+window.testCrypto = testCrypto;
 
 let initialState = loadStateFromLocalStorage();
 
