@@ -1,6 +1,7 @@
 import * as ia from '../actions/itemsActions'
 import rootReducer from './index'
 import {createItem} from '../utils'
+import generateTestData from '../data'
 
 describe('UPDATE_ITEM_TEXT', () => {
 
@@ -58,5 +59,18 @@ describe('UPDATE_ITEM_COMPLETE', () => {
 
         expect(newState.items[itemId].complete).toEqual(true);
         expect(newState.items[itemId].completeDate).toEqual(completeDate);
+    });
+});
+
+describe('MERGE_ITEMS', () => {
+
+    test('An empty incoming list of items should result in no updates', () => {
+        let {items} = generateTestData(false);
+        let initialState = {items};
+
+        let action = ia.mergeItems([]);
+        let newState = rootReducer(initialState, action);
+
+        expect(initialState.items).toEqual(newState.items);
     });
 });

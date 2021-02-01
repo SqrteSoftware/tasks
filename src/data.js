@@ -2,7 +2,7 @@ import uuidv4 from 'uuid'
 
 import { createItem } from './utils';
 
-export default function generateTestData()
+export default function generateTestData(log=true)
 {
     // Generate testing items
     let items= {};
@@ -28,6 +28,6 @@ export default function generateTestData()
         }
         items[item.id] = item;
     }
-    console.log(items, layouts);
+    log && console.log(items, layouts);
     return {items, layouts};
 }

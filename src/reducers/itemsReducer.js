@@ -49,7 +49,9 @@ export function items(state = {}, action) {
                 action.newChildItemId
             );
         case 'SYNC_ITEMS':
-            return mergeItems(state, action.items);
+            return mergeItemsOld(state, action.items);
+        case 'MERGE_ITEMS':
+            return mergeItems(items, action.items)
         case 'REPAIR_ITEM_LINKS':
             return repairItemLinks(state);
         default:
@@ -163,13 +165,22 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
     return items;
 }
 
+function mergeItems(currentItems, incomingItems) {
+    //  anchors = find all incomingItems whose prev is NOT in incomingItems
+    //  for every anchor
+    //      If anchor's prev does NOT match current item's prev
+    //          Mark items in segment as conflicted
+    //      Insert items from segment starting with anchor
+    return currentItems;
+}
+
 // The following merging algorithm assumes that the lists
 // we're merging items into have referential integrity. Each
 // merge operation must also yield a list with the same integrity.
 // Incoming data is not trusted as it may not be intact referentially.
 // We do our best to place it. If a good placement can't be found,
 // we place the incoming item at the top of the list by default.
-function mergeItems(currentItems, incomingItems) {
+function mergeItemsOld(currentItems, incomingItems) {
     let modifiedItems = currentItems;
 
     let parents = incomingItems.filter(i => Object.keys(i.parents).length <= 0);
