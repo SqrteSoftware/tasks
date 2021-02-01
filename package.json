@@ -8,7 +8,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.20",
     "prop-types": "latest",
     "react": "^16.8.6",
     "react-dnd": "^2.5.4",
