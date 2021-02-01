@@ -193,6 +193,6 @@ export async function testCrypto() {
 
     if (msg !== decryptedMessage) 
         throw Error('Decrypted message does not match original message');
-    debugger;
+
     console.log("SUCCESS!");
 }
