@@ -5,7 +5,8 @@ import IconButton from "@material-ui/core/IconButton";
 import NoteAddOutlined from "@material-ui/icons/NoteAddOutlined";
 import SaveAltOutlined from "@material-ui/icons/SaveAltOutlined";
 import OpenInBrowserOutlined from "@material-ui/icons/OpenInBrowserOutlined";
-import MenuIcon from "@material-ui/icons/Menu"
+import MenuIcon from "@material-ui/icons/Menu";
+import Sync from "@material-ui/icons/Sync";
 
 
 export default function ToolBar(props) {
@@ -29,6 +30,11 @@ export default function ToolBar(props) {
                         <OpenInBrowserOutlined fontSize="inherit"/>
                     </IconButton>
                 </label>
+            </div>
+            <div className="sync iconButton" title="Sync Data" onClick={props.onSyncData}>
+                <IconButton>
+                    <Sync fontSize="inherit"/>
+                </IconButton>
             </div>
             <div className="menu iconButton" title="Menu">
                 <IconButton onClick={props.onMenuClick} edge="start">

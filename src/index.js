@@ -11,7 +11,7 @@ import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
 import {syncUp, syncDown} from './sync';
 import './index.css';
 
-import {testCrypto} from './crypto';
+import {testCrypto} from './utils/crypto';
 window.testCrypto = testCrypto;
 
 let initialState = loadStateFromLocalStorage();

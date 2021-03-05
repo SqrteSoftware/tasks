@@ -9,6 +9,7 @@ import List from '../List';
 import {createViewData, getSortedListItems, downloadJSON, disableTouchMove, enableTouchMove} from '../../utils';
 import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
+import SyncModal from "../Shared/SyncModal";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -27,7 +28,8 @@ class App extends Component {
         this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
 
         this.state = {
-          "slidingMenuOpen": false
+          "slidingMenuOpen": false,
+          "syncModalOpen": false
         };
     }
 
@@ -51,6 +53,7 @@ class App extends Component {
                     onAddList={this.props.createNewParentItem}
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
+                    onSyncData={this.onSyncData}
                     onMenuClick={this.onMenuClick}
                 />
                 <MobileMenu
@@ -60,6 +63,7 @@ class App extends Component {
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                 />
+                <SyncModal open={this.state.syncModalOpen}/>
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}
@@ -149,6 +153,10 @@ class App extends Component {
             }
             e.target.value = "";
         }
+    };
+
+    onSyncData = (e) => {
+        this.setState({"syncModalOpen": true})
     };
 
     onLayoutChange = (currentLayout, allLayouts) => {
