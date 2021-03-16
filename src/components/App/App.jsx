@@ -9,7 +9,7 @@ import List from '../List';
 import {createViewData, getSortedListItems, downloadJSON, disableTouchMove, enableTouchMove} from '../../utils';
 import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
-import SyncModal from "../Shared/SyncModal";
+import SyncDialog from "../Shared/SyncDialog";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -63,7 +63,7 @@ class App extends Component {
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                 />
-                <SyncModal open={this.state.syncModalOpen}/>
+                <SyncDialog open={this.state.syncModalOpen} onClose={this.onSyncModalClose}/>
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}
@@ -157,6 +157,10 @@ class App extends Component {
 
     onSyncData = (e) => {
         this.setState({"syncModalOpen": true})
+    };
+
+    onSyncModalClose = (e) => {
+        this.setState({"syncModalOpen": false})
     };
 
     onLayoutChange = (currentLayout, allLayouts) => {
