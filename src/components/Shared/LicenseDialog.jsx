@@ -7,8 +7,7 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import {onClick} from '../../utils/stripe';
-import LoadingButton from './LoadingButton';
+import Button from '@material-ui/core/Button';
 
 const styles = (theme) => ({
   root: {
@@ -50,20 +49,21 @@ const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-export default function SyncDialog(props) {
+export default function LicenseDialog(props) {
   return (
     <div>
       <Dialog onClose={props.onClose} aria-labelledby="customized-dialog-title" open={props.open}>
         <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
-          Sync Your Data
+          Your License Key
         </DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
-            Subscribe to sync your data across devices.
+            Save your license key and a bunch of other stuff you should know about.
+            Keep it secret, keep it safe.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <LoadingButton onClick={onClick}/>
+          <Button onClick={props.onClose}>Done</Button>
         </DialogActions>
       </Dialog>
     </div>

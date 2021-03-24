@@ -10,6 +10,7 @@ import {createViewData, getSortedListItems, downloadJSON, disableTouchMove, enab
 import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
+import LicenseDialog from "../Shared/LicenseDialog";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -27,9 +28,12 @@ class App extends Component {
 
         this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
 
+        let queryParams = new URLSearchParams(window.location.search);
+
         this.state = {
           "slidingMenuOpen": false,
-          "syncModalOpen": false
+          "syncModalOpen": false,
+          "licenseModalOpen": queryParams.get('session') != null
         };
     }
 
@@ -64,6 +68,7 @@ class App extends Component {
                     onImportData={this.onImportData}
                 />
                 <SyncDialog open={this.state.syncModalOpen} onClose={this.onSyncModalClose}/>
+                <LicenseDialog open={this.state.licenseModalOpen} onClose={this.onLicenseModalClose}/>
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}
@@ -161,6 +166,10 @@ class App extends Component {
 
     onSyncModalClose = (e) => {
         this.setState({"syncModalOpen": false})
+    };
+
+    onLicenseModalClose = (e) => {
+        this.setState({"licenseModalOpen": false})
     };
 
     onLayoutChange = (currentLayout, allLayouts) => {
