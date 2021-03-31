@@ -1,5 +1,5 @@
-import {clearSync} from './actions/syncActions'
-import {syncItems} from './actions/itemsActions'
+import {clearSync} from '../actions/syncActions'
+import {syncItems} from '../actions/itemsActions'
 
 
 let apiUrl = "https://u9ncjz9oza.execute-api.us-east-1.amazonaws.com/default/bdProcessItems";

@@ -8,7 +8,7 @@ import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
-import {syncUp, syncDown} from './sync';
+import {syncUp, syncDown} from './utils/sync';
 import './index.css';
 
 import {testCrypto} from './utils/crypto';
