@@ -27,13 +27,11 @@ class App extends Component {
         this.listBoundsById = {};
 
         this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
-
-        let queryParams = new URLSearchParams(window.location.search);
-
+        
         this.state = {
           "slidingMenuOpen": false,
           "syncModalOpen": false,
-          "licenseModalOpen": queryParams.get('session') != null
+          "licenseModalOpen": props.queryParams.session != null
         };
     }
 

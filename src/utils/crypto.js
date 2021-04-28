@@ -77,9 +77,7 @@ function base64decode(encodedString) {
 }
 
 
-export async function createEncodedKeypair() {
-    let license = "A1B2C-A1B2C-A1B2C-A1B2C";
-
+export async function createEncodedKeypair(license) {
     let salt = window.crypto.getRandomValues(new Uint8Array(16));
     let kek = await createKEK(license, salt);
 
@@ -169,7 +167,8 @@ export async function decrypt(arrayBuffer, key) {
 
 
 export async function testCrypto() {
-    let exportedKeys = await createEncodedKeypair();
+    let license = "A1B2C-A1B2C-A1B2C-A1B2C";
+    let exportedKeys = await createEncodedKeypair(license);
 
     if (!exportedKeys.salt) 
         throw Error('Missing Salt');

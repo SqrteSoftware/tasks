@@ -128,8 +128,22 @@ export function loadStateFromLocalStorage() {
     }
 }
 
+export function loadUrlQueryParams() {
+    let queryParams = new URLSearchParams(window.location.search);
+    let queryParamObject = {};
+    queryParams.forEach((value, key) => queryParamObject[key] = value);
+    return queryParamObject;
+}
+
 export function saveStateToLocalStorage(state) {
     try {
+        // Before saving to disk, remove any state that should 
+        // only be stored in-memory.
+        for (var key in state) {
+            if (state[key].inMemoryOnly) {
+                delete state[key];
+            }
+        }
         let serializedState = JSON.stringify(state);
         localStorage.setItem('appState', serializedState);
     }
