@@ -137,14 +137,15 @@ export function loadUrlQueryParams() {
 
 export function saveStateToLocalStorage(state) {
     try {
-        // Before saving to disk, remove any state that should 
+        // Before saving to disk, remove any state that should
         // only be stored in-memory.
+        let stateToSave = {};
         for (var key in state) {
-            if (state[key].inMemoryOnly) {
-                delete state[key];
+            if (!state[key].inMemoryOnly) {
+                stateToSave[key] = state[key];
             }
         }
-        let serializedState = JSON.stringify(state);
+        let serializedState = JSON.stringify(stateToSave);
         localStorage.setItem('appState', serializedState);
     }
     catch (e) {

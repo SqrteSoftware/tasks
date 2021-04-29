@@ -3,15 +3,12 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import throttle from 'lodash/throttle';
-import uuidv4 from 'uuid/v4'
-
 import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
-import {loadUrlQueryParams} from './utils';
+import {handleNewSession} from './utils/license';
 import {syncUp, syncDown} from './utils/sync';
-import {createEncodedKeypair} from './utils/crypto';
 import './index.css';
 
 import {testCrypto} from './utils/crypto';
@@ -62,20 +59,11 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
 }
 
 syncDown(store);
-
-let queryParams = loadUrlQueryParams();
-if (queryParams.session) {
-    let license = uuidv4().toUpperCase();
-    createEncodedKeypair(license).then(keyInfo => {
-        console.log("LICENSE:",license);
-        console.log("KEY GENERATED:",keyInfo);
-        // store.dispatch();
-    });
-}
+handleNewSession(store);
 
 ReactDOM.render(
     <Provider store={store}>
-        <App queryParams={queryParams}/>
+        <App/>
     </Provider>,
     document.getElementById('root'));
 

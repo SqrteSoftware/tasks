@@ -27,11 +27,11 @@ class App extends Component {
         this.listBoundsById = {};
 
         this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
-        
+
         this.state = {
           "slidingMenuOpen": false,
           "syncModalOpen": false,
-          "licenseModalOpen": props.queryParams.session != null
+          "licenseModalOpen": props.license.paymentSession != null
         };
     }
 
