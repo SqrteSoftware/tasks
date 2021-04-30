@@ -165,6 +165,35 @@ export async function decrypt(arrayBuffer, key) {
     return enc.decode(ciphertext);
 }
 
+export async function persistKeys(keys) {
+    var requestDb = window.indexedDB.open('keystore');
+    requestDb.onupgradeneeded = e => {
+        e.target.result.createObjectStore('keys', 
+            { autoIncrement : true }
+        );
+    }
+    
+    requestDb.onsuccess = e => {
+        let db = e.target.result;
+        var store = db.transaction('keys', 'readwrite').objectStore('keys');
+        store.add(keys);
+    }
+}
+
+export async function restoreKeys() {
+    var requestDb = window.indexedDB.open('keystore');
+    requestDb.onupgradeneeded = e => {
+        e.target.result.createObjectStore('keys', 
+            { autoIncrement : true }
+        );
+    }
+
+    requestDb.onsuccess = e => {
+        let db = e.target.result;
+        var store = db.transaction('keys').objectStore('keys')
+        store.get(1).onsuccess = e => console.log(e.target.result)
+    }
+}
 
 export async function testCrypto() {
     let license = "A1B2C-A1B2C-A1B2C-A1B2C";
