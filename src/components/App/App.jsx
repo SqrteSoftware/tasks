@@ -66,7 +66,11 @@ class App extends Component {
                     onImportData={this.onImportData}
                 />
                 <SyncDialog open={this.state.syncModalOpen} onClose={this.onSyncModalClose}/>
-                <LicenseDialog open={this.state.licenseModalOpen} onClose={this.onLicenseModalClose}/>
+                <LicenseDialog 
+                    open={this.state.licenseModalOpen} 
+                    licenseKey={this.props.license.licenseKey} 
+                    onClose={this.onLicenseModalClose}
+                />
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}

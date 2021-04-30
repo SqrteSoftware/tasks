@@ -59,8 +59,11 @@ export default function LicenseDialog(props) {
         <DialogContent dividers>
           <Typography gutterBottom>
             Save your license key and a bunch of other stuff you should know about.
-            Keep it secret, keep it safe.
+            Keep it secret, keep it safe:
           </Typography>
+          <code>
+          {props.licenseKey}
+          </code>
         </DialogContent>
         <DialogActions>
           <Button onClick={props.onClose}>Done</Button>
