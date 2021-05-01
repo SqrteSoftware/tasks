@@ -172,12 +172,17 @@ export async function persistKeys(keys) {
             { autoIncrement : true }
         );
     }
-    
-    requestDb.onsuccess = e => {
-        let db = e.target.result;
-        var store = db.transaction('keys', 'readwrite').objectStore('keys');
-        store.add(keys);
-    }
+
+    return new Promise((resolve) => {
+        requestDb.onsuccess = e => {
+            let db = e.target.result;
+            var store = db.transaction('keys', 'readwrite').objectStore('keys');
+            let addRequest = store.put(keys, 1);
+            addRequest.onsuccess = e => {
+                resolve();
+            }
+        }
+    });
 }
 
 export async function restoreKeys() {
@@ -188,11 +193,13 @@ export async function restoreKeys() {
         );
     }
 
-    requestDb.onsuccess = e => {
-        let db = e.target.result;
-        var store = db.transaction('keys').objectStore('keys')
-        store.get(1).onsuccess = e => console.log(e.target.result)
-    }
+    return new Promise(resolve => {
+        requestDb.onsuccess = e => {
+            let db = e.target.result;
+            var store = db.transaction('keys').objectStore('keys');
+            store.get(1).onsuccess = e => resolve(e.target.result);
+        }
+    });
 }
 
 export async function testCrypto() {

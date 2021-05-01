@@ -11,8 +11,11 @@ import {handleNewSession} from './utils/license';
 import {syncUp, syncDown} from './utils/sync';
 import './index.css';
 
-import {testCrypto} from './utils/crypto';
+import {testCrypto, persistKeys, restoreKeys} from './utils/crypto';
 window.testCrypto = testCrypto;
+window.restoreKeys = restoreKeys;
+window.persistKeys = persistKeys;
+
 
 let initialState = loadStateFromLocalStorage();
 
