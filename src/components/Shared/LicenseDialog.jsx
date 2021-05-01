@@ -61,9 +61,11 @@ export default function LicenseDialog(props) {
             Save your license key and a bunch of other stuff you should know about.
             Keep it secret, keep it safe:
           </Typography>
-          <code>
-          {props.licenseKey}
-          </code>
+          <Typography style={{"display": "flex", "justifyContent": "center"}}>
+            <code style={{"backgroundColor":"lightgrey", "padding": "10px", "borderRadius": "5px"}}>
+              {props.licenseKey ? props.licenseKey : "Generating License..."}
+            </code>
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={props.onClose}>Done</Button>
