@@ -93,9 +93,7 @@ export async function createEncodedKeypair(license) {
 }
 
 
-export async function importEncodedKeypair({publicKey, privateKey, iv, salt}) {
-    let license = "A1B2C-A1B2C-A1B2C-A1B2C";
-
+export async function importEncodedKeypair(license, {publicKey, privateKey, iv, salt}) {
     let decodedPublicKey = base64decode(publicKey);
     let decodedPrivateKey = base64decode(privateKey);
     let decodedIv = base64decode(iv);
@@ -165,8 +163,10 @@ export async function decrypt(arrayBuffer, key) {
     return enc.decode(ciphertext);
 }
 
-export async function persistKeys(keys) {
-    var requestDb = window.indexedDB.open('keystore');
+export async function persistKeys(publicKey, privateKey) {
+    let keys = {publicKey, privateKey};
+
+    let requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
         e.target.result.createObjectStore('keys', 
             { autoIncrement : true }
@@ -176,7 +176,7 @@ export async function persistKeys(keys) {
     return new Promise((resolve) => {
         requestDb.onsuccess = e => {
             let db = e.target.result;
-            var store = db.transaction('keys', 'readwrite').objectStore('keys');
+            let store = db.transaction('keys', 'readwrite').objectStore('keys');
             let addRequest = store.put(keys, 1);
             addRequest.onsuccess = e => {
                 resolve();
@@ -215,16 +215,31 @@ export async function testCrypto() {
     if (!exportedKeys.privateKey) 
         throw Error('Missing privateKey');
 
-    let importedKeys = await importEncodedKeypair(exportedKeys);
+    let importedKeys = await importEncodedKeypair(license, exportedKeys);
 
     if (!(importedKeys.publicKey instanceof CryptoKey)) 
         throw Error('Imported public key is not a CryptoKey');
     if (!(importedKeys.privateKey instanceof CryptoKey)) 
         throw Error('Imported private key is not a CryptoKey');
 
+    // Encrypt a message using the imported public key
     let msg = "My message";
+    console.log("Initial Message: ", msg);
+
     let encryptedMessage = await encrypt(msg, importedKeys.publicKey);
-    let decryptedMessage = await decrypt(encryptedMessage, importedKeys.privateKey);
+    console.log("Encrypted Message: ", encryptedMessage);
+
+    await persistKeys(importedKeys.publicKey, importedKeys.privateKey);
+    let persistedKeys = await restoreKeys();
+
+    if (!(persistedKeys.publicKey instanceof CryptoKey)) 
+        throw Error('Persisted public key is not a CryptoKey');
+    if (!(persistedKeys.privateKey instanceof CryptoKey)) 
+        throw Error('Persisted private key is not a CryptoKey');
+
+    // Decrypt a message with both the imported and persisted private key
+    let decryptedMessage = await decrypt(encryptedMessage, persistedKeys.privateKey);
+    console.log("Encrypted Message: ", decryptedMessage);
 
     if (msg !== decryptedMessage) 
         throw Error('Decrypted message does not match original message');
