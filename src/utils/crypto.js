@@ -77,14 +77,22 @@ function base64decode(encodedString) {
 }
 
 
+
 export async function createEncodedKeypair(license) {
+    // Salt must be at least 16 bytes:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Pbkdf2Params
     let salt = window.crypto.getRandomValues(new Uint8Array(16));
     let kek = await createKEK(license, salt);
 
     let iv = window.crypto.getRandomValues(new Uint8Array(12));
     let keyPair = await createEncryptedKeyPair(kek, iv);
 
+    let enc = new TextEncoder();
+    let encodedLicense = enc.encode(license);
+    let fingerprint = await crypto.subtle.digest("SHA-256", encodedLicense);
+
     return {
+        fingerprint: base64encode(fingerprint),
         salt: base64encode(salt),
         iv: base64encode(iv),
         publicKey: base64encode(keyPair.publicKey),
@@ -185,7 +193,7 @@ export async function persistKeys(publicKey, privateKey) {
     });
 }
 
-export async function restoreKeys() {
+export async function readKeys() {
     var requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
         e.target.result.createObjectStore('keys', 
@@ -220,16 +228,21 @@ export function generateLicenseKey(segmentLength=6, segments=5) {
 }
 
 export async function testCrypto() {
-    let license = "A1B2C-A1B2C-A1B2C-A1B2C";
+    let license = generateLicenseKey();
+    console.log("Generated License:", license);
+    
     let exportedKeys = await createEncodedKeypair(license);
+    console.log("Keypair Created:", exportedKeys);
 
-    if (!exportedKeys.salt) 
+    if (!exportedKeys.fingerprint)
+        throw Error('Missing Fingerprint');
+    if (!exportedKeys.salt)
         throw Error('Missing Salt');
-    if (!exportedKeys.iv) 
+    if (!exportedKeys.iv)
         throw Error('Missing IV');
-    if (!exportedKeys.publicKey) 
+    if (!exportedKeys.publicKey)
         throw Error('Missing publicKey');
-    if (!exportedKeys.privateKey) 
+    if (!exportedKeys.privateKey)
         throw Error('Missing privateKey');
 
     let importedKeys = await importEncodedKeypair(license, exportedKeys);
@@ -247,7 +260,7 @@ export async function testCrypto() {
     console.log("Encrypted Message: ", encryptedMessage);
 
     await persistKeys(importedKeys.publicKey, importedKeys.privateKey);
-    let persistedKeys = await restoreKeys();
+    let persistedKeys = await readKeys();
 
     if (!(persistedKeys.publicKey instanceof CryptoKey)) 
         throw Error('Persisted public key is not a CryptoKey');
