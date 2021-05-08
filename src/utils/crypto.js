@@ -202,6 +202,23 @@ export async function restoreKeys() {
     });
 }
 
+export function generateLicenseKey(segmentLength=6, segments=5) {
+    // Exclude lookalikes: 0&O, 5&S, 6&G
+    let chars = "1234789ABCDEFHIJKLMNPQRTUVWXYZ";
+    let keyLength = segments * segmentLength;
+    let key = "";
+    let randomArray = window.crypto.getRandomValues(new Uint8Array(keyLength));
+    randomArray.forEach((el, i) => {
+        let charPosition = el % chars.length;
+        let selectedChar = chars.charAt(charPosition);
+        key += selectedChar;
+        if ((i + 1) % segmentLength === 0 && (i + 1) < keyLength) {
+            key += "-";
+        }
+    });
+    return key;
+}
+
 export async function testCrypto() {
     let license = "A1B2C-A1B2C-A1B2C-A1B2C";
     let exportedKeys = await createEncodedKeypair(license);
