@@ -7,7 +7,7 @@ import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
-import {handleNewSession} from './utils/license';
+import {handleNewRegistration} from './utils/license';
 import {syncUp, syncDown} from './utils/sync';
 import './index.css';
 
@@ -60,7 +60,7 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
 }
 
 syncDown(store);
-handleNewSession(store);
+handleNewRegistration(store);
 
 ReactDOM.render(
     <Provider store={store}>

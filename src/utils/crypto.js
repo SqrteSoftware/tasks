@@ -29,7 +29,7 @@ export async function createKEK(secret, salt) {
 }
 
 
-export async function createEncryptedKeyPair(kek, iv) {
+export async function createEncryptedKeyPair(kek) {
     // Create keypair
     let keypair = await window.crypto.subtle.generateKey(
         {
@@ -43,13 +43,14 @@ export async function createEncryptedKeyPair(kek, iv) {
     );
 
     // Encrypt and export the private key
+    let privateKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
     let  privateKey = await crypto.subtle.wrapKey(
         'pkcs8',
         keypair.privateKey,
         kek,
         {
             name: "AES-GCM",
-            iv: iv
+            iv: privateKeyWrapIV
         }
     );
 
@@ -58,7 +59,34 @@ export async function createEncryptedKeyPair(kek, iv) {
         keypair.publicKey
     );
 
-    return { publicKey, privateKey };
+    return { publicKey, privateKey, privateKeyWrapIV };
+}
+
+
+export async function createEncryptedSymmetricKey(kek) {
+    // Create symmetric key
+    let symmetricKey = await window.crypto.subtle.generateKey(
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        true,
+        ["encrypt", "decrypt"]
+    );
+
+    // Encrypt and export the symmetric key
+    let symmetricKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
+    let  encryptedSymmetricKey = await crypto.subtle.wrapKey(
+        'raw',
+        symmetricKey,
+        kek,
+        {
+            name: "AES-GCM",
+            iv: symmetricKeyWrapIV
+        }
+    );
+
+    return { encryptedSymmetricKey, symmetricKeyWrapIV};
 }
 
 
@@ -77,15 +105,15 @@ function base64decode(encodedString) {
 }
 
 
-
-export async function createEncodedKeypair(license) {
-    // Salt must be at least 16 bytes:
+export async function createKeypack(license) {
+    // KEK Salt must be at least 16 bytes:
     // https://developer.mozilla.org/en-US/docs/Web/API/Pbkdf2Params
-    let salt = window.crypto.getRandomValues(new Uint8Array(16));
-    let kek = await createKEK(license, salt);
+    let kekSalt = window.crypto.getRandomValues(new Uint8Array(16));
+    let kek = await createKEK(license, kekSalt);
 
-    let iv = window.crypto.getRandomValues(new Uint8Array(12));
-    let keyPair = await createEncryptedKeyPair(kek, iv);
+    let keyPair = await createEncryptedKeyPair(kek);
+
+    let symmetricKey = await createEncryptedSymmetricKey(kek);
 
     let enc = new TextEncoder();
     let encodedLicense = enc.encode(license);
@@ -93,22 +121,26 @@ export async function createEncodedKeypair(license) {
 
     return {
         fingerprint: base64encode(fingerprint),
-        salt: base64encode(salt),
-        iv: base64encode(iv),
+        kekSalt: base64encode(kekSalt),
         publicKey: base64encode(keyPair.publicKey),
-        privateKey: base64encode(keyPair.privateKey)
+        privateKey: base64encode(keyPair.privateKey),
+        privateKeyWrapIV: base64encode(keyPair.privateKeyWrapIV),
+        symmetricKey: base64encode(symmetricKey.encryptedSymmetricKey),
+        symmetricKeyWrapIV: base64encode(symmetricKey.symmetricKeyWrapIV),
     };
 }
 
 
-export async function importEncodedKeypair(license, {publicKey, privateKey, iv, salt}) {
-    let decodedPublicKey = base64decode(publicKey);
-    let decodedPrivateKey = base64decode(privateKey);
-    let decodedIv = base64decode(iv);
-    let decodedSalt = base64decode(salt);
+export async function importKeypack(license, keypack) {
+    let decodedPublicKey = base64decode(keypack.publicKey);
+    let decodedPrivateKey = base64decode(keypack.privateKey);
+    let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
+    let decodedKekSalt = base64decode(keypack.kekSalt);
+    let decodedSymmetricKey = base64decode(keypack.symmetricKey);
+    let decodedSymmetricKeyWrapIv = base64decode(keypack.symmetricKeyWrapIV);
 
     // Derive the KEK
-    let kek = await createKEK(license, decodedSalt);
+    let kek = await createKEK(license, decodedKekSalt);
 
     let importedPrivateKey = await crypto.subtle.unwrapKey(
         'pkcs8',
@@ -116,7 +148,7 @@ export async function importEncodedKeypair(license, {publicKey, privateKey, iv, 
         kek,
         {
             name: "AES-GCM",
-            iv: decodedIv
+            iv: decodedPrivateKeyWrapIv
         },
         {
             name: "RSA-OAEP",
@@ -137,42 +169,82 @@ export async function importEncodedKeypair(license, {publicKey, privateKey, iv, 
         ["encrypt"]
     );
 
+    let importedSymmetricKey = await window.crypto.subtle.unwrapKey(
+        "raw",
+        decodedSymmetricKey,
+        kek,
+        {
+            name: "AES-GCM",
+            iv: decodedSymmetricKeyWrapIv
+        },
+        "AES-GCM",
+        false,
+        ["encrypt", "decrypt"]
+      );
+
     return {
         privateKey: importedPrivateKey,
-        publicKey: importedPublicKey
+        publicKey: importedPublicKey,
+        symmetricKey: importedSymmetricKey
     };
 }
 
 
+
 export async function encrypt(stringData, key) {
+    var params = {name: key.algorithm.name};
+    if (key.algorithm.name === "AES-GCM") {
+        params.iv = window.crypto.getRandomValues(new Uint8Array(12));
+    }
+    else if (key.algorithm.name !== "RSA-OAEP") {
+        throw Error("Unsupported encryption algorithm: " + key.algorithm.name);
+    }
+
     let enc = new TextEncoder();
-    let ciphertext = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP"
-      },
+    let data = await window.crypto.subtle.encrypt(
+      params,
       key,
       enc.encode(stringData)
     );
 
-    return ciphertext;
+    return {data, iv: params.iv};
 }
 
 
-export async function decrypt(arrayBuffer, key) {
+export async function decrypt({data, iv}, key) {
+    console.log(data)
+    if (!(data instanceof ArrayBuffer)) {
+        throw Error("data must be an ArrayBuffer");
+    }
+    var params = {name: key.algorithm.name};
+    if (key.algorithm.name === "AES-GCM") {
+        if (!iv) {
+            throw Error("AES-GCM requires an IV");    
+        }
+        params.iv = iv;
+    }
+    else if (key.algorithm.name === "RSA-OAEP") {
+        if (iv) {
+            throw Error("RSA-OAEP does not support an IV");    
+        }
+    }
+    else {
+        throw Error("Unsupported encryption algorithm: " + key.algorithm.name);
+    }
+
     let enc = new TextDecoder();
     let ciphertext = await window.crypto.subtle.decrypt(
-      {
-        name: "RSA-OAEP"
-      },
+      params,
       key,
-      arrayBuffer
+      data
     );
 
     return enc.decode(ciphertext);
 }
 
-export async function persistKeys(publicKey, privateKey) {
-    let keys = {publicKey, privateKey};
+
+export async function storeLocalKeys(publicKey, privateKey, symmetricKey) {
+    let keys = {publicKey, privateKey, symmetricKey};
 
     let requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
@@ -193,7 +265,7 @@ export async function persistKeys(publicKey, privateKey) {
     });
 }
 
-export async function readKeys() {
+export async function loadLocalKeys() {
     var requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
         e.target.result.createObjectStore('keys', 
@@ -231,47 +303,69 @@ export async function testCrypto() {
     let license = generateLicenseKey();
     console.log("Generated License:", license);
     
-    let exportedKeys = await createEncodedKeypair(license);
-    console.log("Keypair Created:", exportedKeys);
+    let keypack = await createKeypack(license);
+    console.log("Keypack Created:", keypack);
 
-    if (!exportedKeys.fingerprint)
+    if (!keypack.fingerprint)
         throw Error('Missing Fingerprint');
-    if (!exportedKeys.salt)
-        throw Error('Missing Salt');
-    if (!exportedKeys.iv)
-        throw Error('Missing IV');
-    if (!exportedKeys.publicKey)
+    if (!keypack.kekSalt)
+        throw Error('Missing KEK Salt');
+    if (!keypack.privateKeyWrapIV)
+        throw Error('Missing Private Key Wrapping IV');
+    if (!keypack.publicKey)
         throw Error('Missing publicKey');
-    if (!exportedKeys.privateKey)
+    if (!keypack.privateKey)
         throw Error('Missing privateKey');
+    if (!keypack.symmetricKey)
+        throw Error('Missing symmetricKey');
+    if (!keypack.symmetricKeyWrapIV)
+        throw Error('Missing symmetricKeyWrapIV');
 
-    let importedKeys = await importEncodedKeypair(license, exportedKeys);
+    let importedKeys = await importKeypack(license, keypack);
 
     if (!(importedKeys.publicKey instanceof CryptoKey)) 
         throw Error('Imported public key is not a CryptoKey');
     if (!(importedKeys.privateKey instanceof CryptoKey)) 
         throw Error('Imported private key is not a CryptoKey');
+    if (!(importedKeys.symmetricKey instanceof CryptoKey)) 
+        throw Error('Imported symmetric key is not a CryptoKey');
 
-    // Encrypt a message using the imported public key
+    // Encrypt a message using the imported public key and symmetric key
     let msg = "My message";
     console.log("Initial Message: ", msg);
 
-    let encryptedMessage = await encrypt(msg, importedKeys.publicKey);
-    console.log("Encrypted Message: ", encryptedMessage);
+    let encryptedAsymData = await encrypt(msg, importedKeys.publicKey);
+    console.log("Asymmetric Encrypted Message: ", encryptedAsymData);
 
-    await persistKeys(importedKeys.publicKey, importedKeys.privateKey);
-    let persistedKeys = await readKeys();
+    let encryptedSymData = await encrypt(msg, importedKeys.symmetricKey);
+    console.log("Symmetric Encrypted Message: ", encryptedSymData);
+
+    await storeLocalKeys(
+        importedKeys.publicKey, 
+        importedKeys.privateKey,
+        importedKeys.symmetricKey
+    );
+    let persistedKeys = await loadLocalKeys();
 
     if (!(persistedKeys.publicKey instanceof CryptoKey)) 
         throw Error('Persisted public key is not a CryptoKey');
     if (!(persistedKeys.privateKey instanceof CryptoKey)) 
         throw Error('Persisted private key is not a CryptoKey');
+    if (!(persistedKeys.symmetricKey instanceof CryptoKey)) 
+        throw Error('Persisted symmetric key is not a CryptoKey');
 
     // Decrypt a message with both the imported and persisted private key
-    let decryptedMessage = await decrypt(encryptedMessage, persistedKeys.privateKey);
-    console.log("Encrypted Message: ", decryptedMessage);
+    let decryptedAsymMessage = await decrypt(encryptedAsymData, persistedKeys.privateKey);
+    console.log("Decrypted Message: ", decryptedAsymMessage);
 
-    if (msg !== decryptedMessage) 
+    if (msg !== decryptedAsymMessage) 
+        throw Error('Decrypted message does not match original message');
+
+    // Decrypt a message with both the imported and persisted symmetric key
+    let decryptedSymMessage = await decrypt(encryptedSymData, persistedKeys.symmetricKey);
+    console.log("Decrypted Message: ", decryptedSymMessage);
+
+    if (msg !== decryptedSymMessage) 
         throw Error('Decrypted message does not match original message');
 
     console.log("SUCCESS!");
