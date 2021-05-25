@@ -28,7 +28,6 @@ export function onClick(e) {
         .catch(function(error) {
           console.error('Error:', error);
         });
-        // 
     });
   });
 }
