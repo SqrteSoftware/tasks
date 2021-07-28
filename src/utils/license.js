@@ -20,7 +20,7 @@ export function handleNewRegistration(store) {
                   'Content-Type': 'application/json',
                   'Authorization': queryParams.session_id
                 },
-                body: JSON.stringify({Item: {id: '1234',...keyInfo}})
+                body: JSON.stringify(keyInfo)
             }).then(resp => {
             console.log("RESPONSE:",resp);
             });
