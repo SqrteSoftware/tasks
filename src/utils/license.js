@@ -7,24 +7,26 @@ export function handleNewRegistration(store) {
     if (queryParams.session_id) {
         store.dispatch(createPaymentSession(queryParams.session_id));
         let license = generateLicenseKey();
-        createKeypack(license).then(keyInfo => {
-            console.log("LICENSE:",license);
-            console.log("KEY GENERATED:",keyInfo);
-
+        createKeypack(license).then(keypack => {
+            console.log("KEYPACK GENERATED:",keypack);
             fetch('https://edk22w6pt5.execute-api.us-east-1.amazonaws.com/staging/users', {
                 method: 'PUT',
-                // mode: 'cors',
                 cache: 'no-cache',
-                credentials: 'omit',
                 headers: {
                   'Content-Type': 'application/json',
                   'Authorization': queryParams.session_id
                 },
-                body: JSON.stringify(keyInfo)
+                body: JSON.stringify(keypack)
             }).then(resp => {
-            console.log("RESPONSE:",resp);
+                if (resp.status === 200) {
+                    console.log("USER CREATION RESP:",resp);
+                    store.dispatch(createLicenseKey(license));
+                }
+                else {
+                    alert('An error occurred during account setup. Please contact support.');
+                }
+
             });
-            store.dispatch(createLicenseKey(license));
         });
     }
 }

@@ -282,7 +282,7 @@ export async function loadLocalKeys() {
     });
 }
 
-export function generateLicenseKey(segmentLength=6, segments=5) {
+export function generateLicenseKey(segmentLength=5, segments=5) {
     // Exclude lookalikes: 0&O, 5&S, 6&G
     let chars = "1234789ABCDEFHIJKLMNPQRTUVWXYZ";
     let keyLength = segments * segmentLength;
