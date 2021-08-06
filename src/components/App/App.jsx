@@ -65,7 +65,10 @@ class App extends Component {
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                 />
-                <SyncDialog open={this.state.syncModalOpen} onClose={this.onSyncModalClose}/>
+                <SyncDialog 
+                    open={this.state.syncModalOpen} 
+                    onClose={this.onSyncModalClose}
+                />
                 <LicenseDialog 
                     open={this.state.licenseModalOpen} 
                     licenseKey={this.props.license.licenseKey} 
@@ -172,6 +175,10 @@ class App extends Component {
 
     onLicenseModalClose = (e) => {
         this.setState({"licenseModalOpen": false})
+        // Clear sensitive info on close
+        this.props.deleteLicenseInfo();
+        // Remove session info from URL
+        window.history.replaceState(null, null, window.location.pathname)
     };
 
     onLayoutChange = (currentLayout, allLayouts) => {

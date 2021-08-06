@@ -183,8 +183,8 @@ export async function importKeypack(license, keypack) {
       );
 
     return {
-        privateKey: importedPrivateKey,
         publicKey: importedPublicKey,
+        privateKey: importedPrivateKey,
         symmetricKey: importedSymmetricKey
     };
 }
@@ -243,7 +243,7 @@ export async function decrypt({data, iv}, key) {
 }
 
 
-export async function storeLocalKeys(publicKey, privateKey, symmetricKey) {
+export async function storeLocalKeys({publicKey, privateKey, symmetricKey}) {
     let keys = {publicKey, privateKey, symmetricKey};
 
     let requestDb = window.indexedDB.open('keystore');
@@ -340,11 +340,7 @@ export async function testCrypto() {
     let encryptedSymData = await encrypt(msg, importedKeys.symmetricKey);
     console.log("Symmetric Encrypted Message: ", encryptedSymData);
 
-    await storeLocalKeys(
-        importedKeys.publicKey, 
-        importedKeys.privateKey,
-        importedKeys.symmetricKey
-    );
+    await storeLocalKeys({...importedKeys});
     let persistedKeys = await loadLocalKeys();
 
     if (!(persistedKeys.publicKey instanceof CryptoKey)) 
