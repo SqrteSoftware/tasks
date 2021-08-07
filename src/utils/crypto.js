@@ -92,8 +92,7 @@ export async function createEncryptedSymmetricKey(kek) {
 
 function base64encode(arrayBuffer) {
     let bytes = new Uint8Array(arrayBuffer);
-    let encodedString = '';
-    bytes.forEach(b => encodedString += String.fromCharCode(b));
+    let encodedString = String.fromCharCode.apply(null, bytes);
     encodedString = btoa(encodedString);
     return encodedString;
 }
