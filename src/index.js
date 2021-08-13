@@ -11,8 +11,8 @@ import {handleNewRegistration} from './utils/license';
 import {syncUp, syncDown} from './utils/sync';
 import './index.css';
 
-import {testCrypto} from './utils/crypto';
-window.testCrypto = testCrypto;
+import {testCryptoStorage} from './utils/crypto';
+window.testCryptoStorage = testCryptoStorage;
 
 
 let initialState = loadStateFromLocalStorage();

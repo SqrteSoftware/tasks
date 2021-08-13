@@ -1,14 +1,12 @@
 ############################################################
 # Build the base container used for other stages
 ############################################################
-FROM alpine:3.9 as base
+FROM node:16.6-alpine3.11 as base
 
 RUN apk update && \
     apk add \
         wget \
         ca-certificates \
-        nodejs \
-        nodejs-npm \
         bash
 
 WORKDIR /tasks/app

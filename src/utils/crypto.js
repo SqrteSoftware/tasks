@@ -1,3 +1,9 @@
+// Mock window var for nodejs tests
+if (!window.crypto) window.crypto = require('crypto').webcrypto;
+if (!window.TextEncoder) window.TextEncoder = require('util').TextEncoder;
+if (!window.TextDecoder) window.TextDecoder = require('util').TextDecoder;
+
+
 export async function createKEK(secret, salt) {
     let iterations = 100000;
     let enc = new TextEncoder();
@@ -211,7 +217,6 @@ export async function encrypt(stringData, key) {
 
 
 export async function decrypt({data, iv}, key) {
-    console.log(data)
     if (!(data instanceof ArrayBuffer)) {
         throw Error("data must be an ArrayBuffer");
     }
@@ -298,43 +303,18 @@ export function generateLicenseKey(segmentLength=5, segments=5) {
     return key;
 }
 
-export async function testCrypto() {
+export async function testCryptoStorage() {
     let license = generateLicenseKey();
     console.log("Generated License:", license);
     
     let keypack = await createKeypack(license);
     console.log("Keypack Created:", keypack);
 
-    if (!keypack.fingerprint)
-        throw Error('Missing Fingerprint');
-    if (!keypack.kekSalt)
-        throw Error('Missing KEK Salt');
-    if (!keypack.privateKeyWrapIV)
-        throw Error('Missing Private Key Wrapping IV');
-    if (!keypack.publicKey)
-        throw Error('Missing publicKey');
-    if (!keypack.privateKey)
-        throw Error('Missing privateKey');
-    if (!keypack.symmetricKey)
-        throw Error('Missing symmetricKey');
-    if (!keypack.symmetricKeyWrapIV)
-        throw Error('Missing symmetricKeyWrapIV');
-
     let importedKeys = await importKeypack(license, keypack);
-
-    if (!(importedKeys.publicKey instanceof CryptoKey)) 
-        throw Error('Imported public key is not a CryptoKey');
-    if (!(importedKeys.privateKey instanceof CryptoKey)) 
-        throw Error('Imported private key is not a CryptoKey');
-    if (!(importedKeys.symmetricKey instanceof CryptoKey)) 
-        throw Error('Imported symmetric key is not a CryptoKey');
 
     // Encrypt a message using the imported public key and symmetric key
     let msg = "My message";
     console.log("Initial Message: ", msg);
-
-    let encryptedAsymData = await encrypt(msg, importedKeys.publicKey);
-    console.log("Asymmetric Encrypted Message: ", encryptedAsymData);
 
     let encryptedSymData = await encrypt(msg, importedKeys.symmetricKey);
     console.log("Symmetric Encrypted Message: ", encryptedSymData);
@@ -348,13 +328,6 @@ export async function testCrypto() {
         throw Error('Persisted private key is not a CryptoKey');
     if (!(persistedKeys.symmetricKey instanceof CryptoKey)) 
         throw Error('Persisted symmetric key is not a CryptoKey');
-
-    // Decrypt a message with both the imported and persisted private key
-    let decryptedAsymMessage = await decrypt(encryptedAsymData, persistedKeys.privateKey);
-    console.log("Decrypted Message: ", decryptedAsymMessage);
-
-    if (msg !== decryptedAsymMessage) 
-        throw Error('Decrypted message does not match original message');
 
     // Decrypt a message with both the imported and persisted symmetric key
     let decryptedSymMessage = await decrypt(encryptedSymData, persistedKeys.symmetricKey);

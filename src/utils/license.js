@@ -13,7 +13,7 @@ export async function handleNewRegistration(store) {
     let keypack = await createKeypack(license);
     console.log("KEYPACK GENERATED:",keypack);
     let keyObjects = await importKeypack(license, keypack);
-    await storeLocalKeys({...keyObjects})
+    await storeLocalKeys({...keyObjects});
 
     let resp = await fetch('https://edk22w6pt5.execute-api.us-east-1.amazonaws.com/staging/users', {
         method: 'PUT',
