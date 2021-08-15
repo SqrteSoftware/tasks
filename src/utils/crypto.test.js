@@ -4,6 +4,16 @@ const webcrypto = require('crypto').webcrypto;
 
 describe('Crypto', () => {
 
+    let license = null;
+    let keypack = null;
+    let importedKeys = null;
+
+    beforeAll(async () => {
+        license = crypto.generateLicenseKey()
+        keypack = await crypto.createKeypack(license)
+        importedKeys = await crypto.importKeypack(license, keypack);
+    });
+
     test('generateLicenseKey should have expected length', () => {
         let segmentLength = 5;
         let segments = 5;
@@ -14,33 +24,32 @@ describe('Crypto', () => {
     });
 
     test('createKeypack should generate keys', async () => {
-        let license = crypto.generateLicenseKey()
-        let keypack = await crypto.createKeypack(license)
-        
         expect(keypack.fingerprint).toBeDefined()
         expect(keypack.kekSalt).toBeDefined()
+
         expect(keypack.privateKeyWrapIV).toBeDefined()
         expect(keypack.publicKey).toBeDefined()
         expect(keypack.privateKey).toBeDefined()
+
+        expect(keypack.privateSigningKeyWrapIV).toBeDefined()
+        expect(keypack.publicSigningKey).toBeDefined()
+        expect(keypack.privateSigningKey).toBeDefined()
+
         expect(keypack.symmetricKey).toBeDefined()
         expect(keypack.symmetricKeyWrapIV).toBeDefined()
     });
 
     test('importKeypack should import keys', async () => {
-        let license = crypto.generateLicenseKey()
-        let keypack = await crypto.createKeypack(license)
-        let importedKeys = await crypto.importKeypack(license, keypack);
-        
         expect(importedKeys.publicKey).toBeInstanceOf(webcrypto.CryptoKey)
         expect(importedKeys.privateKey).toBeInstanceOf(webcrypto.CryptoKey)
+
+        expect(importedKeys.publicSigningKey).toBeInstanceOf(webcrypto.CryptoKey)
+        expect(importedKeys.privateSigningKey).toBeInstanceOf(webcrypto.CryptoKey)
+        
         expect(importedKeys.symmetricKey).toBeInstanceOf(webcrypto.CryptoKey)
     });
 
     test('encryption and decryption with asymmetric key', async () => {
-        let license = crypto.generateLicenseKey()
-        let keypack = await crypto.createKeypack(license)
-        let importedKeys = await crypto.importKeypack(license, keypack);
-        
         let msg = 'my secret message';
         let encryptedAsymData = await crypto.encrypt(msg, importedKeys.publicKey);
 
@@ -52,11 +61,18 @@ describe('Crypto', () => {
         expect(decryptedAsymMessage).toBe(msg);
     });
 
+    test('signing and verifying with asymmetric key', async () => {
+        let msg = 'my secret message';
+        let signature = await crypto.sign(msg, importedKeys.privateSigningKey);
+
+        expect(signature).toBeInstanceOf(ArrayBuffer)
+
+        let verification = await crypto.verify(msg, signature, importedKeys.publicSigningKey);
+
+        expect(verification).toBe('valid');
+    });    
+
     test('encryption and decryption with symmetric key', async () => {
-        let license = crypto.generateLicenseKey()
-        let keypack = await crypto.createKeypack(license)
-        let importedKeys = await crypto.importKeypack(license, keypack);
-        
         let msg = 'my secret message';
         let encryptedAsymData = await crypto.encrypt(msg, importedKeys.symmetricKey);
 

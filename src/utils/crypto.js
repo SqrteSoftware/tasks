@@ -69,6 +69,40 @@ export async function createEncryptedKeyPair(kek) {
 }
 
 
+export async function createEncryptedSigningKeyPair(kek) {
+    // Create keypair
+    let keypair = await window.crypto.subtle.generateKey(
+        {
+            name: "RSA-PSS",
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256",
+        },
+        true,
+        ["sign", "verify"]
+    );
+
+    // Encrypt and export the private key
+    let privateKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
+    let  privateKey = await crypto.subtle.wrapKey(
+        'pkcs8',
+        keypair.privateKey,
+        kek,
+        {
+            name: "AES-GCM",
+            iv: privateKeyWrapIV
+        }
+    );
+
+    let publicKey = await crypto.subtle.exportKey(
+        'spki',
+        keypair.publicKey
+    );
+
+    return { publicKey, privateKey, privateKeyWrapIV };
+}
+
+
 export async function createEncryptedSymmetricKey(kek) {
     // Create symmetric key
     let symmetricKey = await window.crypto.subtle.generateKey(
@@ -117,7 +151,7 @@ export async function createKeypack(license) {
     let kek = await createKEK(license, kekSalt);
 
     let keyPair = await createEncryptedKeyPair(kek);
-
+    let signingKeyPair = await createEncryptedSigningKeyPair(kek);
     let symmetricKey = await createEncryptedSymmetricKey(kek);
 
     let enc = new TextEncoder();
@@ -130,6 +164,9 @@ export async function createKeypack(license) {
         publicKey: base64encode(keyPair.publicKey),
         privateKey: base64encode(keyPair.privateKey),
         privateKeyWrapIV: base64encode(keyPair.privateKeyWrapIV),
+        publicSigningKey: base64encode(signingKeyPair.publicKey),
+        privateSigningKey: base64encode(signingKeyPair.privateKey),
+        privateSigningKeyWrapIV: base64encode(signingKeyPair.privateKeyWrapIV),
         symmetricKey: base64encode(symmetricKey.encryptedSymmetricKey),
         symmetricKeyWrapIV: base64encode(symmetricKey.symmetricKeyWrapIV),
     };
@@ -140,6 +177,11 @@ export async function importKeypack(license, keypack) {
     let decodedPublicKey = base64decode(keypack.publicKey);
     let decodedPrivateKey = base64decode(keypack.privateKey);
     let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
+
+    let decodedPublicSigningKey = base64decode(keypack.publicKey);
+    let decodedPrivateSigningKey = base64decode(keypack.privateKey);
+    let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
+
     let decodedKekSalt = base64decode(keypack.kekSalt);
     let decodedSymmetricKey = base64decode(keypack.symmetricKey);
     let decodedSymmetricKeyWrapIv = base64decode(keypack.symmetricKeyWrapIV);
@@ -174,6 +216,33 @@ export async function importKeypack(license, keypack) {
         ["encrypt"]
     );
 
+    let importedPrivateSigningKey = await crypto.subtle.unwrapKey(
+        'pkcs8',
+        decodedPrivateSigningKey,
+        kek,
+        {
+            name: "AES-GCM",
+            iv: decodedPrivateSigningKeyWrapIv
+        },
+        {
+            name: "RSA-PSS",
+            hash: "SHA-256"
+        },
+        false,
+        ["sign"]
+    );
+
+    let importedPublicSigningKey = await crypto.subtle.importKey(
+        'spki',
+        decodedPublicSigningKey,
+        {
+            name: "RSA-PSS",
+            hash: "SHA-256"
+        },
+        false,
+        ["verify"]
+    );
+
     let importedSymmetricKey = await window.crypto.subtle.unwrapKey(
         "raw",
         decodedSymmetricKey,
@@ -190,14 +259,48 @@ export async function importKeypack(license, keypack) {
     return {
         publicKey: importedPublicKey,
         privateKey: importedPrivateKey,
+        publicSigningKey: importedPublicSigningKey,
+        privateSigningKey: importedPrivateSigningKey,
         symmetricKey: importedSymmetricKey
     };
 }
 
 
+export async function sign(stringData, privateKey) {
+    let enc = new TextEncoder();
+    let signature = await window.crypto.subtle.sign(
+        {
+          name: "RSA-PSS",
+          saltLength: 32,
+        },
+        privateKey,
+        enc.encode(stringData)
+    );
+
+    return signature;
+}
+
+
+export async function verify(stringData, signature, publicKey) {
+    let enc = new TextEncoder();
+    let data = enc.encode(stringData);
+    let result = await window.crypto.subtle.verify(
+      {
+        name: "RSA-PSS",
+        saltLength: 32,
+      },
+      publicKey,
+      signature,
+      data
+    );
+  
+    return result ? "valid" : "invalid";
+  }
+
 
 export async function encrypt(stringData, key) {
     var params = {name: key.algorithm.name};
+
     if (key.algorithm.name === "AES-GCM") {
         params.iv = window.crypto.getRandomValues(new Uint8Array(12));
     }
@@ -247,9 +350,7 @@ export async function decrypt({data, iv}, key) {
 }
 
 
-export async function storeLocalKeys({publicKey, privateKey, symmetricKey}) {
-    let keys = {publicKey, privateKey, symmetricKey};
-
+export async function storeLocalKeys(keys) {
     let requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
         e.target.result.createObjectStore('keys', 
@@ -319,7 +420,7 @@ export async function testCryptoStorage() {
     let encryptedSymData = await encrypt(msg, importedKeys.symmetricKey);
     console.log("Symmetric Encrypted Message: ", encryptedSymData);
 
-    await storeLocalKeys({...importedKeys});
+    await storeLocalKeys(importedKeys);
     let persistedKeys = await loadLocalKeys();
 
     if (!(persistedKeys.publicKey instanceof CryptoKey)) 
