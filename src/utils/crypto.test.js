@@ -62,7 +62,7 @@ describe('Crypto', () => {
     });
 
     test('signing and verifying with asymmetric key', async () => {
-        let msg = 'my secret message';
+        let msg = JSON.stringify({fingerprint: '123', timestamp: Date.now()});
         let signature = await crypto.sign(msg, importedKeys.privateSigningKey);
 
         expect(signature).toBeInstanceOf(ArrayBuffer)

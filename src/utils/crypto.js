@@ -130,7 +130,7 @@ export async function createEncryptedSymmetricKey(kek) {
 }
 
 
-function base64encode(arrayBuffer) {
+export function base64encode(arrayBuffer) {
     let bytes = new Uint8Array(arrayBuffer);
     let encodedString = String.fromCharCode.apply(null, bytes);
     encodedString = btoa(encodedString);
@@ -138,7 +138,7 @@ function base64encode(arrayBuffer) {
 }
 
 
-function base64decode(encodedString) {
+export function base64decode(encodedString) {
     let decodedString = window.atob(encodedString);
     return Uint8Array.from(decodedString, c => c.charCodeAt(0));
 }
@@ -178,9 +178,9 @@ export async function importKeypack(license, keypack) {
     let decodedPrivateKey = base64decode(keypack.privateKey);
     let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
 
-    let decodedPublicSigningKey = base64decode(keypack.publicKey);
-    let decodedPrivateSigningKey = base64decode(keypack.privateKey);
-    let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
+    let decodedPublicSigningKey = base64decode(keypack.publicSigningKey);
+    let decodedPrivateSigningKey = base64decode(keypack.privateSigningKey);
+    let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateSigningKeyWrapIV);
 
     let decodedKekSalt = base64decode(keypack.kekSalt);
     let decodedSymmetricKey = base64decode(keypack.symmetricKey);
