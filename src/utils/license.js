@@ -1,3 +1,4 @@
+import {BASE_URL} from '../config'
 import {generateLicenseKey, createKeypack, importKeypack, storeLocalKeys} from './crypto';
 import {loadUrlQueryParams} from '../utils'
 import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
@@ -15,7 +16,7 @@ export async function handleNewRegistration(store) {
     let keyObjects = await importKeypack(license, keypack);
     await storeLocalKeys({...keyObjects});
 
-    let resp = await fetch('https://edk22w6pt5.execute-api.us-east-1.amazonaws.com/staging/users', {
+    let resp = await fetch(BASE_URL + '/users', {
         method: 'PUT',
         cache: 'no-cache',
         headers: {

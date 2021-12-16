@@ -1,10 +1,11 @@
+import {BASE_URL} from '../config'
 
 export function onClick(e) {
   e.preventDefault();
   window.grecaptcha.ready(function() {
     window.grecaptcha.execute('6LdGv_EZAAAAAHPwtoTIPLs9FbLDOYUwHJCc4xVm', {action: 'submit'}).then(function(token) {
         console.log("sending captcha token:",token);
-        fetch('https://edk22w6pt5.execute-api.us-east-1.amazonaws.com/staging/session', {
+        fetch(BASE_URL + '/payment-sessions', {
           method: 'POST',
           headers: {
             'Authorization': token
