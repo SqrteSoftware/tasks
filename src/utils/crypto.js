@@ -404,6 +404,13 @@ export function generateLicenseKey(segmentLength=5, segments=5) {
     return key;
 }
 
+export async function generateAuthToken(fingerprint, privateKey) {
+    let tokenBody = JSON.stringify({fingerprint, timestamp: Date.now()});
+    let signature = await sign(tokenBody, privateKey);
+    let token = btoa(tokenBody) + '.' + base64encode(signature);
+    return token;
+}
+
 export async function testCryptoStorage() {
     let license = generateLicenseKey();
     console.log("Generated License:", license);
@@ -427,6 +434,10 @@ export async function testCryptoStorage() {
         throw Error('Persisted public key is not a CryptoKey');
     if (!(persistedKeys.privateKey instanceof CryptoKey)) 
         throw Error('Persisted private key is not a CryptoKey');
+    if (!(persistedKeys.publicSigningKey instanceof CryptoKey)) 
+        throw Error('Persisted public signing key is not a CryptoKey');
+    if (!(persistedKeys.privateSigningKey instanceof CryptoKey)) 
+        throw Error('Persisted private signing key is not a CryptoKey');
     if (!(persistedKeys.symmetricKey instanceof CryptoKey)) 
         throw Error('Persisted symmetric key is not a CryptoKey');
 

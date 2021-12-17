@@ -84,5 +84,22 @@ describe('Crypto', () => {
         expect(decryptedAsymMessage).toBe(msg);
     });
 
+    test('creating an auth token', async() => {
+
+        let token = await crypto.generateAuthToken(
+            '123456', importedKeys.privateSigningKey);
+
+        let tokenParts = token.split('.');
+
+        let verification = await crypto.verify(
+            atob(tokenParts[0]), 
+            crypto.base64decode(tokenParts[1]), 
+            importedKeys.publicSigningKey);
+
+        expect(verification).toBe('valid');
+
+        
+    });
+
 });
 
