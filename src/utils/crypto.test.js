@@ -92,13 +92,14 @@ describe('Crypto', () => {
         let tokenParts = token.split('.');
 
         let verification = await crypto.verify(
-            atob(tokenParts[0]), 
+            tokenParts[0], 
             crypto.base64decode(tokenParts[1]), 
             importedKeys.publicSigningKey);
 
         expect(verification).toBe('valid');
 
-        
+        let parsedToken = JSON.parse(atob(tokenParts[0]));
+        expect(parsedToken['fingerprint']).toBe('123456');
     });
 
 });

@@ -405,9 +405,9 @@ export function generateLicenseKey(segmentLength=5, segments=5) {
 }
 
 export async function generateAuthToken(fingerprint, privateKey) {
-    let tokenBody = JSON.stringify({fingerprint, timestamp: Date.now()});
-    let signature = await sign(tokenBody, privateKey);
-    let token = btoa(tokenBody) + '.' + base64encode(signature);
+    let tokenBody = btoa(JSON.stringify({fingerprint, timestamp: Date.now()}));
+    let signature = base64encode(await sign(tokenBody, privateKey));
+    let token = tokenBody + '.' + signature;
     return token;
 }
 
