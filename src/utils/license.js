@@ -28,6 +28,7 @@ export async function handleNewRegistration(store) {
     if (resp.status === 200) {
         console.log("USER CREATION RESP:",resp);
         store.dispatch(createLicenseKey(license));
+        localStorage.setItem('fingerprint', keypack.fingerprint);
     }
     else {
         alert('An error occurred during account setup. Please contact support.');

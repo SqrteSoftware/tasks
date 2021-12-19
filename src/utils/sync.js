@@ -1,14 +1,16 @@
 import {BASE_URL} from '../config'
 import {clearSync} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
+import * as crypto from './crypto'
 
 
 let apiUrl = BASE_URL + '/items';
 
-export function syncUp(store) {
+export async function syncUp(store) {
     let changes = store.getState().sync;
     let items = store.getState().items;
     let apiKey = localStorage.getItem('apiKey');
+    let fingerprint = localStorage.getItem('fingerprint');
 
     if (!changes || Object.keys(changes).length <= 0) {
         console.log("No changes, skipping sync...");
@@ -19,10 +21,14 @@ export function syncUp(store) {
     // be invoked again, but without changes so it will exit immediately.
     store.dispatch(clearSync());
 
-    if (apiKey === null) {
+    if (apiKey === null && fingerprint === null) {
         console.log("No API Key, skipping sync...");
         return;
     }
+
+    let keys = await crypto.loadLocalKeys();
+    let authToken = await crypto.generateAuthToken(fingerprint, keys.privateSigningKey);
+    console.log(authToken)
 
     let updates = [];
     let deletions = [];
@@ -43,7 +49,7 @@ export function syncUp(store) {
             mode: "cors",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": apiKey
+                "Authorization": authToken
             },
             body: JSON.stringify(wrappedItem)
         }).then((res) => {
@@ -58,7 +64,7 @@ export function syncUp(store) {
             mode: "cors",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": apiKey
+                "Authorization": authToken
             },
             body: JSON.stringify(wrappedItem)
         }).then((res) => {
