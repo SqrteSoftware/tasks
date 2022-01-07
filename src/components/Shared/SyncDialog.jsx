@@ -9,6 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import {onClick} from '../../utils/stripe';
 import LoadingButton from './LoadingButton';
+import Button from '@material-ui/core/Button';
 
 const styles = (theme) => ({
   root: {
@@ -64,6 +65,12 @@ export default function SyncDialog(props) {
         </DialogContent>
         <DialogActions>
           <LoadingButton onClick={onClick}/>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={e => {}}>
+            Existing License
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

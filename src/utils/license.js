@@ -34,3 +34,8 @@ export async function handleNewRegistration(store) {
         alert('An error occurred during account setup. Please contact support.');
     }
 }
+
+export async function handleExistingLicense(license) {
+    // Hash license to get fingerprint
+    // Use fingerprint to download license from server
+}

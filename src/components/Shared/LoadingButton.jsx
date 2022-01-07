@@ -49,7 +49,7 @@ export default function LoadingButton(props) {
           color="primary"
           disabled={loading}
           onClick={handleButtonClick}>
-          Subscribe
+          New Subscription
         </Button>
         {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
       </div>

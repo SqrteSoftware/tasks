@@ -144,6 +144,14 @@ export function base64decode(encodedString) {
 }
 
 
+export async function getHash(string) {
+    let enc = new TextEncoder();
+    let encodedString = enc.encode(string);
+    let hash = await crypto.subtle.digest("SHA-256", encodedString);
+    return hash;
+}
+
+
 export async function createKeypack(license) {
     // KEK Salt must be at least 16 bytes:
     // https://developer.mozilla.org/en-US/docs/Web/API/Pbkdf2Params
@@ -154,9 +162,7 @@ export async function createKeypack(license) {
     let signingKeyPair = await createEncryptedSigningKeyPair(kek);
     let symmetricKey = await createEncryptedSymmetricKey(kek);
 
-    let enc = new TextEncoder();
-    let encodedLicense = enc.encode(license);
-    let fingerprint = await crypto.subtle.digest("SHA-256", encodedLicense);
+    let fingerprint = getHash(license);
 
     return {
         fingerprint: base64encode(fingerprint),

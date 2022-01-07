@@ -65,8 +65,8 @@ class App extends Component {
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                 />
-                <SyncDialog 
-                    open={this.state.syncModalOpen} 
+                <SyncDialog
+                    open={this.state.syncModalOpen}
                     onClose={this.onSyncModalClose}
                 />
                 <LicenseDialog 
