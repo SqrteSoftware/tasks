@@ -17,7 +17,7 @@ describe('Crypto', () => {
     test('getHash should generate expected hash', async () => {
         let hash = await crypto.getHash('foo');
         let expectedHash = 'LCa0a2j/xo/5m0U8HTBBNBNCLXBkg7+g+YpeiGJm564='
-        expect(crypto.base64encode(hash)).toBe(expectedHash)
+        expect(hash).toBe(expectedHash)
     });
 
     test('generateLicenseKey should have expected length', () => {

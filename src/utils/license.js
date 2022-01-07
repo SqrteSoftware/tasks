@@ -1,5 +1,5 @@
 import {BASE_URL} from '../config'
-import {generateLicenseKey, createKeypack, importKeypack, storeLocalKeys} from './crypto';
+import * as crypto from './crypto'
 import {loadUrlQueryParams} from '../utils'
 import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
 
@@ -9,12 +9,12 @@ export async function handleNewRegistration(store) {
         return
     }
     store.dispatch(createPaymentSession(queryParams.session_id));
-    let license = generateLicenseKey();
+    let license = crypto.generateLicenseKey();
 
-    let keypack = await createKeypack(license);
+    let keypack = await crypto.createKeypack(license);
     console.log("KEYPACK GENERATED:",keypack);
-    let keyObjects = await importKeypack(license, keypack);
-    await storeLocalKeys({...keyObjects});
+    let keyObjects = await crypto.importKeypack(license, keypack);
+    await crypto.storeLocalKeys({...keyObjects});
 
     let resp = await fetch(BASE_URL + '/users', {
         method: 'PUT',
@@ -36,6 +36,8 @@ export async function handleNewRegistration(store) {
 }
 
 export async function handleExistingLicense(license) {
+    let fingerprint = await crypto.getHash(license);
     // Hash license to get fingerprint
     // Use fingerprint to download license from server
+    // Import keypack from server
 }

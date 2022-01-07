@@ -148,7 +148,8 @@ export async function getHash(string) {
     let enc = new TextEncoder();
     let encodedString = enc.encode(string);
     let hash = await crypto.subtle.digest("SHA-256", encodedString);
-    return hash;
+    let b64hash = base64encode(hash);
+    return b64hash;
 }
 
 
@@ -165,7 +166,7 @@ export async function createKeypack(license) {
     let fingerprint = getHash(license);
 
     return {
-        fingerprint: base64encode(fingerprint),
+        fingerprint: fingerprint,
         kekSalt: base64encode(kekSalt),
         publicKey: base64encode(keyPair.publicKey),
         privateKey: base64encode(keyPair.privateKey),
