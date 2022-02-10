@@ -9,7 +9,6 @@ let apiUrl = BASE_URL + '/items';
 export async function syncUp(store) {
     let changes = store.getState().sync;
     let items = store.getState().items;
-    let apiKey = localStorage.getItem('apiKey');
     let fingerprint = localStorage.getItem('fingerprint');
 
     if (!changes || Object.keys(changes).length <= 0) {
@@ -21,8 +20,8 @@ export async function syncUp(store) {
     // be invoked again, but without changes so it will exit immediately.
     store.dispatch(clearSync());
 
-    if (apiKey === null && fingerprint === null) {
-        console.log("No API Key, skipping sync...");
+    if (fingerprint === null) {
+        console.log("No Fingerprint, skipping sync...");
         return;
     }
 
@@ -73,16 +72,21 @@ export async function syncUp(store) {
     });
 }
 
-export function syncDown(store) {
-    let apiKey = localStorage.getItem('apiKey');
-    if (apiKey === null) return;
+export async function syncDown(store) {
+    let fingerprint = localStorage.getItem('fingerprint');
+
+    if (fingerprint === null) return;
+
+    let keys = await crypto.loadLocalKeys();
+    let authToken = await crypto.generateAuthToken(fingerprint, keys.privateSigningKey);
+    console.log(authToken)
 
     fetch(apiUrl, {
         method: "GET",
         mode: "cors",
         headers: {
             "Content-Type": "application/json",
-            "x-api-key": apiKey
+            "Authorization": authToken
         }
     }).then((res) => {
         return res.json();
