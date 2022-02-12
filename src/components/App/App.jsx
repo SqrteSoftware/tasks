@@ -91,6 +91,7 @@ class App extends Component {
                                  style={this.props.dnd.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
                                     parent={item.parent}
+                                    firstChild={item.firstChild}
                                     children={item.children}
                                     history={item.history}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}

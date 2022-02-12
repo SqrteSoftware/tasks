@@ -19,6 +19,7 @@ export function createViewData(items) {
             let children = getSortedListItems(parentItem.id, items, false);
             listData.push({
                 'parent': parentItem,
+                'firstChild': children[0],
                 'children': children.filter(i => !i.complete),
                 'history': children.filter(i => i.complete)
                     .sort((a, b) => compareDates(a.completeDate, b.completeDate))
