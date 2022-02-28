@@ -163,7 +163,7 @@ export async function createKeypack(license) {
     let signingKeyPair = await createEncryptedSigningKeyPair(kek);
     let symmetricKey = await createEncryptedSymmetricKey(kek);
 
-    let fingerprint = getHash(license);
+    let fingerprint = await getHash(license);
 
     return {
         fingerprint: fingerprint,
