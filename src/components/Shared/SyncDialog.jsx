@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -7,9 +7,14 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import {onClick} from '../../utils/stripe';
 import LoadingButton from './LoadingButton';
 import Button from '@material-ui/core/Button';
+import { TextField } from '@material-ui/core';
+
+import {onClick} from '../../utils/stripe';
+import {handleExistingLicense} from '../../utils/license'
+
+
 
 const styles = (theme) => ({
   root: {
@@ -52,27 +57,68 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 export default function SyncDialog(props) {
+  const [screen, setScreen] = React.useState('intro');
+
+  var content = <IntroBody {...props} setScreen={setScreen}/>;
+  if (screen !== 'intro') {
+    content = <ExistingLicenseBody {...props} setScreen={setScreen}/>
+  }
+
   return (
     <div>
       <Dialog onClose={props.onClose} aria-labelledby="customized-dialog-title" open={props.open}>
-        <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
-          Sync Your Data
-        </DialogTitle>
-        <DialogContent dividers>
-          <Typography gutterBottom>
-            Subscribe to sync your data across devices.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <LoadingButton onClick={onClick}/>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={e => {}}>
-            Existing License
-          </Button>
-        </DialogActions>
+        { content }
       </Dialog>
     </div>
   );
+}
+
+
+function IntroBody(props) {
+  return (
+    <div>
+      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+        Sync Your Data
+      </DialogTitle>
+      <DialogContent dividers>
+        <Typography gutterBottom>
+          Subscribe to sync your data across devices.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <LoadingButton onClick={onClick}/>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={e => { props.setScreen('existing') }}>
+          Existing License
+        </Button>
+      </DialogActions>
+    </div>
+  )
+}
+
+function ExistingLicenseBody(props) {
+  const [licenseKey, setLicenseKey] = useState('');
+  return (
+    <div>
+      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+        Sync Your Data
+      </DialogTitle>
+      <DialogContent dividers>
+        <Typography gutterBottom>
+          Enter your existing license
+        </Typography>
+        <TextField value={licenseKey} onChange={e => setLicenseKey(e.target.value)}/>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={e => {props.setScreen('intro')}} variant="contained" color="secondary">
+            Cancel
+        </Button>
+        <Button onClick={e => handleExistingLicense(licenseKey)} variant="contained" color="primary">
+            Save
+        </Button>
+      </DialogActions>
+    </div>
+  )
 }

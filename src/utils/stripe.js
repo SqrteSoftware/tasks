@@ -13,7 +13,7 @@ export function onClick(e) {
         })
         .then(resp => resp.json())
         .then(data => {
-          console.log(data); 
+          console.log(data);
           let sessionId = data['session-id'];
           // Create an instance of the Stripe object with your publishable API key
           var stripe = window.Stripe('pk_test_ztFkedIL0S6sNPNb2SuPWcuq');

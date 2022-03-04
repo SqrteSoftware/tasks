@@ -36,8 +36,37 @@ export async function handleNewRegistration(store) {
 }
 
 export async function handleExistingLicense(license) {
+    // e.preventDefault();
+
     let fingerprint = await crypto.getHash(license);
     // Hash license to get fingerprint
     // Use fingerprint to download license from server
-    // Import keypack from server
+
+
+    window.grecaptcha.ready(function() {
+        window.grecaptcha.execute(
+            '6LdGv_EZAAAAAHPwtoTIPLs9FbLDOYUwHJCc4xVm', {action: 'submit'})
+            .then(function(token) {
+                console.log("Captcha token:",token);
+                console.log("Fingerprint:",fingerprint);
+                fetch(BASE_URL + '/users/' + encodeURIComponent(fingerprint), {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.error) {
+                        alert(data.error.message);
+                    }
+                    // Import keypack from server
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                });
+        });
+    });
+
 }
