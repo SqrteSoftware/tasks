@@ -89,6 +89,7 @@ export async function syncDown(store) {
             "Authorization": authToken
         }
     }).then((res) => {
+        if (res.status >= 400) throw res
         return res.json();
     }).then((json) => {
         let items = [];
@@ -96,5 +97,7 @@ export async function syncDown(store) {
            items.push(item);
         });
         store.dispatch(syncItems(items));
+    }).catch(res => {
+        res.json().then(err => console.log(err))
     });
 }
