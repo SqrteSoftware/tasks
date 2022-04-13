@@ -53,6 +53,8 @@ export async function syncUp(store) {
             body: JSON.stringify(wrappedItem)
         }).then((res) => {
             console.log("UPDATE:", item, res);
+        }).catch(res => {
+            console.log('Failed to update item: ', item, res)
         });
     });
 
@@ -68,6 +70,8 @@ export async function syncUp(store) {
             body: JSON.stringify(wrappedItem)
         }).then((res) => {
             console.log("DELETE:", itemId, res);
+        }).catch(res => {
+            console.log('Failed to delete item: ', itemId, res)
         });
     });
 }
