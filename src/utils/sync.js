@@ -9,7 +9,7 @@ let apiUrl = BASE_URL + '/items';
 export async function syncUp(store) {
     let changes = store.getState().sync;
     let items = store.getState().items;
-    let fingerprint = localStorage.getItem('fingerprint');
+    let userId = localStorage.getItem('userId');
 
     if (!changes || Object.keys(changes).length <= 0) {
         console.log("No changes, skipping sync...");
@@ -20,13 +20,13 @@ export async function syncUp(store) {
     // be invoked again, but without changes so it will exit immediately.
     store.dispatch(clearSync());
 
-    if (fingerprint === null) {
-        console.log("No Fingerprint, skipping sync...");
+    if (userId === null) {
+        console.log("No userId, skipping sync...");
         return;
     }
 
     let keys = await crypto.loadLocalKeys();
-    let authToken = await crypto.generateAuthToken(fingerprint, keys.privateSigningKey);
+    let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
     console.log(authToken)
 
     let updates = [];
@@ -73,12 +73,12 @@ export async function syncUp(store) {
 }
 
 export async function syncDown(store) {
-    let fingerprint = localStorage.getItem('fingerprint');
+    let userId = localStorage.getItem('userId');
 
-    if (fingerprint === null) return;
+    if (userId === null) return;
 
     let keys = await crypto.loadLocalKeys();
-    let authToken = await crypto.generateAuthToken(fingerprint, keys.privateSigningKey);
+    let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
     console.log(authToken)
 
     fetch(apiUrl, {
@@ -98,6 +98,11 @@ export async function syncDown(store) {
         });
         store.dispatch(syncItems(items));
     }).catch(res => {
-        res.json().then(err => console.log(err))
+        if (res.json) {
+            res.json().then(err => console.log(err))
+        }
+        else {
+            console.log('Error: ', res)
+        }
     });
 }

@@ -105,7 +105,7 @@ describe('Crypto', () => {
         expect(verification).toBe('valid');
 
         let parsedToken = JSON.parse(atob(tokenParts[0]));
-        expect(parsedToken['fingerprint']).toBe('123456');
+        expect(parsedToken['userId']).toBe('123456');
     });
 
 });

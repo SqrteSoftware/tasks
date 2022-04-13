@@ -380,7 +380,7 @@ export async function storeLocalKeys(keys) {
 export async function loadLocalKeys() {
     var requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
-        e.target.result.createObjectStore('keys', 
+        e.target.result.createObjectStore('keys',
             { autoIncrement : true }
         );
     }
@@ -411,8 +411,8 @@ export function generateLicenseKey(segmentLength=5, segments=5) {
     return key;
 }
 
-export async function generateAuthToken(fingerprint, privateKey) {
-    let tokenBody = btoa(JSON.stringify({fingerprint, timestamp: Date.now()}));
+export async function generateAuthToken(userId, privateKey) {
+    let tokenBody = btoa(JSON.stringify({userId, timestamp: Date.now()}));
     let signature = base64encode(await sign(tokenBody, privateKey));
     let token = tokenBody + '.' + signature;
     return token;
