@@ -37,12 +37,9 @@ export async function handleNewRegistration(store) {
 }
 
 export async function handleExistingLicense(license) {
-    // e.preventDefault();
-
-    let fingerprint = await crypto.getHash(license);
     // Hash license to get fingerprint
-    // Use fingerprint to download license from server
-
+    // Use fingerprint to download keypack from server
+    let fingerprint = await crypto.getHash(license);
 
     window.grecaptcha.ready(function() {
         window.grecaptcha.execute(
