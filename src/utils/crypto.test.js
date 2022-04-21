@@ -33,16 +33,16 @@ describe('Crypto', () => {
         expect(keypack.fingerprint).toBeDefined()
         expect(keypack.kekSalt).toBeDefined()
 
-        expect(keypack.privateKeyWrapIV).toBeDefined()
+        expect(keypack.privateKeyWrapIv).toBeDefined()
         expect(keypack.publicKey).toBeDefined()
         expect(keypack.privateKey).toBeDefined()
 
-        expect(keypack.privateSigningKeyWrapIV).toBeDefined()
+        expect(keypack.privateSigningKeyWrapIv).toBeDefined()
         expect(keypack.publicSigningKey).toBeDefined()
         expect(keypack.privateSigningKey).toBeDefined()
 
         expect(keypack.symmetricKey).toBeDefined()
-        expect(keypack.symmetricKeyWrapIV).toBeDefined()
+        expect(keypack.symmetricKeyWrapIv).toBeDefined()
     });
 
     test('importKeypack should import keys', async () => {

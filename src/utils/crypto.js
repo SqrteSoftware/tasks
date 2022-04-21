@@ -49,14 +49,14 @@ export async function createEncryptedKeyPair(kek) {
     );
 
     // Encrypt and export the private key
-    let privateKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
+    let privateKeyWrapIv = window.crypto.getRandomValues(new Uint8Array(12));
     let  privateKey = await crypto.subtle.wrapKey(
         'pkcs8',
         keypair.privateKey,
         kek,
         {
             name: "AES-GCM",
-            iv: privateKeyWrapIV
+            iv: privateKeyWrapIv
         }
     );
 
@@ -65,7 +65,7 @@ export async function createEncryptedKeyPair(kek) {
         keypair.publicKey
     );
 
-    return { publicKey, privateKey, privateKeyWrapIV };
+    return { publicKey, privateKey, privateKeyWrapIv };
 }
 
 
@@ -83,14 +83,14 @@ export async function createEncryptedSigningKeyPair(kek) {
     );
 
     // Encrypt and export the private key
-    let privateKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
+    let privateKeyWrapIv = window.crypto.getRandomValues(new Uint8Array(12));
     let  privateKey = await crypto.subtle.wrapKey(
         'pkcs8',
         keypair.privateKey,
         kek,
         {
             name: "AES-GCM",
-            iv: privateKeyWrapIV
+            iv: privateKeyWrapIv
         }
     );
 
@@ -99,7 +99,7 @@ export async function createEncryptedSigningKeyPair(kek) {
         keypair.publicKey
     );
 
-    return { publicKey, privateKey, privateKeyWrapIV };
+    return { publicKey, privateKey, privateKeyWrapIv };
 }
 
 
@@ -115,18 +115,18 @@ export async function createEncryptedSymmetricKey(kek) {
     );
 
     // Encrypt and export the symmetric key
-    let symmetricKeyWrapIV = window.crypto.getRandomValues(new Uint8Array(12));
+    let symmetricKeyWrapIv = window.crypto.getRandomValues(new Uint8Array(12));
     let  encryptedSymmetricKey = await crypto.subtle.wrapKey(
         'raw',
         symmetricKey,
         kek,
         {
             name: "AES-GCM",
-            iv: symmetricKeyWrapIV
+            iv: symmetricKeyWrapIv
         }
     );
 
-    return { encryptedSymmetricKey, symmetricKeyWrapIV};
+    return { encryptedSymmetricKey, symmetricKeyWrapIv};
 }
 
 
@@ -170,12 +170,12 @@ export async function createKeypack(license) {
         kekSalt: base64encode(kekSalt),
         publicKey: base64encode(keyPair.publicKey),
         privateKey: base64encode(keyPair.privateKey),
-        privateKeyWrapIV: base64encode(keyPair.privateKeyWrapIV),
+        privateKeyWrapIv: base64encode(keyPair.privateKeyWrapIv),
         publicSigningKey: base64encode(signingKeyPair.publicKey),
         privateSigningKey: base64encode(signingKeyPair.privateKey),
-        privateSigningKeyWrapIV: base64encode(signingKeyPair.privateKeyWrapIV),
+        privateSigningKeyWrapIv: base64encode(signingKeyPair.privateKeyWrapIv),
         symmetricKey: base64encode(symmetricKey.encryptedSymmetricKey),
-        symmetricKeyWrapIV: base64encode(symmetricKey.symmetricKeyWrapIV),
+        symmetricKeyWrapIv: base64encode(symmetricKey.symmetricKeyWrapIv),
     };
 }
 
@@ -183,15 +183,15 @@ export async function createKeypack(license) {
 export async function importKeypack(license, keypack) {
     let decodedPublicKey = base64decode(keypack.publicKey);
     let decodedPrivateKey = base64decode(keypack.privateKey);
-    let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIV);
+    let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIv);
 
     let decodedPublicSigningKey = base64decode(keypack.publicSigningKey);
     let decodedPrivateSigningKey = base64decode(keypack.privateSigningKey);
-    let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateSigningKeyWrapIV);
+    let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateSigningKeyWrapIv);
 
     let decodedKekSalt = base64decode(keypack.kekSalt);
     let decodedSymmetricKey = base64decode(keypack.symmetricKey);
-    let decodedSymmetricKeyWrapIv = base64decode(keypack.symmetricKeyWrapIV);
+    let decodedSymmetricKeyWrapIv = base64decode(keypack.symmetricKeyWrapIv);
 
     // Derive the KEK
     let kek = await createKEK(license, decodedKekSalt);
@@ -333,13 +333,13 @@ export async function decrypt({data, iv}, key) {
     var params = {name: key.algorithm.name};
     if (key.algorithm.name === "AES-GCM") {
         if (!iv) {
-            throw Error("AES-GCM requires an IV");    
+            throw Error("AES-GCM requires an IV");
         }
         params.iv = iv;
     }
     else if (key.algorithm.name === "RSA-OAEP") {
         if (iv) {
-            throw Error("RSA-OAEP does not support an IV");    
+            throw Error("RSA-OAEP does not support an IV");
         }
     }
     else {
