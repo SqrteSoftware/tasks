@@ -11,7 +11,8 @@ const mapStateToProps = (state) => {
         dnd: state.dnd,
         layouts: state.layouts,
         lists: state.lists,
-        license: state.license
+        license: state.license,
+        user: state.user
     }
 };
 

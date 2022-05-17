@@ -67,7 +67,10 @@ class App extends Component {
                 />
                 <SyncDialog
                     open={this.state.syncModalOpen}
+                    user={this.props.user}
                     onClose={this.onSyncModalClose}
+                    onCreateUserId={this.props.createUserId}
+                    onDeleteUserId={this.props.deleteUserId}
                 />
                 <LicenseDialog 
                     open={this.state.licenseModalOpen} 

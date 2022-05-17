@@ -7,6 +7,7 @@ export * from './focusActions'
 export * from './layoutActions'
 export * from './listsActions'
 export * from './licenseActions'
+export * from './userActions'
 
 
 export const resetData = () => ({type: 'RESET_DATA'});

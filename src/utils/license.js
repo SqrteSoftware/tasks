@@ -2,6 +2,7 @@ import {BASE_URL} from '../config'
 import * as crypto from './crypto'
 import {loadUrlQueryParams} from '../utils'
 import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
+import { createUserId } from '../actions/userActions';
 
 export async function handleNewRegistration(store) {
     let queryParams = loadUrlQueryParams();
@@ -29,14 +30,14 @@ export async function handleNewRegistration(store) {
         console.log("USER CREATION RESP:",resp);
         store.dispatch(createLicenseKey(license));
         let user = await resp.json()
-        localStorage.setItem('userId', user.id);
+        store.dispatch(createUserId(user.id))
     }
     else {
         alert('An error occurred during account setup. Please contact support.');
     }
 }
 
-export async function handleExistingLicense(license) {
+export async function handleExistingLicense(license, onCreateUserId, onDeleteUserId) {
     // Hash license to get fingerprint
     // Use fingerprint to download keypack from server
     let fingerprint = await crypto.getHash(license);
@@ -45,26 +46,27 @@ export async function handleExistingLicense(license) {
         window.grecaptcha.execute(
             '6LdGv_EZAAAAAHPwtoTIPLs9FbLDOYUwHJCc4xVm', {action: 'submit'})
             .then(function(token) {
-                console.log("Captcha token:",token);
-                console.log("Fingerprint:",fingerprint);
-                fetch(BASE_URL + '/users/' + encodeURIComponent(fingerprint), {
+                return fetch(BASE_URL + '/users/' + encodeURIComponent(fingerprint), {
                     method: 'GET',
                     headers: {
                         'Authorization': token
                     }
                 })
-                .then(resp => resp.json())
-                .then(data => {
-                    console.log(data);
-                    if (data.error) {
-                        alert(data.error.message);
-                    }
-                    // Import keypack from server
-                })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                });
-        });
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error.message);
+                }
+                onCreateUserId(data.id);
+                return crypto.importKeypack(license, data.keypack);
+            })
+            .then(keyObjects => {
+                return crypto.storeLocalKeys({...keyObjects});
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                onDeleteUserId();
+            });
     });
-
 }

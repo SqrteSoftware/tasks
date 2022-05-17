@@ -9,7 +9,7 @@ let apiUrl = BASE_URL + '/items';
 export async function syncUp(store) {
     let changes = store.getState().sync;
     let items = store.getState().items;
-    let userId = localStorage.getItem('userId');
+    let userId = store.getState().user.id;
 
     if (!changes || Object.keys(changes).length <= 0) {
         console.log("No changes, skipping sync...");
@@ -77,7 +77,7 @@ export async function syncUp(store) {
 }
 
 export async function syncDown(store) {
-    let userId = localStorage.getItem('userId');
+    let userId = store.getState().user.id;
 
     if (userId === null) return;
 

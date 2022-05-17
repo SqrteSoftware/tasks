@@ -60,7 +60,10 @@ export default function SyncDialog(props) {
   const [screen, setScreen] = React.useState('intro');
 
   var content = <IntroBody {...props} setScreen={setScreen}/>;
-  if (screen !== 'intro') {
+  if (props.user.id !== null) {
+    content = <ConnectedBody {...props} onDisconnect={props.onDeleteUserId}/>
+  }
+  else if (screen !== 'intro') {
     content = <ExistingLicenseBody {...props} setScreen={setScreen}/>
   }
 
@@ -115,8 +118,36 @@ function ExistingLicenseBody(props) {
         <Button onClick={e => {props.setScreen('intro')}} variant="contained" color="secondary">
             Cancel
         </Button>
-        <Button onClick={e => handleExistingLicense(licenseKey)} variant="contained" color="primary">
+        <Button onClick={e => handleExistingLicense(licenseKey, props.onCreateUserId, props.onDeleteUserId)} variant="contained" color="primary">
             Save
+        </Button>
+      </DialogActions>
+    </div>
+  )
+}
+
+function ConnectedBody(props) {
+  return (
+    <div>
+      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+        Your Subscription
+      </DialogTitle>
+      <DialogContent dividers>
+        <Typography gutterBottom>
+          You are currently connected and syncing your data.
+          <br/><br/>
+          You can disconnect this device by clicking 'Disconnect' below. You can connect
+          again by entering your existing license key again.
+          <br/><br/>
+          If you wish to cancel your subscription completely, please contact support.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={ props.onDisconnect }>
+          Disconnect This Device
         </Button>
       </DialogActions>
     </div>

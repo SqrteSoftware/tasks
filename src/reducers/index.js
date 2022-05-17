@@ -5,6 +5,8 @@ import {layouts} from "./layoutsReducer";
 import {sync} from "./syncReducer";
 import {lists} from "./listsReducer";
 import {license} from "./licenseReducer";
+import {user} from "./userReducer";
+
 
 const rootReducer = (state={}, action) => {
     switch (action.type) {
@@ -28,7 +30,8 @@ function customCombine(state={}, action) {
         dnd: dnd(state.dnd, action),
         layouts: layouts(state.layouts, action),
         lists: lists(state.lists, action),
-        license: license(state.license, action)
+        license: license(state.license, action),
+        user: user(state.user, action)
     };
     newState["sync"] = sync(state.sync, action, state, newState);
     return newState;
