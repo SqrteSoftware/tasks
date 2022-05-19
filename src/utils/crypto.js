@@ -360,7 +360,7 @@ export async function decrypt({data, iv}, key) {
 export async function storeLocalKeys(keys) {
     let requestDb = window.indexedDB.open('keystore');
     requestDb.onupgradeneeded = e => {
-        e.target.result.createObjectStore('keys', 
+        e.target.result.createObjectStore('keys',
             { autoIncrement : true }
         );
     }
@@ -373,6 +373,7 @@ export async function storeLocalKeys(keys) {
             addRequest.onsuccess = e => {
                 resolve();
             }
+            db.close();
         }
     });
 }
@@ -385,11 +386,27 @@ export async function loadLocalKeys() {
         );
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         requestDb.onsuccess = e => {
             let db = e.target.result;
             var store = db.transaction('keys').objectStore('keys');
-            store.get(1).onsuccess = e => resolve(e.target.result);
+            let request = store.get(1);
+            request.onsuccess = e => resolve(e.target.result);
+            request.onerror = e => reject(e);
+            db.close();
+        }
+    });
+}
+
+export async function deleteLocalKeys() {
+    let requestDb = window.indexedDB.deleteDatabase('keystore');
+
+    return new Promise((resolve, reject) => {
+        requestDb.onsuccess = e => {
+            resolve(e.target.result);
+        }
+        requestDb.onerror = e => {
+            reject(e);
         }
     });
 }
@@ -454,6 +471,13 @@ export async function testCryptoStorage() {
 
     if (msg !== decryptedSymMessage) 
         throw Error('Decrypted message does not match original message');
+
+    console.log('delete')
+    await deleteLocalKeys();
+    console.log('load')
+    persistedKeys = await loadLocalKeys();
+    if (persistedKeys !== undefined)
+        throw Error('Was able to load keys that should not exist');
 
     console.log("SUCCESS!");
 }

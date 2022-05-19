@@ -27,7 +27,6 @@ export async function syncUp(store) {
 
     let keys = await crypto.loadLocalKeys();
     let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
-    console.log(authToken)
 
     let updates = [];
     let deletions = [];
@@ -83,7 +82,6 @@ export async function syncDown(store) {
 
     let keys = await crypto.loadLocalKeys();
     let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
-    console.log(authToken)
 
     fetch(apiUrl, {
         method: "GET",

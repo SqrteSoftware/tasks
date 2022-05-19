@@ -12,7 +12,8 @@ import Button from '@material-ui/core/Button';
 import { TextField } from '@material-ui/core';
 
 import {onClick} from '../../utils/stripe';
-import {handleExistingLicense} from '../../utils/license'
+import {handleExistingLicense} from '../../utils/license';
+import { deleteLocalKeys } from '../../utils/crypto';
 
 
 
@@ -61,7 +62,7 @@ export default function SyncDialog(props) {
 
   var content = <IntroBody {...props} setScreen={setScreen}/>;
   if (props.user.id !== null) {
-    content = <ConnectedBody {...props} onDisconnect={props.onDeleteUserId}/>
+    content = <ConnectedBody {...props} setScreen={setScreen} onDisconnect={props.onDeleteUserId}/>
   }
   else if (screen !== 'intro') {
     content = <ExistingLicenseBody {...props} setScreen={setScreen}/>
@@ -118,15 +119,22 @@ function ExistingLicenseBody(props) {
         <Button onClick={e => {props.setScreen('intro')}} variant="contained" color="secondary">
             Cancel
         </Button>
-        <Button onClick={e => handleExistingLicense(licenseKey, props.onCreateUserId, props.onDeleteUserId)} variant="contained" color="primary">
-            Save
-        </Button>
+        <LoadingButton onClick={e => handleExistingLicense(licenseKey, props.onCreateUserId, props.onDeleteUserId)}>
+          Save
+        </LoadingButton>
       </DialogActions>
     </div>
   )
 }
 
 function ConnectedBody(props) {
+
+  async function disconnectDevice() {
+    props.onDisconnect();
+    props.setScreen('intro');
+    await deleteLocalKeys();
+  }
+
   return (
     <div>
       <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
@@ -142,13 +150,11 @@ function ConnectedBody(props) {
           If you wish to cancel your subscription completely, please contact support.
         </Typography>
       </DialogContent>
+
       <DialogActions>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={ props.onDisconnect }>
+        <LoadingButton onClick={disconnectDevice}>
           Disconnect This Device
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </div>
   )
