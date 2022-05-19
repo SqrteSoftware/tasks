@@ -89,7 +89,7 @@ function IntroBody(props) {
         </Typography>
       </DialogContent>
       <DialogActions>
-        <LoadingButton onClick={onClick}/>
+        <LoadingButton onClick={onClick}>New Subscription</LoadingButton>
         <Button
           variant="contained"
           color="primary"
