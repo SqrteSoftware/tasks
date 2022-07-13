@@ -1,7 +1,7 @@
 ############################################################
 # Build the base container used for other stages
 ############################################################
-FROM node:16.6-alpine3.11 as base
+FROM node:16.16-alpine3.16 as base
 
 RUN apk update && \
     apk add \
