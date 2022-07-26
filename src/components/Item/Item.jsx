@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {DraggableCore} from 'react-draggable'
-import DragIndicator from '@material-ui/icons/DragIndicatorOutlined'
+import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './Item.css'
 import {disableTouchMove, enableTouchMove} from "../../utils"
@@ -12,6 +12,7 @@ class Item extends PureComponent {
         super(props);
         this.widthOnDragStart = null;
         this.inputRef = null;
+        this.liRef = React.createRef();
         this.itemMiddleY = 0;
         this.handleMiddleX = 0;
         this.state = {
@@ -41,6 +42,7 @@ class Item extends PureComponent {
 
         return (
             <DraggableCore
+                nodeRef={this.liRef}
                 disabled={item.complete}
                 onDrag={this.onDrag}
                 onStart={this.onDragStart}
@@ -48,6 +50,7 @@ class Item extends PureComponent {
                 handle={'.itemHandle'}>
                 <li className={"item" + (item.complete ? " complete" : "")}
                     ref={this.onItemRef}
+                    // ref={this.liRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     {item.complete ? '' : <DragIndicator className="dragHandle itemHandle"></DragIndicator>}
                     <input
@@ -151,6 +154,7 @@ class Item extends PureComponent {
 
     // Fired when item DOM element is mounted/unmounted
     onItemRef = (ref) => {
+        this.liRef.current = ref;
         let totalHeight = ref ? ref.offsetHeight : 0;
         this.props.onItemRef({'id': this.props.item.id, totalHeight, 'ref': ref});
         this.itemMiddleY = ref === null ? 0 : (ref.offsetHeight / 2) - 2;

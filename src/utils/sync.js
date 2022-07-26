@@ -1,7 +1,7 @@
 import {BASE_URL} from '../config'
 import {clearSync} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
-import * as crypto from './crypto'
+import * as crypto from './app_crypto'
 
 
 let apiUrl = BASE_URL + '/items';

@@ -1,8 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import throttle from 'lodash/throttle';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
 import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
@@ -11,7 +13,7 @@ import {handleNewRegistration} from './utils/license';
 import {syncUp, syncDown} from './utils/sync';
 import './index.css';
 
-import {testCryptoStorage} from './utils/crypto';
+import {testCryptoStorage} from './utils/app_crypto';
 window.testCryptoStorage = testCryptoStorage;
 
 
@@ -62,11 +64,18 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
 syncDown(store);
 handleNewRegistration(store);
 
-ReactDOM.render(
-    <Provider store={store}>
-        <App/>
-    </Provider>,
-    document.getElementById('root'));
+const theme = createTheme();
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+    <React.StrictMode>
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
+        </Provider>
+    </React.StrictMode>
+);
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

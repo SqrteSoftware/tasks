@@ -1,5 +1,5 @@
 import {BASE_URL} from '../config'
-import * as crypto from './crypto'
+import * as crypto from './app_crypto'
 import {loadUrlQueryParams} from '../utils'
 import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
 import { createUserId } from '../actions/userActions';

@@ -1,61 +1,43 @@
 import React, { useState } from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import LoadingButton from './LoadingButton';
-import Button from '@material-ui/core/Button';
-import { TextField } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import { TextField } from '@mui/material';
 
 import {onClick} from '../../utils/stripe';
 import {handleExistingLicense} from '../../utils/license';
-import { deleteLocalKeys } from '../../utils/crypto';
+import { deleteLocalKeys } from '../../utils/app_crypto';
 
 
+const CustDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
 
-const styles = (theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
+  let dialogTitleStyle = { m: 0, p: 2 };
+
+  let iconButtonStyle = {
     position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
+    right: 8,
+    top: 8,
+    color: (theme) => theme.palette.grey[500],
+  };
 
-const DialogTitle = withStyles(styles)((props) => {
-  const { children, classes, onClose, ...other } = props;
   return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6">{children}</Typography>
+    <DialogTitle sx={dialogTitleStyle} {...other}>
+      {children}
       {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+        <IconButton aria-label="close" onClick={onClose} sx={iconButtonStyle}>
           <CloseIcon />
         </IconButton>
       ) : null}
-    </MuiDialogTitle>
+    </DialogTitle>
   );
-});
-
-const DialogContent = withStyles((theme) => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles((theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
+};
 
 export default function SyncDialog(props) {
   const [screen, setScreen] = React.useState('intro');
@@ -81,9 +63,9 @@ export default function SyncDialog(props) {
 function IntroBody(props) {
   return (
     <div>
-      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+      <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
         Sync Your Data
-      </DialogTitle>
+      </CustDialogTitle>
       <DialogContent dividers>
         <Typography gutterBottom>
           Subscribe to sync your data across devices.
@@ -106,9 +88,9 @@ function ExistingLicenseBody(props) {
   const [licenseKey, setLicenseKey] = useState('');
   return (
     <div>
-      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+      <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
         Sync Your Data
-      </DialogTitle>
+      </CustDialogTitle>
       <DialogContent dividers>
         <Typography gutterBottom>
           Enter your existing license
@@ -137,9 +119,9 @@ function ConnectedBody(props) {
 
   return (
     <div>
-      <DialogTitle id="customized-dialog-title" onClose={props.onClose}>
+      <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
         Your Subscription
-      </DialogTitle>
+      </CustDialogTitle>
       <DialogContent dividers>
         <Typography gutterBottom>
           You are currently connected and syncing your data.

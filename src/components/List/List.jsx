@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import DragIndicator from '@material-ui/icons/DragIndicatorOutlined'
+import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './List.css'
 import Item from '../Item';
