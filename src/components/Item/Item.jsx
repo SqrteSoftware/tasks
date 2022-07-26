@@ -12,7 +12,7 @@ class Item extends PureComponent {
         super(props);
         this.widthOnDragStart = null;
         this.inputRef = null;
-        this.liRef = React.createRef();
+        this.itemRef = React.createRef();
         this.itemMiddleY = 0;
         this.handleMiddleX = 0;
         this.state = {
@@ -42,7 +42,7 @@ class Item extends PureComponent {
 
         return (
             <DraggableCore
-                nodeRef={this.liRef}
+                nodeRef={this.itemRef}
                 disabled={item.complete}
                 onDrag={this.onDrag}
                 onStart={this.onDragStart}
@@ -50,7 +50,6 @@ class Item extends PureComponent {
                 handle={'.itemHandle'}>
                 <li className={"item" + (item.complete ? " complete" : "")}
                     ref={this.onItemRef}
-                    // ref={this.liRef}
                     style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
                     {item.complete ? '' : <DragIndicator className="dragHandle itemHandle"></DragIndicator>}
                     <input
@@ -154,7 +153,7 @@ class Item extends PureComponent {
 
     // Fired when item DOM element is mounted/unmounted
     onItemRef = (ref) => {
-        this.liRef.current = ref;
+        this.itemRef.current = ref;
         let totalHeight = ref ? ref.offsetHeight : 0;
         this.props.onItemRef({'id': this.props.item.id, totalHeight, 'ref': ref});
         this.itemMiddleY = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
