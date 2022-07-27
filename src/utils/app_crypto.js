@@ -1,10 +1,7 @@
-
 // Mock browser globals for nodejs tests
-if (process.env.NODE_ENV === 'test') {
-    var crypto = require('crypto').webcrypto;
-    var TextEncoder = require('util').TextEncoder;
-    var TextDecoder = require('util').TextDecoder;
-}
+var crypto = process.env.NODE_ENV === 'test' ? require('crypto').webcrypto : window.crypto;
+var TextEncoder = process.env.NODE_ENV === 'test' ? require('util').TextEncoder : window.TextEncoder;
+var TextDecoder = process.env.NODE_ENV === 'test' ? require('util').TextDecoder : window.TextDecoder;
 
 
 export async function createKEK(secret, salt) {
@@ -12,7 +9,7 @@ export async function createKEK(secret, salt) {
     let enc = new TextEncoder();
 
     // Import password as a key
-    let importedKey = await  crypto.subtle.importKey(
+    let importedKey = await crypto.subtle.importKey(
         "raw", 
         enc.encode(secret), 
         {name: "PBKDF2"},
@@ -21,7 +18,7 @@ export async function createKEK(secret, salt) {
     );
     
     // Create key from imported password
-    let kek = await  crypto.subtle.deriveKey(
+    let kek = await crypto.subtle.deriveKey(
         {
             "name": "PBKDF2",
             salt: salt,
@@ -40,7 +37,7 @@ export async function createKEK(secret, salt) {
 
 export async function createEncryptedKeyPair(kek) {
     // Create keypair
-    let keypair = await  crypto.subtle.generateKey(
+    let keypair = await crypto.subtle.generateKey(
         {
             name: "RSA-OAEP",
             modulusLength: 4096,
@@ -53,7 +50,7 @@ export async function createEncryptedKeyPair(kek) {
 
     // Encrypt and export the private key
     let privateKeyWrapIv =  crypto.getRandomValues(new Uint8Array(12));
-    let  privateKey = await  crypto.subtle.wrapKey(
+    let  privateKey = await crypto.subtle.wrapKey(
         'pkcs8',
         keypair.privateKey,
         kek,
@@ -63,7 +60,7 @@ export async function createEncryptedKeyPair(kek) {
         }
     );
 
-    let publicKey = await  crypto.subtle.exportKey(
+    let publicKey = await crypto.subtle.exportKey(
         'spki',
         keypair.publicKey
     );
@@ -74,7 +71,7 @@ export async function createEncryptedKeyPair(kek) {
 
 export async function createEncryptedSigningKeyPair(kek) {
     // Create keypair
-    let keypair = await  crypto.subtle.generateKey(
+    let keypair = await crypto.subtle.generateKey(
         {
             name: "RSA-PSS",
             modulusLength: 4096,
@@ -87,7 +84,7 @@ export async function createEncryptedSigningKeyPair(kek) {
 
     // Encrypt and export the private key
     let privateKeyWrapIv =  crypto.getRandomValues(new Uint8Array(12));
-    let  privateKey = await  crypto.subtle.wrapKey(
+    let  privateKey = await crypto.subtle.wrapKey(
         'pkcs8',
         keypair.privateKey,
         kek,
@@ -97,7 +94,7 @@ export async function createEncryptedSigningKeyPair(kek) {
         }
     );
 
-    let publicKey = await  crypto.subtle.exportKey(
+    let publicKey = await crypto.subtle.exportKey(
         'spki',
         keypair.publicKey
     );
@@ -108,7 +105,7 @@ export async function createEncryptedSigningKeyPair(kek) {
 
 export async function createEncryptedSymmetricKey(kek) {
     // Create symmetric key
-    let symmetricKey = await  crypto.subtle.generateKey(
+    let symmetricKey = await crypto.subtle.generateKey(
         {
             name: "AES-GCM",
             length: 256
@@ -119,7 +116,7 @@ export async function createEncryptedSymmetricKey(kek) {
 
     // Encrypt and export the symmetric key
     let symmetricKeyWrapIv =  crypto.getRandomValues(new Uint8Array(12));
-    let  encryptedSymmetricKey = await  crypto.subtle.wrapKey(
+    let  encryptedSymmetricKey = await crypto.subtle.wrapKey(
         'raw',
         symmetricKey,
         kek,
@@ -150,7 +147,7 @@ export function base64decode(encodedString) {
 export async function getHash(string) {
     let enc = new TextEncoder();
     let encodedString = enc.encode(string);
-    let hash = await  crypto.subtle.digest("SHA-256", encodedString);
+    let hash = await crypto.subtle.digest("SHA-256", encodedString);
     let b64hash = base64encode(hash);
     return b64hash;
 }
@@ -199,7 +196,7 @@ export async function importKeypack(license, keypack) {
     // Derive the KEK
     let kek = await createKEK(license, decodedKekSalt);
 
-    let importedPrivateKey = await  crypto.subtle.unwrapKey(
+    let importedPrivateKey = await crypto.subtle.unwrapKey(
         'pkcs8',
         decodedPrivateKey,
         kek,
@@ -215,7 +212,7 @@ export async function importKeypack(license, keypack) {
         ["decrypt"]
     );
 
-    let importedPublicKey = await  crypto.subtle.importKey(
+    let importedPublicKey = await crypto.subtle.importKey(
         'spki',
         decodedPublicKey,
         {
@@ -226,7 +223,7 @@ export async function importKeypack(license, keypack) {
         ["encrypt"]
     );
 
-    let importedPrivateSigningKey = await  crypto.subtle.unwrapKey(
+    let importedPrivateSigningKey = await crypto.subtle.unwrapKey(
         'pkcs8',
         decodedPrivateSigningKey,
         kek,
@@ -242,7 +239,7 @@ export async function importKeypack(license, keypack) {
         ["sign"]
     );
 
-    let importedPublicSigningKey = await  crypto.subtle.importKey(
+    let importedPublicSigningKey = await crypto.subtle.importKey(
         'spki',
         decodedPublicSigningKey,
         {
@@ -253,7 +250,7 @@ export async function importKeypack(license, keypack) {
         ["verify"]
     );
 
-    let importedSymmetricKey = await  crypto.subtle.unwrapKey(
+    let importedSymmetricKey = await crypto.subtle.unwrapKey(
         "raw",
         decodedSymmetricKey,
         kek,
@@ -278,7 +275,7 @@ export async function importKeypack(license, keypack) {
 
 export async function sign(stringData, privateKey) {
     let enc = new TextEncoder();
-    let signature = await  crypto.subtle.sign(
+    let signature = await crypto.subtle.sign(
         {
           name: "RSA-PSS",
           saltLength: 32,
@@ -294,7 +291,7 @@ export async function sign(stringData, privateKey) {
 export async function verify(stringData, signature, publicKey) {
     let enc = new TextEncoder();
     let data = enc.encode(stringData);
-    let result = await  crypto.subtle.verify(
+    let result = await crypto.subtle.verify(
       {
         name: "RSA-PSS",
         saltLength: 32,
@@ -319,7 +316,7 @@ export async function encrypt(stringData, key) {
     }
 
     let enc = new TextEncoder();
-    let data = await  crypto.subtle.encrypt(
+    let data = await crypto.subtle.encrypt(
       params,
       key,
       enc.encode(stringData)
@@ -350,7 +347,7 @@ export async function decrypt({data, iv}, key) {
     }
 
     let enc = new TextDecoder();
-    let ciphertext = await  crypto.subtle.decrypt(
+    let ciphertext = await crypto.subtle.decrypt(
       params,
       key,
       data
