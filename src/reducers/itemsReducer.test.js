@@ -3,6 +3,23 @@ import rootReducer from './index'
 import {createItem} from '../utils'
 import generateTestData from '../data'
 
+describe('CREATE_ITEM', () => {
+
+    test('creates a new parent item with child item', () => {
+
+        let initialState = {items: {}};
+
+        let action = ia.createNewParentItem();
+        let newState = rootReducer(initialState, action);
+
+        let itemIds = Object.keys(newState.items);
+        let itemId = itemIds[0];
+
+        expect(itemIds.length).toEqual(2);
+        expect(itemId).toMatch(/item-[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/);
+    });
+});
+
 describe('UPDATE_ITEM_TEXT', () => {
 
     test('updates the text for an existing item', () => {
