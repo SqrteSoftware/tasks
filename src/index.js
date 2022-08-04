@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import {configureStore} from '@reduxjs/toolkit';
 import throttle from 'lodash/throttle';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -19,11 +19,10 @@ window.testCryptoStorage = testCryptoStorage;
 
 let initialState = loadStateFromLocalStorage();
 
-const store = createStore(
-    rootReducer,
-    initialState,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-);
+const store = configureStore({
+    reducer: rootReducer,
+    preloadedState: initialState
+});
 
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
