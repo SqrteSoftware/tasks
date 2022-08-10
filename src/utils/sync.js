@@ -1,7 +1,8 @@
 import {BASE_URL} from '../config'
 import {clearSync} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
-import * as crypto from './app_crypto'
+import * as app_crypto from './app_crypto'
+import * as utils from '.'
 
 
 let apiUrl = BASE_URL + '/items';
@@ -25,22 +26,25 @@ export async function syncUp(store) {
         return;
     }
 
-    let keys = await crypto.loadLocalKeys();
-    let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
+    let keys = await app_crypto.loadLocalKeys();
+    let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
     let updates = [];
     let deletions = [];
     Object.keys(changes).forEach((itemId) => {
         let change = changes[itemId];
         if (change === 'CREATED' || change === 'UPDATED') {
-            updates.push(items[itemId]);
+            updates.push(itemId);
         }
         else if (change === 'DELETED') {
             deletions.push(itemId);
         }
     });
 
-    updates.forEach((item) => {
+    updates.forEach(async (itemId) => {
+        let item = utils.clone(items[itemId]);
+        // Encrypt item data before sending
+        item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
         let wrappedItem = {Item: item};
         fetch(apiUrl, {
             method: "POST",
@@ -80,8 +84,8 @@ export async function syncDown(store) {
 
     if (userId === null) return;
 
-    let keys = await crypto.loadLocalKeys();
-    let authToken = await crypto.generateAuthToken(userId, keys.privateSigningKey);
+    let keys = await app_crypto.loadLocalKeys();
+    let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
     fetch(apiUrl, {
         method: "GET",
@@ -91,13 +95,20 @@ export async function syncDown(store) {
             "Authorization": authToken
         }
     }).then((res) => {
+        // Parse the response
         if (res.status >= 400) throw res
         return res.json();
-    }).then((json) => {
-        let items = [];
-        json.Items.forEach((item) => {
-           items.push(item);
-        });
+    }).then(async (json) => {
+        // Decrypt item data
+        let items = json.Items.map(async (item) => {
+            if (item.value.data !== undefined) {
+                item.value = await app_crypto.decrypt(item.value, keys.symmetricKey);
+            }
+            return item;
+        })
+        return Promise.all(items);
+    }).then(items => {
+        // Store downloaded items
         store.dispatch(syncItems(items));
     }).catch(res => {
         if (res.json) {

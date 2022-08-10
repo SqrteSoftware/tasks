@@ -62,8 +62,10 @@ describe('Crypto', () => {
     test('encryption and decryption with asymmetric key', async () => {
         let msg = 'my secret message';
         let encryptedAsymData = await app_crypto.encrypt(msg, importedKeys.publicKey);
-        expect(encryptedAsymData.data).toBeInstanceOf(ArrayBuffer)
-        expect(encryptedAsymData.iv).toBeUndefined()
+
+        let decodedData = app_crypto.base64decode(encryptedAsymData.data);
+        expect(decodedData).toBeInstanceOf(Uint8Array)
+        expect(encryptedAsymData.iv).toBeUndefined();
 
         let decryptedAsymMessage = await app_crypto.decrypt(encryptedAsymData, importedKeys.privateKey);
 
@@ -83,12 +85,15 @@ describe('Crypto', () => {
 
     test('encryption and decryption with symmetric key', async () => {
         let msg = 'my secret message';
-        let encryptedAsymData = await app_crypto.encrypt(msg, importedKeys.symmetricKey);
+        let encryptedData = await app_crypto.encrypt(msg, importedKeys.symmetricKey);
 
-        expect(encryptedAsymData.data).toBeInstanceOf(ArrayBuffer)
-        expect(encryptedAsymData.iv).toBeDefined()
+        let decodedData = app_crypto.base64decode(encryptedData.data);
+        expect(decodedData).toBeInstanceOf(Uint8Array)
 
-        let decryptedAsymMessage = await app_crypto.decrypt(encryptedAsymData, importedKeys.symmetricKey);
+        let decodedIv = app_crypto.base64decode(encryptedData.iv);
+        expect(decodedIv).toBeDefined()
+
+        let decryptedAsymMessage = await app_crypto.decrypt(encryptedData, importedKeys.symmetricKey);
 
         expect(decryptedAsymMessage).toBe(msg);
     });

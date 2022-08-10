@@ -322,23 +322,28 @@ export async function encrypt(stringData, key) {
       enc.encode(stringData)
     );
 
-    return {data, iv: params.iv};
+    let dataEncoded = base64encode(data);
+    let ivEncoded = params.iv ? base64encode(params.iv) : undefined;
+    return {data: dataEncoded, iv: ivEncoded};
 }
 
 
 export async function decrypt({data, iv}, key) {
-    if (!(data instanceof ArrayBuffer)) {
-        throw Error("data must be an ArrayBuffer");
+    let dataDecoded = base64decode(data);
+    let ivDecoded = iv ? base64decode(iv) : undefined;
+
+    if (!(dataDecoded instanceof Uint8Array)) {
+        throw Error("data must be an ArrayBuffer or Uint8Array");
     }
     var params = {name: key.algorithm.name};
     if (key.algorithm.name === "AES-GCM") {
-        if (!iv) {
+        if (!ivDecoded) {
             throw Error("AES-GCM requires an IV");
         }
-        params.iv = iv;
+        params.iv = ivDecoded;
     }
     else if (key.algorithm.name === "RSA-OAEP") {
-        if (iv) {
+        if (ivDecoded) {
             throw Error("RSA-OAEP does not support an IV");
         }
     }
@@ -350,7 +355,7 @@ export async function decrypt({data, iv}, key) {
     let ciphertext = await crypto.subtle.decrypt(
       params,
       key,
-      data
+      dataDecoded
     );
 
     return enc.decode(ciphertext);
