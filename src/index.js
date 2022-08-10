@@ -63,7 +63,16 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
 syncDown(store);
 handleNewRegistration(store);
 
-const theme = createTheme();
+const theme = createTheme({
+    palette: {
+        secondary: {
+            main: "#cccccc",
+            light: "#dddddd",
+            dark: "#bbbbbb",
+            contrastText: "#000000"
+        }
+    }
+});
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
