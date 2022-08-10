@@ -10,8 +10,8 @@ var buttonProgressStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
-  marginTop: -12,
-  marginLeft: -12,
+  marginTop: '-10px',
+  marginLeft: '-5px',
 }
 
 export default function LoadingButton(props) {
