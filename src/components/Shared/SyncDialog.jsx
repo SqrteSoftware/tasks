@@ -70,7 +70,7 @@ function IntroBody(props) {
         <Typography gutterBottom>
           Subscribe to sync your data across devices.
         </Typography>
-        <Typography variant="body2" color="text.disabled" sx={{'max-width': '350px'}}>
+        <Typography variant="body2" color="text.disabled" sx={{'maxWidth': '350px'}}>
         This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
         </Typography>
       </DialogContent>

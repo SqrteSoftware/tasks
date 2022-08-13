@@ -441,6 +441,12 @@ export async function generateAuthToken(userId, privateKey) {
 }
 
 export async function testCryptoStorage() {
+    let prompt = "This will destroy any existing keys. Do you wish to proceed?";
+    let proceed = window.confirm(prompt);
+    if (!proceed) {
+        return
+    }
+
     let license = generateLicenseKey();
     console.log("Generated License:", license);
     

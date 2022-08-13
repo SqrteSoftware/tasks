@@ -53,11 +53,13 @@ if (navigator.storage && navigator.storage.persisted && navigator.storage.persis
         if (!persisted) {
             navigator.storage.persist().then(persist => {
                 if (!persist) {
-                    console.log("WARNING: request for persistent storage was denied.");
+                    alert("WARNING: request for protected persistent storage was denied. Data loss could occur.");
                 }
             })
         }
     });
+} else {
+    alert("WARNING: This browser does not support protected persistent storage. Data loss could occur.")
 }
 
 syncDown(store);
