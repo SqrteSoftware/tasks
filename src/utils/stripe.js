@@ -1,9 +1,13 @@
-import {BASE_URL} from '../config'
+import {
+  BASE_URL,
+  STRIPE_PUBLISHABLE_KEY,
+  RECAPTCHA_SITE_KEY
+} from '../config'
 
 export function onClick(e) {
   e.preventDefault();
   window.grecaptcha.ready(function() {
-    window.grecaptcha.execute('6LdGv_EZAAAAAHPwtoTIPLs9FbLDOYUwHJCc4xVm', {action: 'submit'}).then(function(token) {
+    window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(function(token) {
         console.log("sending captcha token:",token);
         fetch(BASE_URL + '/payment-sessions', {
           method: 'POST',
@@ -16,7 +20,7 @@ export function onClick(e) {
           console.log(data);
           let sessionId = data['session-id'];
           // Create an instance of the Stripe object with your publishable API key
-          var stripe = window.Stripe('pk_test_ztFkedIL0S6sNPNb2SuPWcuq');
+          var stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
           return stripe.redirectToCheckout({ sessionId });
         }).then(function(result) {
           // If `redirectToCheckout` fails due to a browser or network

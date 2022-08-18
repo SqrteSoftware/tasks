@@ -1,4 +1,7 @@
-import {BASE_URL} from '../config'
+import {
+    BASE_URL,
+    RECAPTCHA_SITE_KEY
+  } from '../config'
 import * as crypto from './app_crypto'
 import {loadUrlQueryParams} from '../utils'
 import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
@@ -43,8 +46,7 @@ export async function handleExistingLicense(license, onCreateUserId, onDeleteUse
     let fingerprint = await crypto.getHash(license);
 
     window.grecaptcha.ready(function() {
-        window.grecaptcha.execute(
-            '6LdGv_EZAAAAAHPwtoTIPLs9FbLDOYUwHJCc4xVm', {action: 'submit'})
+        window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
             .then(function(token) {
                 return fetch(BASE_URL + '/users/' + encodeURIComponent(fingerprint), {
                     method: 'GET',
