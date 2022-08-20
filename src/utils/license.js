@@ -14,9 +14,7 @@ export async function handleNewRegistration(store) {
     }
     store.dispatch(createPaymentSession(queryParams.session_id));
     let license = crypto.generateLicenseKey();
-
     let keypack = await crypto.createKeypack(license);
-    console.log("KEYPACK GENERATED:",keypack);
     let keyObjects = await crypto.importKeypack(license, keypack);
     await crypto.storeLocalKeys({...keyObjects});
 
@@ -30,7 +28,6 @@ export async function handleNewRegistration(store) {
         body: JSON.stringify(keypack)
     });
     if (resp.status === 201) {
-        console.log("USER CREATION RESP:",resp);
         store.dispatch(createLicenseKey(license));
         let user = await resp.json()
         store.dispatch(createUserId(user.id))

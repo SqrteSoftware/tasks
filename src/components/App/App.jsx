@@ -73,8 +73,8 @@ class App extends Component {
                     onDeleteUserId={this.props.deleteUserId}
                 />
                 <LicenseDialog 
-                    open={this.state.licenseModalOpen} 
-                    licenseKey={this.props.license.licenseKey} 
+                    open={this.state.licenseModalOpen}
+                    licenseKey={this.props.license.licenseKey}
                     onClose={this.onLicenseModalClose}
                 />
                 <ResponsiveGridLayout
