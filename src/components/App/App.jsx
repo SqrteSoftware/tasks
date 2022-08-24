@@ -72,7 +72,7 @@ class App extends Component {
                     onCreateUserId={this.props.createUserId}
                     onDeleteUserId={this.props.deleteUserId}
                 />
-                <LicenseDialog 
+                <LicenseDialog
                     open={this.state.licenseModalOpen}
                     licenseKey={this.props.license.licenseKey}
                     onClose={this.onLicenseModalClose}

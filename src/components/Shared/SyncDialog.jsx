@@ -15,44 +15,36 @@ import {handleExistingLicense} from '../../utils/license';
 import { deleteLocalKeys } from '../../utils/app_crypto';
 
 
-const CustDialogTitle = (props) => {
-  const { children, onClose, ...other } = props;
-
-  let dialogTitleStyle = { m: 0, p: 2 };
-
-  let iconButtonStyle = {
-    position: 'absolute',
-    right: 8,
-    top: 8,
-    color: (theme) => theme.palette.grey[500],
-  };
-
-  return (
-    <DialogTitle sx={dialogTitleStyle} {...other}>
-      {children}
-      {onClose ? (
-        <IconButton aria-label="close" onClick={onClose} sx={iconButtonStyle}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </DialogTitle>
-  );
-};
-
 export default function SyncDialog(props) {
   const [screen, setScreen] = React.useState('intro');
 
-  var content = <IntroBody {...props} setScreen={setScreen}/>;
-  if (props.user.id !== null) {
-    content = <ConnectedBody {...props} setScreen={setScreen} onDisconnect={props.onDeleteUserId}/>
+  if (!props.open) {
+    // Don't render anything if dialog is closed.
+    // This helps make sure that the Existing License screen is
+    // always unmounted when closed and sensitive state is destroyed.
+    return (null);
   }
-  else if (screen !== 'intro') {
-    content = <ExistingLicenseBody {...props} setScreen={setScreen}/>
+
+  const onClose = e => {
+    // Reset to intro screen when closing dialog.
+    setScreen('intro');
+    props.onClose(e);
+  }
+
+  let content = null;
+  if (props.user.id !== null) {
+    content = <ConnectedBody {...props} onClose={onClose} setScreen={setScreen} onDisconnect={props.onDeleteUserId}/>
+  }
+  else if (screen === 'intro') {
+    content = <IntroBody {...props} onClose={onClose} setScreen={setScreen}/>;
+  }
+  else if (screen === 'existing') {
+    content = <ExistingLicenseBody {...props} onClose={onClose} setScreen={setScreen}/>
   }
 
   return (
     <div>
-      <Dialog onClose={props.onClose} aria-labelledby="customized-dialog-title" open={props.open}>
+      <Dialog onClose={onClose} aria-labelledby="customized-dialog-title" open={props.open}>
         { content }
       </Dialog>
     </div>
@@ -89,6 +81,7 @@ function IntroBody(props) {
 
 function ExistingLicenseBody(props) {
   const [licenseKey, setLicenseKey] = useState('');
+
   return (
     <div>
       <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
@@ -102,7 +95,7 @@ function ExistingLicenseBody(props) {
       </DialogContent>
       <DialogActions>
         <Button onClick={e => {props.setScreen('intro')}} variant="contained" color="secondary">
-            Cancel
+          Cancel
         </Button>
         <LoadingButton onClick={e => handleExistingLicense(licenseKey, props.onCreateUserId, props.onDeleteUserId)}>
           Save
@@ -144,3 +137,27 @@ function ConnectedBody(props) {
     </div>
   )
 }
+
+const CustDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
+
+  let dialogTitleStyle = { m: 0, p: 2 };
+
+  let iconButtonStyle = {
+    position: 'absolute',
+    right: 8,
+    top: 8,
+    color: (theme) => theme.palette.grey[500],
+  };
+
+  return (
+    <DialogTitle sx={dialogTitleStyle} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton aria-label="close" onClick={onClose} sx={iconButtonStyle}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+};
