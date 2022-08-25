@@ -13,9 +13,9 @@ export function onClick(e) {
           headers: {
             'Authorization': token
           }
-        })
-        .then(resp => resp.json())
-        .then(data => {
+        }).then(
+          resp => resp.json()
+        ).then(data => {
           let sessionId = data['session-id'];
           // Create an instance of the Stripe object with your publishable API key
           var stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
@@ -27,8 +27,7 @@ export function onClick(e) {
           if (result.error) {
             alert(result.error.message);
           }
-        })
-        .catch(function(error) {
+        }).catch(function(error) {
           console.error('Error:', error);
         });
     });
