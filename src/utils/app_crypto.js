@@ -181,6 +181,8 @@ export async function createKeypack(license) {
 
 
 export async function importKeypack(license, keypack) {
+    let decodedKekSalt = base64decode(keypack.kekSalt);
+
     let decodedPublicKey = base64decode(keypack.publicKey);
     let decodedPrivateKey = base64decode(keypack.privateKey);
     let decodedPrivateKeyWrapIv = base64decode(keypack.privateKeyWrapIv);
@@ -189,7 +191,6 @@ export async function importKeypack(license, keypack) {
     let decodedPrivateSigningKey = base64decode(keypack.privateSigningKey);
     let decodedPrivateSigningKeyWrapIv = base64decode(keypack.privateSigningKeyWrapIv);
 
-    let decodedKekSalt = base64decode(keypack.kekSalt);
     let decodedSymmetricKey = base64decode(keypack.symmetricKey);
     let decodedSymmetricKeyWrapIv = base64decode(keypack.symmetricKeyWrapIv);
 
