@@ -93,7 +93,6 @@ export async function syncUp(store) {
         let item = utils.clone(items[itemId]);
         // Encrypt item data before sending
         item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
-        let wrappedItem = {Item: item};
         fetch(apiUrl, {
             method: "POST",
             mode: "cors",
@@ -101,7 +100,7 @@ export async function syncUp(store) {
                 "Content-Type": "application/json",
                 "Authorization": authToken
             },
-            body: JSON.stringify(wrappedItem)
+            body: JSON.stringify(item)
         }).then((res) => {
             console.log("UPDATE:", item, res);
         }).catch(res => {
@@ -148,7 +147,7 @@ export async function syncDown(store) {
         return res.json();
     }).then(async (json) => {
         // Decrypt item data
-        let items = json.Items.map(async (item) => {
+        let items = json.map(async (item) => {
             if (item.value.data !== undefined) {
                 item.value = await app_crypto.decrypt(item.value, keys.symmetricKey);
             }

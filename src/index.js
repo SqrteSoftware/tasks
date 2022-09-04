@@ -14,10 +14,6 @@ import {handleNewRegistration} from './utils/license';
 import {syncUp, syncDown, syncUpAll} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
 
-// Make util methods public
-window.syncUpAll = syncUpAll;
-window.testCryptoStorage = testCryptoStorage;
-
 
 let initialState = loadStateFromLocalStorage();
 
@@ -93,3 +89,8 @@ root.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+
+// Make util methods public
+window.syncUpAll = syncUpAll.bind(null, store);
+window.testCryptoStorage = testCryptoStorage;
