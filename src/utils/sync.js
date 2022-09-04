@@ -101,7 +101,7 @@ export async function syncUp(store) {
                 "Content-Type": "application/json",
                 "Authorization": authToken
             },
-            body: JSON.stringify(item)
+            body: JSON.stringify([item])
         }).then((res) => {
             console.log("UPDATE:", item, res);
         }).catch(res => {
