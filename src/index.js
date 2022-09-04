@@ -5,15 +5,17 @@ import {configureStore} from '@reduxjs/toolkit';
 import throttle from 'lodash/throttle';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+import './index.css';
 import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
 import {handleNewRegistration} from './utils/license';
-import {syncUp, syncDown} from './utils/sync';
-import './index.css';
-
+import {syncUp, syncDown, syncUpAll} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
+
+// Make util methods public
+window.syncUpAll = syncUpAll;
 window.testCryptoStorage = testCryptoStorage;
 
 

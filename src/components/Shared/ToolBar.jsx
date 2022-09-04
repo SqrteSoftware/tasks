@@ -33,7 +33,7 @@ export default function ToolBar(props) {
                     </IconButton>
                 </label>
             </div>
-            
+
             { localStorage.getItem('syncEnabled') === 'true' &&
             <div className="sync iconButton" title="Sync Data" onClick={props.onSyncData}>
                 <IconButton>
