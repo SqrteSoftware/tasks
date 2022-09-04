@@ -102,6 +102,25 @@ describe('Crypto', () => {
         expect(decryptedAsymMessage).toBe(msg);
     });
 
+    test('encryption and decryption of empty string with symmetric key', async () => {
+        let msg = '';
+        let encryptedData = await app_crypto.encrypt(msg, importedKeys.symmetricKey);
+
+        let decodedData = app_crypto.base64decode(encryptedData.data);
+        expect(decodedData).toBeDefined()
+        expect(decodedData).toBeInstanceOf(Uint8Array)
+        expect(decodedData.length).toBeGreaterThan(0)
+
+        let decodedIv = app_crypto.base64decode(encryptedData.iv);
+        expect(decodedIv).toBeDefined()
+        expect(decodedIv).toBeInstanceOf(Uint8Array)
+        expect(decodedIv.length).toBeGreaterThan(0)
+
+        let decryptedAsymMessage = await app_crypto.decrypt(encryptedData, importedKeys.symmetricKey);
+
+        expect(decryptedAsymMessage).toBe(msg);
+    });
+
     test('creating an auth token', async() => {
 
         let token = await app_crypto.generateAuthToken(
