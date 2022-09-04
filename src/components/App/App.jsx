@@ -64,6 +64,7 @@ class App extends Component {
                     onAddList={this.props.createNewParentItem}
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
+                    onSyncData={this.onSyncData}
                 />
                 <SyncDialog
                     open={this.state.syncModalOpen}

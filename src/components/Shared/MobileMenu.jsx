@@ -9,6 +9,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
 import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
 import OpenInBrowserOutlined from "@mui/icons-material/OpenInBrowserOutlined";
+import Sync from "@mui/icons-material/Sync";
 
 import { Box } from "@mui/system";
 
@@ -27,6 +28,11 @@ export default function MobileMenu(props) {
 
     function handleImportClick(e) {
         props.onImportData(e);
+        props.onClose(e);
+    }
+
+    function handleSyncClick(e) {
+        props.onSyncData(e);
         props.onClose(e);
     }
 
@@ -63,6 +69,13 @@ export default function MobileMenu(props) {
                         <ListItemText primary="Import" />
                     </ListItem>
                     </label>
+
+                    <ListItem button key="Sync" onClick={handleSyncClick}>
+                        <ListItemIcon>
+                            <Sync fontSize="inherit"/>
+                        </ListItemIcon>
+                        <ListItemText primary="Sync" />
+                    </ListItem>
                 </List>
             </Box>
         </Drawer>
