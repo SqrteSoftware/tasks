@@ -33,7 +33,7 @@ export async function syncUpAll(store) {
     let encrypted_item_chunks = [];
     let chunk_size = 50;
     for (let i = 0; i < encrypted_items.length; i += chunk_size) {
-        let chunk = encrypted_items.slice(i, i + chunk);
+        let chunk = encrypted_items.slice(i, i + chunk_size);
         encrypted_item_chunks.push(chunk);
     }
 
