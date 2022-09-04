@@ -26,7 +26,7 @@ class List extends Component {
         }
         return (
             <div className="list">
-                <div className="listDelete" onClick={this.onDeleteList}>
+                <div className="listDelete noDrag" onClick={this.onDeleteList}>
                     X
                 </div>
                 <div className="listTitle">
