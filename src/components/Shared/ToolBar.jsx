@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
 import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
 import OpenInBrowserOutlined from "@mui/icons-material/OpenInBrowserOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
 import Sync from "@mui/icons-material/Sync";
 
 
