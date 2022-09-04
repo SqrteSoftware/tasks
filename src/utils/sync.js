@@ -22,11 +22,12 @@ export async function syncUpAll(store) {
 
     // Encrypt items before sending
     let encrypted_items = [];
-    items.forEach(async (item) => {
-        item = utils.clone(item);
+    let itemKeys = Object.keys(items);
+    for (let i = 0; i < itemKeys.length; i++) {
+        let item = utils.clone(items[itemKeys[i]]);
         item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
         encrypted_items.push(item);
-    });
+    }
 
     // Split list of items into chunks
     let encrypted_item_chunks = [];
