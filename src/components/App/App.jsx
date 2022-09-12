@@ -152,7 +152,7 @@ class App extends Component {
     onExportData = (e) => {
         let state = {items: this.props.items, layouts: this.props.layouts};
         let now = Date.now();
-        downloadJSON(state, 'braindump-backup-' + now + '.json');
+        downloadJSON(state, 'sqrte-tasks-' + now + '.json');
     };
 
     onImportData = (e) => {

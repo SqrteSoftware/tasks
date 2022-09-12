@@ -7,8 +7,8 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
-import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
-import OpenInBrowserOutlined from "@mui/icons-material/OpenInBrowserOutlined";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import Sync from "@mui/icons-material/Sync";
 
 import { Box } from "@mui/system";
@@ -55,18 +55,18 @@ export default function MobileMenu(props) {
 
                     <ListItem button key="Export" onClick={handleExportClick}>
                         <ListItemIcon>
-                            <SaveAltOutlined/>
+                            <SaveOutlinedIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Export" />
+                        <ListItemText primary="Save" />
                     </ListItem>
 
                     <input id="fileUploadInput" type="file" style={{display: 'none'}} onChange={props.onImportData}/>
                     <label htmlFor="fileUploadInput">
                     <ListItem button key="Import" onClick={handleImportClick}>
                         <ListItemIcon component="span">
-                            <OpenInBrowserOutlined/>
+                            <FolderOpenOutlinedIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Import" />
+                        <ListItemText primary="Open" />
                     </ListItem>
                     </label>
 

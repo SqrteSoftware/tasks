@@ -3,8 +3,8 @@ import React from "react";
 import logo from "../../braindump90.png";
 import IconButton from "@mui/material/IconButton";
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
-import SaveAltOutlined from "@mui/icons-material/SaveAltOutlined";
-import OpenInBrowserOutlined from "@mui/icons-material/OpenInBrowserOutlined";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import MenuIcon from "@mui/icons-material/Menu";
 import Sync from "@mui/icons-material/Sync";
 
@@ -20,17 +20,17 @@ export default function ToolBar(props) {
                 </IconButton>
             </div>
 
-            <div className="export iconButton" title="Export Data" onClick={props.onExportData}>
+            <div className="export iconButton" title="Save" onClick={props.onExportData}>
                 <IconButton>
-                    <SaveAltOutlined fontSize="inherit"/>
+                    <SaveOutlinedIcon fontSize="inherit"/>
                 </IconButton>
             </div>
 
-            <div className="import iconButton" title="Import Data" onClick={props.onImportData}>
+            <div className="import iconButton" title="Open" onClick={props.onImportData}>
                 <input id="fileUploadInput" className="importInput" type="file" onChange={props.onImportData}/>
                 <label htmlFor="fileUploadInput" className="importLabel">
                     <IconButton component="span">
-                        <OpenInBrowserOutlined fontSize="inherit"/>
+                        <FolderOpenOutlinedIcon fontSize="inherit"/>
                     </IconButton>
                 </label>
             </div>
