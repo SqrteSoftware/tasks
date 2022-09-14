@@ -133,8 +133,14 @@ class Item extends PureComponent {
         this.setState({
             'position': {x: data.x - this.handleMiddleX, y: data.y - this.itemMiddleY}
         }, () => {
-            data.id = this.props.item.id;
-            this.props.onDrag(data);
+            // Call AFTER above state changes are rendered. This may get called AFTER
+            // onDragStop has been called, probably because react is batching things
+            // so stuff is happening out of order. Thus we need to check the activeDrag
+            // field before percolating the event.
+            if (this.state.activeDrag) {
+                data.id = this.props.item.id;
+                this.props.onDrag(data);
+            }
         });
     };
 
