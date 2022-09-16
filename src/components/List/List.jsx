@@ -34,6 +34,7 @@ class List extends Component {
                     <input
                         className="listTitleInput noDrag"
                         type="text"
+                        enterKeyHint="Go" /* For Android */
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"

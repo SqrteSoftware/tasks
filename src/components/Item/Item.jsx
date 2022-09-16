@@ -61,6 +61,7 @@ class Item extends PureComponent {
                         className="itemInput"
                         ref={ref => this.inputRef = ref}
                         type="text"
+                        enterKeyHint="Go" /* For Android */
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"
