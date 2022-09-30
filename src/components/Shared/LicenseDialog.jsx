@@ -52,7 +52,13 @@ export default function LicenseDialog(props) {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.onClose}>Done</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={props.onClose}
+          >
+            Done
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

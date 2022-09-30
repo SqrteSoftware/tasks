@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import {configureStore} from '@reduxjs/toolkit';
 import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import './index.css';
@@ -10,9 +11,11 @@ import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
+import { persistenceCheck } from './utils/persistence';
 import {handleNewRegistration} from './utils/license';
 import {syncUp, syncDown, syncUpAll} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
+import { keepFresh } from './utils/refresh';
 
 
 let initialState = loadStateFromLocalStorage();
@@ -31,6 +34,8 @@ store.subscribe(throttle(() => {
     }
 }, 1000));
 
+store.subscribe(debounce(() => persistenceCheck(), 1000));
+
 window.addEventListener('online', () => {
     syncUp(store);
 });
@@ -41,25 +46,7 @@ window.addEventListener('visibilitychange', () => {
     }
 });
 
-if (navigator.storage && navigator.storage.persisted && navigator.storage.persist) {
-    // Ask the browser to protect this domain's local storage
-    // from user-agent cleanup:
-    // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
-    // https://storage.spec.whatwg.org/
-    // https://developers.google.com/web/updates/2016/06/persistent-storage
-    navigator.storage.persisted().then((persisted) => {
-        if (!persisted) {
-            navigator.storage.persist().then(persist => {
-                if (!persist) {
-                    alert("WARNING: request for protected persistent storage was denied. Data loss could occur.");
-                }
-            })
-        }
-    });
-} else {
-    alert("WARNING: This browser does not support protected persistent storage. Data loss could occur.")
-}
-
+keepFresh();
 syncDown(store);
 handleNewRegistration(store);
 

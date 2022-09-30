@@ -6,6 +6,7 @@ import {sync} from "./syncReducer";
 import {lists} from "./listsReducer";
 import {license} from "./licenseReducer";
 import {user} from "./userReducer";
+import {dialogs} from "./dialogsReducer";
 
 
 const rootReducer = (state={}, action) => {
@@ -31,7 +32,8 @@ function customCombine(state={}, action) {
         layouts: layouts(state.layouts, action),
         lists: lists(state.lists, action),
         license: license(state.license, action),
-        user: user(state.user, action)
+        user: user(state.user, action),
+        dialogs: dialogs(state.dialogs, action)
     };
     newState["sync"] = sync(state.sync, action, state, newState);
     return newState;

@@ -11,6 +11,7 @@ import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
+import WelcomeDialog from "../Shared/WelcomeDialog";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -77,6 +78,10 @@ class App extends Component {
                     open={this.state.licenseModalOpen}
                     licenseKey={this.props.license.licenseKey}
                     onClose={this.onLicenseModalClose}
+                />
+                <WelcomeDialog
+                    open={this.props.dialogs.activeDialog === 'welcome'}
+                    onClose={this.props.closeDialog}
                 />
                 <ResponsiveGridLayout
                     className="layout"
