@@ -7,16 +7,34 @@ let persistenceActive = false;
 // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
 // https://storage.spec.whatwg.org/
 // https://developers.google.com/web/updates/2016/06/persistent-storage
-export function persistenceCheck() {
+export function persistenceCheck(hasSync) {
     if (persistenceActive) return;
     if (currentMutations++ % mutationThreshold !== 0) return;
 
-    if (!navigator.storage || !navigator.storage.persisted || !navigator.storage.persist) {
-        let msg = "WARNING: This browser does not support protected persistent " +
-            "storage. Please use a different browser to prevent data loss." +
-            "Any of these should work: Brave, Chrome, Edge, FireFox, or Safari."
-        alert(msg);
-        return;
+    // Only users without sync subscriptions need to see persistence alerts
+    if (!hasSync) {
+        if (navigator.vendor.toLowerCase().includes('apple')) {
+            let msg = "WARNING: Unfortunately Safari (and iOS in general) do not adequately support " +
+                "persistent storage. This means your local data could be deleted without warning. " +
+                "We recommend using one of these browsers instead while using the free version of " +
+                "Sqrte Tasks: Brave, Chrome, Edge, and FireFox.\n\n" +
+
+                "Alternatively, you can also sign up for a sync subscription, which will store your data " +
+                "safely in the cloud.";
+            alert(msg);
+            return;
+        }
+        else if ((!navigator.storage || !navigator.storage.persisted || !navigator.storage.persist)) {
+            let msg = "WARNING: Unfortunately your browser does not adequately support persistent storage. " +
+                "This means your local data could be deleted without warning. We recommend using one of " +
+                "these browsers instead while using the free version of Sqrte Tasks: " +
+                "Brave, Chrome, Edge, and FireFox.\n\n" +
+
+                "Alternatively, you can also sign up for a sync subscription, which will store your data " +
+                "safely in the cloud.";
+            alert(msg);
+            return;
+        }
     }
 
     navigator.storage.persisted().then((persisted) => {
@@ -26,22 +44,18 @@ export function persistenceCheck() {
     }).then(persisted => {
         if (persisted === undefined) return;
         persistenceActive = persisted;
-        if (persistenceActive) {
-            let msg = "Sqrte Tasks successfully received permission to use 'protected " +
-            "persistent storage'. Your data is now protected."
-            alert(msg);
-        }
-        else {
+        // Only users without sync subscriptions need to see persistence alerts
+        if (!hasSync && !persistenceActive) {
             let msg = "WARNING: Sqrte Tasks was denied permission to use 'protected persistent storage', " +
-            "which is required to preserve your data.\n\n" +
+                "which is required to preserve your data.\n\n" +
 
-            "This can happen if the browser does not consider the site to be important. " +
-            "Try bookmarking the page to indicate importance.\n\n" +
+                "This can happen if the browser does not consider the site to be important. " +
+                "Try bookmarking the page to indicate importance.\n\n" +
 
-            "If you explicitly denied a prompt to use persistent storage, you " +
-            "will need to manually unblock the request.\n\n" +
+                "If you explicitly denied a prompt to use persistent storage, you " +
+                "will need to manually unblock the request.\n\n" +
 
-            "Permission will be requested again soon."
+                "Permission will be requested again soon. You will be notified if the issue remains."
             alert(msg);
         }
     })
