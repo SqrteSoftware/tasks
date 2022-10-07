@@ -1,3 +1,5 @@
+import debounce from 'lodash/debounce'
+
 import {BASE_URL} from '../config'
 import {clearSync} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
@@ -6,6 +8,32 @@ import * as utils from '.'
 
 
 let apiUrl = BASE_URL + '/items';
+
+
+export function initSync(store) {
+    // When edits are being made, sync up every second
+    store.subscribe(debounce(() => {
+        if (navigator.onLine) {
+            console.log('syncUp')
+            syncUp(store);
+        }
+    }, 1000, {leading: true}));
+
+    // Sync up after going online
+    window.addEventListener('online', () => {
+        syncUp(store);
+    });
+
+    // Sync up when focus is received
+    window.addEventListener('visibilitychange', () => {
+        if (navigator.onLine && !document.hidden) {
+            syncUp(store);
+        }
+    });
+
+    // Sync down on page load
+    syncDown(store);
+}
 
 
 export async function syncUpAll(store) {

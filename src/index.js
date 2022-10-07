@@ -13,7 +13,7 @@ import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
 import { persistenceCheck } from './utils/persistence';
 import {handleNewRegistration} from './utils/license';
-import {syncUp, syncDown, syncUpAll} from './utils/sync';
+import {syncUpAll, initSync} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
 import { keepFresh } from './utils/refresh';
 
@@ -28,28 +28,11 @@ const store = configureStore({
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
-store.subscribe(throttle(() => {
-    if (navigator.onLine) {
-        syncUp(store);
-    }
-}, 1000));
-
-store.subscribe(debounce(() => {
-    persistenceCheck(store.getState().user.id !== null)
-}, 1000));
-
-window.addEventListener('online', () => {
-    syncUp(store);
-});
-
-window.addEventListener('visibilitychange', () => {
-    if (navigator.onLine && !document.hidden) {
-        syncUp(store);
-    }
-});
+store.subscribe(
+    debounce(() => persistenceCheck(store.getState().user.id !== null), 1000));
 
 keepFresh();
-syncDown(store);
+initSync(store);
 handleNewRegistration(store);
 
 const theme = createTheme({
