@@ -106,22 +106,35 @@ export async function syncUp(store) {
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
-    let updates = [];
-    let deletions = [];
+    let preparedItems = []
     Object.keys(changes).forEach((itemId) => {
-        let change = changes[itemId];
-        if (change === 'CREATED' || change === 'UPDATED') {
-            updates.push(itemId);
+        let changeType = changes[itemId];
+        if (changeType === 'CREATED' || changeType === 'UPDATED') {
+            let item = utils.clone(items[itemId]);
+            preparedItems.push(item);
         }
-        else if (change === 'DELETED') {
-            deletions.push(itemId);
+        else if (changeType === 'DELETED') {
+            let item = {id: itemId, deleted: true};
+            preparedItems.push(item);
         }
     });
 
-    updates.forEach(async (itemId) => {
-        let item = utils.clone(items[itemId]);
-        // Encrypt item data before sending
-        item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
+    // Encrypt data of any items that have values (ie: not deleted)
+    for (const item of preparedItems) {
+        if (item.value) {
+            item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
+        }
+    }
+
+    // Group items by chunkSize so they can be sent in bulk requests
+    let chunkedPreparedItems = [];
+    let chunkSize = 50;
+    for (let i = 0; i < preparedItems.length; i += chunkSize) {
+        let chunkOfItems = preparedItems.slice(i, i + chunkSize);
+        chunkedPreparedItems.push(chunkOfItems);
+    }
+
+    chunkedPreparedItems.forEach(async (chunkOfItems) => {
         fetch(apiUrl, {
             method: "POST",
             mode: "cors",
@@ -129,28 +142,11 @@ export async function syncUp(store) {
                 "Content-Type": "application/json",
                 "Authorization": authToken
             },
-            body: JSON.stringify([item])
+            body: JSON.stringify(chunkOfItems)
         }).then((res) => {
-            console.log("UPDATE:", item, res);
+            console.log("UPDATE:", chunkOfItems, res);
         }).catch(res => {
-            console.log('Failed to update item: ', item, res)
-        });
-    });
-
-    deletions.forEach((itemId) => {
-        let wrappedItem = {Key: {id: itemId}};
-        fetch(apiUrl, {
-            method: "DELETE",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authToken
-            },
-            body: JSON.stringify(wrappedItem)
-        }).then((res) => {
-            console.log("DELETE:", itemId, res);
-        }).catch(res => {
-            console.log('Failed to delete item: ', itemId, res)
+            console.log('Failed to update items: ', chunkOfItems, res)
         });
     });
 }
