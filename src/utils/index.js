@@ -190,3 +190,26 @@ export function enableTouchMove() {
 }
 
 export const preventEvent = (e) => { e.preventDefault(); return false; }
+
+/**
+ * Split a list up into a list of chunks
+ *
+ * @param {*} list the list to split up into chunks
+ * @param {*} chunkSize the size of the sub lists
+ * @returns a list of lists of size chunksize or smaller
+ */
+function chunker(list, chunkSize) {
+    let chunkedList = [];
+    let currentIndex = 0;
+    let endIndex = currentIndex + chunkSize;
+    while (currentIndex < list.length) {
+        let chunk = []
+        while (currentIndex < endIndex) {
+            chunk.push(list[currentIndex])
+            currentIndex++;
+        }
+        chunkedList.push(chunk);
+        endIndex = Math.min(currentIndex + chunkSize, list.length);
+    }
+    return chunkedList;
+}
