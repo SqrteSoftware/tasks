@@ -94,10 +94,6 @@ export async function syncUp(store) {
         return;
     }
 
-    // Being overly optimistic here! Calling this will cause syncUp to
-    // be invoked again, but without changes so it will exit immediately.
-    store.dispatch(clearSync());
-
     if (userId === null) {
         console.log("No userId, skipping sync...");
         return;
@@ -134,21 +130,32 @@ export async function syncUp(store) {
         chunkedPreparedItems.push(chunkOfItems);
     }
 
-    chunkedPreparedItems.forEach(async (chunkOfItems) => {
-        fetch(apiUrl, {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authToken
-            },
-            body: JSON.stringify(chunkOfItems)
-        }).then((res) => {
-            console.log("UPDATE:", chunkOfItems, res);
-        }).catch(res => {
-            console.log('Failed to update items: ', chunkOfItems, res)
-        });
-    });
+    // Upload items in chunks
+    for (const chunk of chunkedPreparedItems) {
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                let res = await fetch(apiUrl, {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": authToken
+                    },
+                    body: JSON.stringify(chunk)
+                });
+                if (res.status === 200)  {
+                    console.log("PROCESSED:", attempt, chunk, res);
+                    // Calling this will cause syncUp to be invoked again,
+                    // but without changes so it will exit immediately.
+                    store.dispatch(clearSync());
+                    break;
+                }
+                console.log("ERROR STATUS CODE: ", attempt, chunk, res);
+            } catch (e) {
+                console.log('Failed to update items: ', attempt, chunk, e)
+            }
+        }
+    }
 }
 
 export async function syncDown(store) {
