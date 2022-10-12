@@ -117,7 +117,7 @@ export async function syncUp(store) {
 
     // Encrypt data of any items that have values (ie: not deleted)
     for (const item of preparedItems) {
-        if (item.value) {
+        if (item.value !== undefined) {
             item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
         }
     }

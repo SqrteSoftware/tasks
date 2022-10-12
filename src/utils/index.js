@@ -198,7 +198,7 @@ export const preventEvent = (e) => { e.preventDefault(); return false; }
  * @param {*} chunkSize the size of the sub lists
  * @returns a list of lists of size chunksize or smaller
  */
-function chunker(list, chunkSize) {
+export function chunker(list, chunkSize) {
     let chunkedList = [];
     let currentIndex = 0;
     let endIndex = currentIndex + chunkSize;
