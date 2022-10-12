@@ -185,11 +185,22 @@ function mergeItemsOld(currentItems, incomingItems) {
 
     let parents = incomingItems.filter(i => Object.keys(i.parents).length <= 0);
     parents.forEach(incomingParent => {
+        if (incomingParent.deleted) {
+            // Delete parent and any orphaned children
+            modifiedItems = deleteItem(incomingParent.id, modifiedItems);
+            return;
+        }
+
         // Root items can be added verbatim since they have no references to maintain
         modifiedItems = set(modifiedItems, incomingParent.id, incomingParent);
 
         // Now handle root's children
         getSortedChildren(incomingParent.id, incomingItems).forEach(incomingItem => {
+            if (incomingItem.deleted) {
+                modifiedItems = deleteItem(incomingItem.id, modifiedItems);
+                return;
+            }
+
             // If item exists in list, it must be detached before being moved
             let existingItem = modifiedItems[incomingItem.id];
             if (existingItem) {
