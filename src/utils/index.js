@@ -1,11 +1,14 @@
 
 
-export function createItem(id=null, value="", complete=false, completeDate=new Date().toISOString(), parents={}) {
+export function createItem(id=null, value="", complete=false, date=null, parents={}) {
+    date = date || new Date().toISOString();
     return {
         id,
         value,
         complete,
-        completeDate: complete ? completeDate : null,
+        completeDate: complete ? date : null,
+        createdDate: date,
+        modifiedDate: date,
         parents
     };
 }
