@@ -11,12 +11,12 @@ export function items(state = {}, action) {
                     items = moveItemToTop(action.itemId, parentId, items);
                 });
             }
-            items = set(items, action.itemId, 'complete', action.complete);
-            items = set(items, action.itemId, 'completeDate', action.completeDate);
+            items = setItem(items, action.itemId, 'complete', action.complete);
+            items = setItem(items, action.itemId, 'completeDate', action.completeDate);
             return items;
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             let newItem = createItem(action.newItemId);
-            items = set(items, newItem.id, newItem);
+            items = setItem(items, newItem.id, newItem);
             return attachItemToParent(
                 action.newItemId,
                 action.parentItemId,
@@ -61,7 +61,8 @@ export function items(state = {}, action) {
 
 function updateItemText(items, itemId, text) {
     if (items[itemId] === undefined) return items;
-    return set(items, itemId, 'value', text);
+    items = setItem(items, itemId, 'value', text);
+    return items;
 }
 
 function moveItemToTop(itemId, parentId, items) {
@@ -90,14 +91,14 @@ function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
         prev: prevItemId ? prevItemId : null,
         next: nextItemId ? nextItemId : null
     };
-    items = set(items, itemId, 'parents', parentId, newParent);
+    items = setItem(items, itemId, 'parents', parentId, newParent);
     // Find previous item and mutate parent to point to inserted item
     if (prevItemId) {
-        items = set(items, prevItemId, 'parents', parentId, 'next', itemId);
+        items = setItem(items, prevItemId, 'parents', parentId, 'next', itemId);
     }
     // Find next item and mutate parent to point to inserted item
     if (nextItemId) {
-        items = set(items, nextItemId, 'parents', parentId, 'prev', itemId);
+        items = setItem(items, nextItemId, 'parents', parentId, 'prev', itemId);
     }
     return items;
 }
@@ -111,16 +112,16 @@ function detachItemFromParent(itemId, parentId, items) {
     // Remove parent from item
     let newParents = {...item.parents};
     delete newParents[parentId];
-    items = set(items, itemId, 'parents', newParents);
+    items = setItem(items, itemId, 'parents', newParents);
     // Remove item from prev item and attach next item instead
     if (oldPrevItem) {
         let newNextId = oldNextItem ? oldNextItem.id : null;
-        items = set(items, oldPrevItem.id, 'parents', parentId, 'next', newNextId);
+        items = setItem(items, oldPrevItem.id, 'parents', parentId, 'next', newNextId);
     }
     // Remove item from next item and attach prev item instead
     if (oldNextItem) {
         let newPrevId = oldPrevItem ? oldPrevItem.id : null;
-        items = set(items, oldNextItem.id, 'parents', parentId, 'prev', newPrevId);
+        items = setItem(items, oldNextItem.id, 'parents', parentId, 'prev', newPrevId);
     }
     return items;
 }
@@ -144,7 +145,7 @@ function deleteItem(itemId, items) {
             let newParents = {...i.parents};
             delete newParents[itemId];
             if (Object.keys(newParents).length > 0) {
-                items[id] = {...i, parents: newParents};
+                items = setItem(items, id, 'parents', newParents)
             } else {
                 delete items[id];
             }
@@ -159,8 +160,8 @@ function deleteItem(itemId, items) {
 function createNewParentItem(items, newParentItemId, newChildItemId) {
     let newParentItem = createItem(newParentItemId);
     let newChildItem = createItem(newChildItemId);
-    items = set(items, newParentItemId, newParentItem);
-    items = set(items, newChildItemId, newChildItem);
+    items = setItem(items, newParentItemId, newParentItem);
+    items = setItem(items, newChildItemId, newChildItem);
     items = attachItemToParent(newChildItemId, newParentItemId, null, null, items);
     return items;
 }
@@ -338,5 +339,11 @@ function repairItemLinks(items) {
         });
     });
 
+    return items;
+}
+
+function setItem(items, itemId, ...args) {
+    items = set(items, itemId, ...args);
+    items = set(items, itemId, 'modifiedDate', new Date().toISOString());
     return items;
 }
