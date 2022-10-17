@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 
 import {BASE_URL} from '../config'
-import {clearSync} from '../actions/syncActions'
+import {clearSync, syncedUp} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
@@ -85,7 +85,7 @@ export async function syncUpAll(store) {
 
 
 export async function syncUp(store) {
-    let changes = store.getState().sync;
+    let changes = store.getState().sync.changes;
     let items = store.getState().items;
     let userId = store.getState().user.id;
 
@@ -96,6 +96,9 @@ export async function syncUp(store) {
 
     if (userId === null) {
         console.log("No userId, skipping sync...");
+        // If there is no sync subscription, don't
+        // keep track of changes.
+        store.dispatch(clearSync());
         return;
     }
 
@@ -148,6 +151,7 @@ export async function syncUp(store) {
                     // Calling this will cause syncUp to be invoked again,
                     // but without changes so it will exit immediately.
                     store.dispatch(clearSync());
+                    store.dispatch(syncedUp());
                     break;
                 }
                 console.log("ERROR STATUS CODE: ", attempt, chunk, res);
