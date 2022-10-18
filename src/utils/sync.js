@@ -172,7 +172,7 @@ export async function syncDown(store) {
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
     let queryParams = '?'
-    if (lastSyncUp !== null) {
+    if (typeof lastSyncUp === 'string') {
         queryParams += 'modified-since=' + encodeURIComponent(lastSyncUp);
     }
 
