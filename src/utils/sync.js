@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 
 import {BASE_URL} from '../config'
-import {clearSync, syncedUp} from '../actions/syncActions'
+import {clearSync, syncedUp, syncedDown} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
@@ -164,7 +164,7 @@ export async function syncUp(store) {
 
 export async function syncDown(store) {
     let userId = store.getState().user.id;
-    let lastSyncUp = store.getState().sync.lastSyncUp;
+    let lastSyncDown = store.getState().sync.lastSyncDown;
 
     if (userId === null) return;
 
@@ -172,8 +172,8 @@ export async function syncDown(store) {
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
     let queryParams = '?'
-    if (typeof lastSyncUp === 'string') {
-        queryParams += 'modified-since=' + encodeURIComponent(lastSyncUp);
+    if (typeof lastSyncDown === 'string') {
+        queryParams += 'modified-since=' + encodeURIComponent(lastSyncDown);
     }
 
     fetch(apiUrl + queryParams, {
@@ -199,6 +199,8 @@ export async function syncDown(store) {
     }).then(items => {
         // Store downloaded items
         store.dispatch(syncItems(items));
+        // Indicate sync down complete
+        store.dispatch(syncedDown());
     }).catch(res => {
         if (res.json) {
             res.json().then(err => console.log(err))

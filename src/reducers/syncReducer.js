@@ -1,6 +1,7 @@
 let initialState = {
     changes: {},
-    lastSyncUp: null
+    lastSyncUp: null,
+    lastSyncDown: null
 }
 export const sync = (state=initialState, action, oldRootState={}, newRootState={}) => {
     let oldItem, oldItemParent;
@@ -23,7 +24,12 @@ export const sync = (state=initialState, action, oldRootState={}, newRootState={
             return {
                 ...state,
                 lastSyncUp: action.date
-            }
+            };
+        case 'SYNCED_DOWN':
+            return {
+                ...state,
+                lastSyncDown: action.date
+            };
         case 'CREATE_NEW_ITEM_WITH_FOCUS':
             return {
                 ...state,
