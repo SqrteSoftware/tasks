@@ -164,13 +164,19 @@ export async function syncUp(store) {
 
 export async function syncDown(store) {
     let userId = store.getState().user.id;
+    let lastSyncUp = store.getState().sync.lastSyncUp;
 
     if (userId === null) return;
 
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
-    fetch(apiUrl, {
+    let queryParams = '?'
+    if (lastSyncUp !== null) {
+        queryParams += 'modified-since=' + encodeURIComponent(lastSyncUp);
+    }
+
+    fetch(apiUrl + queryParams, {
         method: "GET",
         mode: "cors",
         headers: {
