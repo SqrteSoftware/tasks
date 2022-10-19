@@ -173,7 +173,14 @@ export async function syncDown(store) {
 
     let queryParams = '?'
     if (typeof lastSyncDown === 'string') {
-        queryParams += 'modified-since=' + encodeURIComponent(lastSyncDown);
+        // Instantiate last sync down date
+        let lastSyncDownDate = new Date(lastSyncDown);
+        // Subtract 1 day from last sync date
+        lastSyncDownDate.setDate(lastSyncDownDate.getDate() - 1);
+        // Convert to ISO string format
+         let modifiedSinceDate = lastSyncDownDate.toISOString();
+         // Get items since this date
+        queryParams += 'modified-since=' + encodeURIComponent(modifiedSinceDate);
     }
 
     fetch(apiUrl + queryParams, {
