@@ -101,7 +101,7 @@ export async function syncUp(store) {
         return;
     }
 
-    let itemsToSync = getItemsToSync();
+    let itemsToSync = getItemsToSync(store);
 
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
