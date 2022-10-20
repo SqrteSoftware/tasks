@@ -86,7 +86,6 @@ export async function syncUpAll(store) {
 
 export async function syncUp(store) {
     let changes = store.getState().sync.changes;
-    let items = store.getState().items;
     let userId = store.getState().user.id;
 
     if (!changes || Object.keys(changes).length <= 0) {
@@ -102,24 +101,13 @@ export async function syncUp(store) {
         return;
     }
 
+    let itemsToSync = getItemsToSync();
+
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
-    let preparedItems = []
-    Object.keys(changes).forEach((itemId) => {
-        let changeType = changes[itemId];
-        if (changeType === 'CREATED' || changeType === 'UPDATED') {
-            let item = utils.clone(items[itemId]);
-            preparedItems.push(item);
-        }
-        else if (changeType === 'DELETED') {
-            let item = {id: itemId, deleted: true};
-            preparedItems.push(item);
-        }
-    });
-
     // Encrypt data of any items that have values (ie: not deleted)
-    for (const item of preparedItems) {
+    for (const item of itemsToSync) {
         if (item.value !== undefined) {
             item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
         }
@@ -128,8 +116,8 @@ export async function syncUp(store) {
     // Group items by chunkSize so they can be sent in bulk requests
     let chunkedPreparedItems = [];
     let chunkSize = 50;
-    for (let i = 0; i < preparedItems.length; i += chunkSize) {
-        let chunkOfItems = preparedItems.slice(i, i + chunkSize);
+    for (let i = 0; i < itemsToSync.length; i += chunkSize) {
+        let chunkOfItems = itemsToSync.slice(i, i + chunkSize);
         chunkedPreparedItems.push(chunkOfItems);
     }
 
@@ -161,6 +149,37 @@ export async function syncUp(store) {
         }
     }
 }
+
+
+function getItemsToSync(store) {
+    let changes = store.getState().sync.changes;
+    let lastSyncUp = store.getState().sync.lastSyncUp;
+    let items = store.getState().items;
+
+    let preparedItems = [];
+    if (lastSyncUp === null) {
+        // First time syncing. Sync all items. No deletions needed.
+        Object.keys(items).forEach(itemId => {
+            let item = utils.clone(items[itemId]);
+            preparedItems.push(item);
+        });
+    }
+    else {
+        Object.keys(changes).forEach((itemId) => {
+            let changeType = changes[itemId];
+            if (changeType === 'CREATED' || changeType === 'UPDATED') {
+                let item = utils.clone(items[itemId]);
+                preparedItems.push(item);
+            }
+            else if (changeType === 'DELETED') {
+                let item = {id: itemId, deleted: true};
+                preparedItems.push(item);
+            }
+        });
+    }
+    return preparedItems;
+}
+
 
 export async function syncDown(store) {
     let userId = store.getState().user.id;
