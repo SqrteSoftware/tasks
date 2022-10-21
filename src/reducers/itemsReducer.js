@@ -198,7 +198,7 @@ function mergeItemsOld(currentItems, incomingItems) {
         // Now handle root's children
         getSortedChildren(incomingParent.id, incomingItems).forEach(incomingItem => {
             if (incomingItem.deleted) {
-                modifiedItems = deleteItem(incomingItem.id, modifiedItems);
+                modifiedItems = removeItemFromParent(incomingItem.id, incomingParent.id, modifiedItems);
                 return;
             }
 
