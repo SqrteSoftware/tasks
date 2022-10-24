@@ -167,11 +167,29 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
 }
 
 function mergeItems(currentItems, incomingItems) {
-    //  anchors = find all incomingItems whose prev is NOT in incomingItems
-    //  for every anchor
-    //      If anchor's prev does NOT match current item's prev
-    //          Mark items in segment as conflicted
-    //      Insert items from segment starting with anchor
+/*
+    for item in incomingItems:
+        if currentItems[item.id] === undefined:
+            continue
+        detachItem(item.id)
+
+    for item in incomingItems:
+        if item.deleted:
+            deleteItem(item.id)
+        removeItem(item, incomingItems)
+
+    Segments = find all segments in the incoming items
+     for segment in segments:
+         prevAnchor = currentItems[segment.prev]
+         nextAnchor = currentItems[segment.next]
+         if (prevAnchor.next === nextAnchor.prev) {
+            // Items are adjacent. Insert segment.
+         }
+         else {
+            // Mark items in segment conflicted
+            // Add items to top of list?
+         }
+*/
     return currentItems;
 }
 
