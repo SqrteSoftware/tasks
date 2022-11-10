@@ -6,11 +6,14 @@ import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
 
+const ITEMS_TO_SYNC_STORAGE_KEY = 'itemsToSync';
 
 let apiUrl = BASE_URL + '/items';
-
+let priorState = null;
 
 export function initSync(store) {
+    priorState = store.getState();
+
     // When edits are being made, sync up every second
     store.subscribe(debounce(() => {
         if (navigator.onLine) {
@@ -85,10 +88,16 @@ export async function syncUpAll(store) {
 
 
 export async function syncUp(store) {
-    let changes = store.getState().sync.changes;
+    // let changes = store.getState().sync.changes;
+    let items = store.getState().items;
     let userId = store.getState().user.id;
 
-    if (!changes || Object.keys(changes).length <= 0) {
+    // if (!changes || Object.keys(changes).length <= 0) {
+    //     console.log("No changes, skipping sync...");
+    //     return;
+    // }
+
+    if (priorState.items === items) {
         console.log("No changes, skipping sync...");
         return;
     }
@@ -97,12 +106,12 @@ export async function syncUp(store) {
         console.log("No userId, skipping sync...");
         // If there is no sync subscription, don't
         // keep track of changes.
-        store.dispatch(clearSync());
+        // store.dispatch(clearSync());
+        priorState = store.getState();
         return;
     }
 
     let itemsToSync = getItemsToSync(store);
-
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
@@ -122,6 +131,7 @@ export async function syncUp(store) {
     }
 
     // Upload items in chunks
+    let error = false;
     for (const chunk of chunkedPreparedItems) {
         for (let attempt = 1; attempt <= 3; attempt++) {
             try {
@@ -136,48 +146,111 @@ export async function syncUp(store) {
                 });
                 if (res.status === 200)  {
                     console.log("PROCESSED:", attempt, chunk, res);
-                    // Calling this will cause syncUp to be invoked again,
-                    // but without changes so it will exit immediately.
-                    store.dispatch(clearSync());
-                    store.dispatch(syncedUp());
                     break;
                 }
+                error = true;
                 console.log("ERROR STATUS CODE: ", attempt, chunk, res);
             } catch (e) {
+                error = true;
                 console.log('Failed to update items: ', attempt, chunk, e)
             }
         }
     }
+    if (!error) {
+        // Calling this will cause syncUp to be invoked again,
+        // but without changes so it will exit immediately.
+        // store.dispatch(clearSync());
+        store.dispatch(syncedUp());
+        clearItemsToSync();
+    }
 }
 
 
+// function getItemsToSync(store) {
+//     let changes = store.getState().sync.changes;
+//     let lastSyncUp = store.getState().sync.lastSyncUp;
+//     let items = store.getState().items;
+
+//     let preparedItems = [];
+//     if (lastSyncUp === null) {
+//         // First time syncing. Sync all items. No deletions needed.
+//         Object.keys(items).forEach(itemId => {
+//             let item = utils.clone(items[itemId]);
+//             preparedItems.push(item);
+//         });
+//     }
+//     else {
+//         Object.keys(changes).forEach((itemId) => {
+//             let changeType = changes[itemId];
+//             if (changeType === 'CREATED' || changeType === 'UPDATED') {
+//                 let item = utils.clone(items[itemId]);
+//                 preparedItems.push(item);
+//             }
+//             else if (changeType === 'DELETED') {
+//                 let item = {id: itemId, deleted: true};
+//                 preparedItems.push(item);
+//             }
+//         });
+//     }
+//     return preparedItems;
+// }
+
+
 function getItemsToSync(store) {
-    let changes = store.getState().sync.changes;
     let lastSyncUp = store.getState().sync.lastSyncUp;
     let items = store.getState().items;
+    let priorItems = priorState.items;
 
-    let preparedItems = [];
+    let preparedItems = loadItemsToSync();
     if (lastSyncUp === null) {
         // First time syncing. Sync all items. No deletions needed.
+        preparedItems = {};
         Object.keys(items).forEach(itemId => {
             let item = utils.clone(items[itemId]);
-            preparedItems.push(item);
+            preparedItems[item.id] = item;
         });
     }
     else {
-        Object.keys(changes).forEach((itemId) => {
-            let changeType = changes[itemId];
-            if (changeType === 'CREATED' || changeType === 'UPDATED') {
-                let item = utils.clone(items[itemId]);
-                preparedItems.push(item);
+        // Collect changed/new items
+        Object.keys(items).forEach(itemId => {
+            let item = items[itemId];
+            let priorItem = priorItems[itemId];
+            if (item !== priorItem) {
+                let preparedItem = utils.clone(item);
+                preparedItems[item.id] = preparedItem;
             }
-            else if (changeType === 'DELETED') {
-                let item = {id: itemId, deleted: true};
-                preparedItems.push(item);
+        });
+        // Collect deleted items
+        Object.keys(priorItems).forEach(priorItemId => {
+            if (items[priorItemId] === undefined) {
+                let preparedItem = {id: priorItemId, deleted: true};
+                preparedItems[priorItemId] = preparedItem;
             }
         });
     }
-    return preparedItems;
+    saveItemsToSync(preparedItems);
+
+    let listOfPreparedItems = [];
+    Object.keys(preparedItems).forEach(itemId => {
+        listOfPreparedItems.push(preparedItems[itemId]);
+    });
+    return listOfPreparedItems;
+}
+
+
+function saveItemsToSync(preparedItems) {
+    localStorage.setItem(
+        ITEMS_TO_SYNC_STORAGE_KEY, JSON.stringify(preparedItems));
+}
+
+function loadItemsToSync() {
+    let items = JSON.parse(localStorage.getItem(ITEMS_TO_SYNC_STORAGE_KEY));
+    return  items || {};
+}
+
+function clearItemsToSync() {
+    localStorage.setItem(
+        ITEMS_TO_SYNC_STORAGE_KEY, JSON.stringify({}));
 }
 
 

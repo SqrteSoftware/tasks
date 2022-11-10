@@ -12,6 +12,7 @@ import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
 import WelcomeDialog from "../Shared/WelcomeDialog";
+import { findAdjacent } from '../../utils/order';
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -199,23 +200,28 @@ class App extends Component {
         if (keyPressed === "Enter") {
 
             let currentItem = this.props.items[itemId];
-            let currentItemParentMeta = currentItem.parents[parentId];
+            // let currentItemParentMeta = currentItem.parents[parentId];
+            let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
             if (cursorPosition > 0 || itemValue.length === 0) {
                 // Insert new item AFTER current item
-                this.props.createNewItemWithFocus(parentId, itemId, currentItemParentMeta.next);
+                let nextId = adjacentItems.next?.id || null;
+                this.props.createNewItemWithFocus(parentId, itemId, nextId);
             }
             else {
                 // Insert new item BEFORE current item
-                this.props.createNewItemWithFocus(parentId, currentItemParentMeta.prev, itemId);
+                let prevId = adjacentItems.prev?.id || null;
+                this.props.createNewItemWithFocus(parentId, prevId, itemId);
             }
         }
         else if (keyPressed === "Backspace" && itemValue === "") {
             let currentItem = this.props.items[itemId];
-            let currentItemParentMeta = currentItem.parents[parentId];
+            // let currentItemParentMeta = currentItem.parents[parentId];
+            let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
+            let prevId = adjacentItems.prev?.id || null;
             this.props.removeItemFromParent(itemId, parentId);
-            if (currentItemParentMeta.prev !== null) {
+            if (prevId !== null) {
                 // If there's an item above the removed item, change focus to it.
-                this.props.updateFocus(parentId, currentItemParentMeta.prev);
+                this.props.updateFocus(parentId, prevId);
                 // If we don't prevent default action here, the cursor will
                 // move up to the next item and delete the last character there.
                 event.preventDefault();
@@ -297,10 +303,13 @@ class App extends Component {
         let overlappedListId = this.props.dnd.overlappedListId;
         if (nearestItemId) {
             // Find the dragged item's new prev and next
-            let nearestItem = this.props.items[nearestItemId];
-            let nearestItemParent = nearestItem.parents[overlappedListId];
-            let draggedItemNewPrev = nearestItemPos === 'above' ? nearestItemParent.prev : nearestItemId;
-            let draggedItemNewNext = nearestItemPos === 'above' ? nearestItemId : nearestItemParent.next;
+            let adjacentItems = findAdjacent(nearestItemId, overlappedListId, this.props.items);
+            let nextId = adjacentItems.next?.id || null;
+            let prevId = adjacentItems.prev?.id || null;
+            // let nearestItem = this.props.items[nearestItemId];
+            // let nearestItemParent = nearestItem.parents[overlappedListId];
+            let draggedItemNewPrev = nearestItemPos === 'above' ? prevId : nearestItemId;
+            let draggedItemNewNext = nearestItemPos === 'above' ? nearestItemId : nextId;
             // Only insert dragged item into new position if the dragged item is
             // NOT the same as the new next or new prev item. If it is the same,
             // then we're dropping the item into the same place it was in.

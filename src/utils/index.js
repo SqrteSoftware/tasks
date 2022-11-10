@@ -62,6 +62,23 @@ export function getFirstItemInList(parentId, items) {
     return items[firstItemId];
 }
 
+export function getFirstItemInList2(parentId, items) {
+    let currentFirstItem = null;
+    let currentMinOrder = null;
+    let currentOrder = null;
+    Object.keys(items).forEach(itemId => {
+        let item = items[itemId];
+        if (item.parents[parentId]) {
+            currentOrder = item.parents[parentId].order;
+            if (currentMinOrder === null || currentOrder < currentMinOrder) {
+                currentFirstItem = item;
+                currentMinOrder = currentOrder;
+            }
+        }
+    });
+    return currentFirstItem;
+}
+
 export function getSortedListItems(parentId, items, activeOnly=true) {
     if (!parentId) return [];
     let children = [];
@@ -95,6 +112,25 @@ export function getSortedListItems(parentId, items, activeOnly=true) {
     }
     // Append any leftover children we couldn't sort
     sortedChildren = sortedChildren.concat(children);
+    return sortedChildren;
+}
+
+export function getSortedListItems2(parentId, items, activeOnly=true) {
+    if (!parentId) return [];
+    let children = [];
+    Object.keys(items).forEach(itemId => {
+        let item = items[itemId]
+        if (item.parents[parentId]) {
+            if (activeOnly && item.complete) return;
+            children.push(item);
+        }
+    });
+    let sortedChildren = [];
+    children.sort((item1, item2) => {
+        let item1Order = item1.parents[parentId].order;
+        let item2Order = item2.parents[parentId].order;
+        return  item1Order - item2Order;
+    })
     return sortedChildren;
 }
 

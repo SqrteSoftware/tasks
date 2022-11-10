@@ -1,4 +1,5 @@
-import {createItem, getFirstItemInList, set} from "../utils";
+import {createItem, getFirstItemInList, getFirstItemInList2, set} from "../utils";
+import { ITEM_ORDER_SPACING, reposition } from "../utils/order";
 
 export function items(state = {}, action) {
     let items = state;
@@ -84,6 +85,25 @@ function moveItemToTop(itemId, parentId, items) {
     return items;
 }
 
+function moveItemToTop2(itemId, parentId, items) {
+    let item = items[itemId];
+    if (item.parents[parentId].prev === null) return items;
+    items = detachItemFromParent(
+        itemId,
+        parentId,
+        items
+    );
+    let firstItem = getFirstItemInList2(parentId, items);
+    items = attachItemToParent2(
+        itemId,
+        parentId,
+        null,
+        firstItem.id,
+        items
+    );
+    return items;
+}
+
 function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
     // Add new parent to item
     let newParent = {
@@ -102,6 +122,84 @@ function attachItemToParent(itemId, parentId, prevItemId, nextItemId, items) {
     }
     return items;
 }
+
+function attachItemToParent2(itemId, parentId, prevItemId, nextItemId, items) {
+
+    let freeSpace = getSpaceBetweenItems(prevItemId, nextItemId, parentId, items);
+    if (freeSpace <= 0) {
+        items = repositionItems(prevItemId, nextItemId, parentId, items);
+    }
+    let newItemOrder = getInsertionPoint(prevItemId, nextItemId, parentId, items);
+
+    // Add new parent to item
+    let newParent = {
+        id: parentId ? parentId : null,
+        order: newItemOrder
+    };
+    items = setItem(items, itemId, 'parents', parentId, newParent);
+    return items;
+}
+
+
+function getSpaceBetweenItems(itemPrevId, itemNextId, parentId, items) {
+    if (itemPrevId === null || itemNextId === null) {
+        return ITEM_ORDER_SPACING;
+    }
+
+    let prevItem = items[itemPrevId];
+    let nextItem = items[itemNextId];
+
+    let prevItemOrder = prevItem.parents[parentId].order;
+    let nextItemOrder = nextItem.parents[parentId].order;
+
+    let freeSpace = Math.abs(nextItemOrder - prevItemOrder) - 1;
+
+    return freeSpace;
+}
+
+
+function getInsertionPoint(itemPrevId, itemNextId, parentId, items) {
+    let prevItem = items[itemPrevId];
+    let nextItem = items[itemNextId];
+
+    if (prevItem === undefined && nextItem === undefined) {
+        return 0;
+    }
+    if (prevItem === undefined) {
+        return nextItem.parents[parentId].order - ITEM_ORDER_SPACING;
+    }
+    if (nextItem === undefined) {
+        return prevItem.parents[parentId].order + ITEM_ORDER_SPACING;
+    }
+
+    let prevItemOrder = prevItem.parents[parentId].order;
+    let nextItemOrder = nextItem.parents[parentId].order;
+    let insertionPoint = Math.floor((prevItemOrder + nextItemOrder) / 2);
+    return insertionPoint;
+}
+
+
+function repositionItems(prevItemId, nextItemId, parentId, items) {
+    let listItems = [];
+    Object.keys(items).forEach(itemId => {
+        let item = items[itemId];
+        if (item.parents[parentId] !== undefined) {
+            listItems.push({
+                id: item.id,
+                order: item.parents[parentId].order
+            })
+        }
+    });
+
+    let spacedListItems = reposition(listItems);
+
+    spacedListItems.forEach(item => {
+        items = setItem(items, item.id, 'parents', parentId, 'order', item.order);
+    });
+
+    return items;
+}
+
 
 function detachItemFromParent(itemId, parentId, items) {
     let item = items[itemId];
@@ -167,31 +265,43 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
 }
 
 function mergeItems(currentItems, incomingItems) {
-/*
-    for item in incomingItems:
-        if currentItems[item.id] === undefined:
-            continue
-        detachItem(item.id)
-
-    for item in incomingItems:
-        if item.deleted:
-            deleteItem(item.id)
-        removeItem(item, incomingItems)
-
-    Segments = find all segments in the incoming items
-     for segment in segments:
-         prevAnchor = currentItems[segment.prev]
-         nextAnchor = currentItems[segment.next]
-         if (prevAnchor.next === nextAnchor.prev) {
-            // Items are adjacent. Insert segment.
-         }
-         else {
-            // Mark items in segment conflicted
-            // Add items to top of list?
-         }
-*/
-    return currentItems;
+    let modifiedItems = currentItems;
+    incomingItems.forEach(incomingItem => {
+        let currentItem = currentItems[incomingItem.id];
+        if (incomingItem.modifiedDate > currentItem.modifiedDate) {
+            // Last write wins
+            modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+        }
+    });
+    return modifiedItems;
 }
+
+// function mergeItems(currentItems, incomingItems) {
+// /*
+//     for item in incomingItems:
+//         if currentItems[item.id] === undefined:
+//             continue
+//         detachItem(item.id)
+
+//     for item in incomingItems:
+//         if item.deleted:
+//             deleteItem(item.id)
+//         removeItem(item, incomingItems)
+
+//     Segments = find all segments in the incoming items
+//      for segment in segments:
+//          prevAnchor = currentItems[segment.prev]
+//          nextAnchor = currentItems[segment.next]
+//          if (prevAnchor.next === nextAnchor.prev) {
+//             // Items are adjacent. Insert segment.
+//          }
+//          else {
+//             // Mark items in segment conflicted
+//             // Add items to top of list?
+//          }
+// */
+//     return currentItems;
+// }
 
 // The following merging algorithm assumes that the lists
 // we're merging items into have referential integrity. Each
