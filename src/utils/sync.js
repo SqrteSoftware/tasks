@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 
 import {BASE_URL} from '../config'
-import {clearSync, syncedUp, syncedDown} from '../actions/syncActions'
+import {syncedUp, syncedDown} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
@@ -88,14 +88,8 @@ export async function syncUpAll(store) {
 
 
 export async function syncUp(store) {
-    // let changes = store.getState().sync.changes;
     let items = store.getState().items;
     let userId = store.getState().user.id;
-
-    // if (!changes || Object.keys(changes).length <= 0) {
-    //     console.log("No changes, skipping sync...");
-    //     return;
-    // }
 
     if (priorState.items === items) {
         console.log("No changes, skipping sync...");
@@ -106,7 +100,6 @@ export async function syncUp(store) {
         console.log("No userId, skipping sync...");
         // If there is no sync subscription, don't
         // keep track of changes.
-        // store.dispatch(clearSync());
         priorState = store.getState();
         return;
     }
@@ -159,7 +152,6 @@ export async function syncUp(store) {
     if (!error) {
         // Calling this will cause syncUp to be invoked again,
         // but without changes so it will exit immediately.
-        // store.dispatch(clearSync());
         store.dispatch(syncedUp());
         clearItemsToSync();
     }

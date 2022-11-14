@@ -1,5 +1,4 @@
 
-
 export function createItem(id=null, value="", complete=false, date=null, parents={}) {
     date = date || new Date().toISOString();
     return {
@@ -30,6 +29,7 @@ export function createViewData(items) {
             listData.push();
         }
     });
+    console.log(listData)
     return listData;
 }
 
@@ -55,14 +55,6 @@ export function getItemsInList(parentId, items) {
 }
 
 export function getFirstItemInList(parentId, items) {
-    let firstItemId = Object.keys(items).find(itemId => {
-        let item = items[itemId];
-        return item.parents[parentId] && item.parents[parentId].prev === null;
-    });
-    return items[firstItemId];
-}
-
-export function getFirstItemInList2(parentId, items) {
     let currentFirstItem = null;
     let currentMinOrder = null;
     let currentOrder = null;
@@ -86,52 +78,22 @@ export function getSortedListItems(parentId, items, activeOnly=true) {
         let item = items[itemId]
         if (item.parents[parentId]) {
             if (activeOnly && item.complete) return;
-            children.push(items[itemId]);
-        }
-    });
-    let childIndex = children.findIndex(item => {
-        return item.parents[parentId].prev === null;
-    });
-    let child = children[childIndex];
-    let sortedChildren = [];
-    let parent;
-    const matchNextItem = item => item.id === parent.next;
-    while (child && childIndex >= 0) {
-        // Remove child from children list
-        children.splice(childIndex, 1);
-        // Add child to sorted children list
-        sortedChildren.push(child);
-        // Should we exit?
-        parent = child.parents[parentId];
-        if (!parent || parent.next === null) {
-            break;
-        }
-        // Get the next child
-        childIndex = children.findIndex(matchNextItem);
-        child = children[childIndex];
-    }
-    // Append any leftover children we couldn't sort
-    sortedChildren = sortedChildren.concat(children);
-    return sortedChildren;
-}
-
-export function getSortedListItems2(parentId, items, activeOnly=true) {
-    if (!parentId) return [];
-    let children = [];
-    Object.keys(items).forEach(itemId => {
-        let item = items[itemId]
-        if (item.parents[parentId]) {
-            if (activeOnly && item.complete) return;
             children.push(item);
         }
     });
-    let sortedChildren = [];
     children.sort((item1, item2) => {
         let item1Order = item1.parents[parentId].order;
         let item2Order = item2.parents[parentId].order;
+        if (item1Order === item2Order) {
+            // There is a chance that items sync'd from different devices
+            // could have the same order. In this case we sort alphabetically,
+            // which may not yield a correct result, but it will at least
+            // yield a deterministic across devices.
+            return item1.value > item2.value ? 1 : -1;
+        }
         return  item1Order - item2Order;
     })
-    return sortedChildren;
+    return children;
 }
 
 export function set() {

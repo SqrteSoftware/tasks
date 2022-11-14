@@ -56,7 +56,3 @@ export const mergeItems = (items) => ({
     type: 'MERGE_ITEMS',
     items
 });
-
-export const repairItemLinks = () => ({
-    type: 'REPAIR_ITEM_LINKS'
-});

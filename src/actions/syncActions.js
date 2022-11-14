@@ -7,12 +7,3 @@ export const syncedDown = (date = new Date().toISOString()) => ({
     type: 'SYNCED_DOWN',
     date
 });
-
-export const clearSync = () => ({
-    type: 'CLEAR_SYNC'
-});
-
-export const forceSync = () => ({
-    type: 'FORCE_SYNC'
-});
-window.forceSync = forceSync;

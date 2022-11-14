@@ -16,7 +16,10 @@ import {handleNewRegistration} from './utils/license';
 import {syncUpAll, initSync} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
 import { keepFresh } from './utils/refresh';
+import { migrate } from './migrations';
 
+
+migrate();
 
 let initialState = loadStateFromLocalStorage();
 
