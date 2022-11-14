@@ -3,7 +3,6 @@ let initialState = {
     lastSyncDown: null
 }
 export const sync = (state=initialState, action, oldRootState={}, newRootState={}) => {
-    // let oldItem, oldItemParent;
     switch (action.type) {
         case 'SYNCED_UP':
             return {

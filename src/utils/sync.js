@@ -103,7 +103,6 @@ export async function syncUp(store) {
         priorState = store.getState();
         return;
     }
-
     let itemsToSync = getItemsToSync(store);
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
@@ -156,36 +155,6 @@ export async function syncUp(store) {
         clearItemsToSync();
     }
 }
-
-
-// function getItemsToSync(store) {
-//     let changes = store.getState().sync.changes;
-//     let lastSyncUp = store.getState().sync.lastSyncUp;
-//     let items = store.getState().items;
-
-//     let preparedItems = [];
-//     if (lastSyncUp === null) {
-//         // First time syncing. Sync all items. No deletions needed.
-//         Object.keys(items).forEach(itemId => {
-//             let item = utils.clone(items[itemId]);
-//             preparedItems.push(item);
-//         });
-//     }
-//     else {
-//         Object.keys(changes).forEach((itemId) => {
-//             let changeType = changes[itemId];
-//             if (changeType === 'CREATED' || changeType === 'UPDATED') {
-//                 let item = utils.clone(items[itemId]);
-//                 preparedItems.push(item);
-//             }
-//             else if (changeType === 'DELETED') {
-//                 let item = {id: itemId, deleted: true};
-//                 preparedItems.push(item);
-//             }
-//         });
-//     }
-//     return preparedItems;
-// }
 
 
 function getItemsToSync(store) {
