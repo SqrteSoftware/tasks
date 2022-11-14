@@ -200,7 +200,6 @@ class App extends Component {
         if (keyPressed === "Enter") {
 
             let currentItem = this.props.items[itemId];
-            // let currentItemParentMeta = currentItem.parents[parentId];
             let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
             if (cursorPosition > 0 || itemValue.length === 0) {
                 // Insert new item AFTER current item
@@ -215,7 +214,6 @@ class App extends Component {
         }
         else if (keyPressed === "Backspace" && itemValue === "") {
             let currentItem = this.props.items[itemId];
-            // let currentItemParentMeta = currentItem.parents[parentId];
             let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
             let prevId = adjacentItems.prev?.id || null;
             this.props.removeItemFromParent(itemId, parentId);
