@@ -29,7 +29,6 @@ export function createViewData(items) {
             listData.push();
         }
     });
-    console.log(listData)
     return listData;
 }
 

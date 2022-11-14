@@ -304,8 +304,6 @@ class App extends Component {
             let adjacentItems = findAdjacent(nearestItemId, overlappedListId, this.props.items);
             let nextId = adjacentItems.next?.id || null;
             let prevId = adjacentItems.prev?.id || null;
-            // let nearestItem = this.props.items[nearestItemId];
-            // let nearestItemParent = nearestItem.parents[overlappedListId];
             let draggedItemNewPrev = nearestItemPos === 'above' ? prevId : nearestItemId;
             let draggedItemNewNext = nearestItemPos === 'above' ? nearestItemId : nextId;
             // Only insert dragged item into new position if the dragged item is
