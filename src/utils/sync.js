@@ -9,10 +9,10 @@ import * as utils from '.'
 const ITEMS_TO_SYNC_STORAGE_KEY = 'itemsToSync';
 
 let apiUrl = BASE_URL + '/items';
-let priorState = null;
+let globalPriorState = null;
 
 export function initSync(store) {
-    priorState = store.getState();
+    globalPriorState = store.getState();
 
     // When edits are being made, sync up every second
     store.subscribe(debounce(() => {
@@ -90,6 +90,8 @@ export async function syncUpAll(store) {
 export async function syncUp(store) {
     let items = store.getState().items;
     let userId = store.getState().user.id;
+    let priorState = globalPriorState;
+    globalPriorState = store.getState();
 
     if (priorState.items === items) {
         console.log("No changes, skipping sync...");
@@ -98,12 +100,10 @@ export async function syncUp(store) {
 
     if (userId === null) {
         console.log("No userId, skipping sync...");
-        // If there is no sync subscription, don't
-        // keep track of changes.
-        priorState = store.getState();
         return;
     }
-    let itemsToSync = getItemsToSync(store);
+
+    let itemsToSync = getItemsToSync(store, priorState);
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
 
@@ -157,7 +157,7 @@ export async function syncUp(store) {
 }
 
 
-function getItemsToSync(store) {
+function getItemsToSync(store, priorState) {
     let lastSyncUp = store.getState().sync.lastSyncUp;
     let items = store.getState().items;
     let priorItems = priorState.items;
