@@ -218,12 +218,23 @@ function createNewParentItem(items, newParentItemId, newChildItemId) {
 
 
 function mergeItems(currentItems, incomingItems) {
+    console.log("current items: ", currentItems)
+    console.log("incoming items: ", incomingItems)
     let modifiedItems = currentItems;
     incomingItems.forEach(incomingItem => {
         let currentItem = currentItems[incomingItem.id];
-        if (incomingItem.modifiedDate > currentItem.modifiedDate) {
-            // Last write wins
+        if (currentItem === undefined) {
+            // New item
+            console.log("New Item", incomingItem)
             modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+        }
+        else if (incomingItem.modifiedDate > currentItem.modifiedDate) {
+            // Last write wins
+            console.log("Update Item", currentItem, incomingItem)
+            modifiedItems = set(modifiedItems, incomingItem.id, incomingItem);
+        }
+        else {
+            console.log("Skipping Item:", incomingItem)
         }
     });
     return modifiedItems;
