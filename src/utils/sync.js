@@ -184,7 +184,11 @@ function getItemsToSync(store, priorState) {
         // Collect deleted items
         Object.keys(priorItems).forEach(priorItemId => {
             if (items[priorItemId] === undefined) {
-                let preparedItem = {id: priorItemId, deleted: true};
+                let preparedItem = {
+                    id: priorItemId,
+                    deleted: true,
+                    modifiedDate: new Date().toISOString()
+                };
                 preparedItems[priorItemId] = preparedItem;
             }
         });
