@@ -56,11 +56,17 @@ function IntroBody(props) {
   return (
     <div>
       <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
-        Sync Your Data
+        Sync Subscription
       </CustDialogTitle>
       <DialogContent dividers>
         <Typography gutterBottom>
-          Subscribe to sync your data across devices.
+          Sync your tasks across multiple devices by subscribing
+          to a synchronization plan. The text of your tasks is
+          encrypted end-to-end so your tasks remain safe and only
+          readable by you. You can cancel your plan anytime.
+        </Typography>
+        <Typography gutterBottom>
+          <i>Got questions? Contact us anytime:</i> <br/>support@sqrte.com
         </Typography>
         <Typography variant="body2" color="text.disabled" sx={{'maxWidth': '350px'}}>
         This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
@@ -92,6 +98,10 @@ function ExistingLicenseBody(props) {
           Enter your existing license
         </Typography>
         <TextField value={licenseKey} onChange={e => setLicenseKey(e.target.value)}/>
+        <Typography gutterBottom>
+          <br/>
+          <i>Got questions? Contact us anytime:</i> <br/>support@sqrte.com
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={e => {props.setScreen('intro')}} variant="contained" color="secondary">
@@ -116,16 +126,17 @@ function ConnectedBody(props) {
   return (
     <div>
       <CustDialogTitle id="customized-dialog-title" onClose={props.onClose}>
-        Your Subscription
+        Sync Subscription Status
       </CustDialogTitle>
       <DialogContent dividers>
         <Typography gutterBottom>
           You are currently connected and syncing your data.
           <br/><br/>
-          You can disconnect this device by clicking 'Disconnect' below. You can connect
+          You can disconnect <i>this device</i> by clicking 'Disconnect' below. You can connect
           again by entering your existing license key again.
           <br/><br/>
-          If you wish to cancel your subscription completely, please contact support.
+          If you wish to cancel <i>your subscription</i> completely, please contact us:<br/>
+          support@sqrte.com
         </Typography>
       </DialogContent>
 

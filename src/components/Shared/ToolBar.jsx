@@ -35,13 +35,11 @@ export default function ToolBar(props) {
                 </label>
             </div>
 
-            { localStorage.getItem('syncEnabled') === 'true' &&
             <div className="sync iconButton" title="Sync Data" onClick={props.onSyncData}>
                 <IconButton>
                     <Sync fontSize="inherit"/>
                 </IconButton>
             </div>
-            }
 
             <div className="menu iconButton" title="Menu">
                 <IconButton onClick={props.onMenuClick} edge="start">
