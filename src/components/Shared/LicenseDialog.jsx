@@ -42,8 +42,9 @@ export default function LicenseDialog(props) {
         </CustDialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
-            Save your license key and a bunch of other stuff you should know about.
-            Keep it secret, keep it safe:
+            Save your license key somewhere safe. You can use it to link or re-link
+            as many devices as you wish. Keep it secret. Anyone with your license
+            key has the ability to access your data.
           </Typography>
           <Typography style={{"display": "flex", "justifyContent": "center"}}>
             <code style={{"backgroundColor":"lightgrey", "padding": "10px", "borderRadius": "5px"}}>
