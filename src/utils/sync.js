@@ -221,7 +221,10 @@ function clearItemsToSync() {
 
 export async function syncDown(store) {
     let userId = store.getState().user.id;
-    let lastSyncDown = store.getState().sync.lastSyncDown;
+
+    // Disable lastSyncDown filtering for now
+    let lastSyncDown = null;
+    // let lastSyncDown = store.getState().sync.lastSyncDown;
 
     if (userId === null) return;
 
