@@ -258,7 +258,7 @@ export async function syncDown(store) {
     }).then(async (json) => {
         // Decrypt item data
         latestSyncDate = json.latestSyncDate
-        raw_items = json.items;
+        let raw_items = json.items;
         let items = raw_items.map(async (item) => {
             if (item.value.data !== undefined) {
                 item.value = await app_crypto.decrypt(item.value, keys.symmetricKey);
