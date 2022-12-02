@@ -222,9 +222,7 @@ function clearItemsToSync() {
 export async function syncDown(store) {
     let userId = store.getState().user.id;
 
-    // Disable lastSyncDown for now
-    let lastSyncDown = null;
-    // let lastSyncDown = store.getState().sync.lastSyncDown;
+    let lastSyncDown = store.getState().sync.lastSyncDown;
 
     if (userId === null) return;
 
@@ -233,14 +231,8 @@ export async function syncDown(store) {
 
     let queryParams = '?'
     if (typeof lastSyncDown === 'string') {
-        // Instantiate last sync down date
-        let lastSyncDownDate = new Date(lastSyncDown);
-        // Subtract 1 day from last sync date
-        lastSyncDownDate.setDate(lastSyncDownDate.getDate() - 1);
-        // Convert to ISO string format
-         let modifiedSinceDate = lastSyncDownDate.toISOString();
-         // Get items since this date
-        queryParams += 'modified-since=' + encodeURIComponent(modifiedSinceDate);
+         // Get items synced since the last sync date
+        queryParams += 'synced-since=' + encodeURIComponent(lastSyncDown);
     }
 
     let latestSyncDate = '';
