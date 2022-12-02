@@ -243,6 +243,7 @@ export async function syncDown(store) {
         queryParams += 'modified-since=' + encodeURIComponent(modifiedSinceDate);
     }
 
+    let latestSyncDate = '';
     fetch(apiUrl + queryParams, {
         method: "GET",
         mode: "cors",
@@ -256,7 +257,9 @@ export async function syncDown(store) {
         return res.json();
     }).then(async (json) => {
         // Decrypt item data
-        let items = json.map(async (item) => {
+        latestSyncDate = json.latestSyncDate
+        raw_items = json.items;
+        let items = raw_items.map(async (item) => {
             if (item.value.data !== undefined) {
                 item.value = await app_crypto.decrypt(item.value, keys.symmetricKey);
             }
@@ -267,7 +270,7 @@ export async function syncDown(store) {
         // Store downloaded items
         store.dispatch(syncItems(items));
         // Indicate sync down complete
-        store.dispatch(syncedDown());
+        store.dispatch(syncedDown(latestSyncDate));
     }).catch(res => {
         if (res.json) {
             res.json().then(err => console.log(err))
