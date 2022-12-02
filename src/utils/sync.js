@@ -259,10 +259,15 @@ export async function syncDown(store) {
         })
         return Promise.all(items);
     }).then(items => {
-        // Store downloaded items
-        store.dispatch(syncItems(items));
-        // Indicate sync down complete
-        store.dispatch(syncedDown(latestSyncDate));
+        if (items.length > 0) {
+            // Store downloaded items
+            store.dispatch(syncItems(items));
+            // Indicate sync down complete
+            store.dispatch(syncedDown(latestSyncDate));
+        }
+        else {
+            console.log("Sync: no items updated since last sync")
+        }
     }).catch(res => {
         if (res.json) {
             res.json().then(err => console.log(err))
