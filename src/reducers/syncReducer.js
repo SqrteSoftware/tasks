@@ -14,6 +14,9 @@ export const sync = (state=initialState, action, oldRootState={}, newRootState={
                 ...state,
                 lastSyncDown: action.date
             };
+        case 'DELETE_USER_ID':
+            // Reset sync state after disconnecting an account
+            return initialState;
         default:
             return state;
     }
