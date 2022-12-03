@@ -53,7 +53,7 @@ export async function handleExistingLicense(license, onCreateUserId, onDeleteUse
                 })
             })
             .then(resp => resp.json())
-            .then(data => {
+            .then(async data => {
                 if (data.error) {
                     alert(data.error.message);
                 }
