@@ -13,7 +13,7 @@ import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
 import { persistenceCheck } from './utils/persistence';
 import {handleNewRegistration} from './utils/license';
-import {syncUpAll, initSync} from './utils/sync';
+import {initSync} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
 import { keepFresh } from './utils/refresh';
 import { migrate } from './migrations';
@@ -67,5 +67,4 @@ serviceWorker.unregister();
 
 
 // Make util methods public
-window.syncUpAll = syncUpAll.bind(null, store);
 window.testCryptoStorage = testCryptoStorage;

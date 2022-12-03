@@ -39,54 +39,6 @@ export function initSync(store) {
 }
 
 
-export async function syncUpAll(store) {
-    let items = store.getState().items;
-    let userId = store.getState().user.id;
-
-    if (userId === null) {
-        console.log("No userId, skipping sync...");
-        return;
-    }
-
-    let keys = await app_crypto.loadLocalKeys();
-    let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
-
-    // Encrypt items before sending
-    let encrypted_items = [];
-    let itemKeys = Object.keys(items);
-    for (let i = 0; i < itemKeys.length; i++) {
-        let item = utils.clone(items[itemKeys[i]]);
-        item.value = await app_crypto.encrypt(item.value, keys.symmetricKey);
-        encrypted_items.push(item);
-    }
-
-    // Split list of items into chunks
-    let encrypted_item_chunks = [];
-    let chunk_size = 50;
-    for (let i = 0; i < encrypted_items.length; i += chunk_size) {
-        let chunk = encrypted_items.slice(i, i + chunk_size);
-        encrypted_item_chunks.push(chunk);
-    }
-
-    // Upload items in chunks
-    encrypted_item_chunks.forEach(async (encrypted_item_chunk) => {
-        fetch(apiUrl, {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": authToken
-            },
-            body: JSON.stringify(encrypted_item_chunk)
-        }).then((res) => {
-            console.log("UPDATE:", encrypted_item_chunk, res);
-        }).catch(res => {
-            console.log('Failed to upload items: ', encrypted_item_chunk, res)
-        });
-    });
-}
-
-
 export async function syncUp(store) {
     let items = store.getState().items;
     let userId = store.getState().user.id;
