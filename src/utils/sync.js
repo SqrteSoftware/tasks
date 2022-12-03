@@ -42,16 +42,17 @@ export function initSync(store) {
 export async function syncUp(store) {
     let items = store.getState().items;
     let userId = store.getState().user.id;
+    let lastSyncUp = store.getState().sync.lastSyncUp;
     let priorState = globalPriorState;
     globalPriorState = store.getState();
 
-    if (priorState.items === items) {
-        console.log("No changes, skipping sync...");
+    if (priorState.items === items && lastSyncUp !== null) {
+        console.log("Skip Sync: No changes");
         return;
     }
 
     if (userId === null) {
-        console.log("No userId, skipping sync...");
+        console.log("Skip Sync: No userId");
         return;
     }
 

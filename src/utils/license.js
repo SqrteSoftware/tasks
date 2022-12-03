@@ -33,7 +33,7 @@ export async function handleNewRegistration(store) {
         store.dispatch(createUserId(user.id))
     }
     else {
-        alert('An error occurred during account setup. Please contact support.');
+        alert('An error occurred during account setup. Please contact support@sqrte.com.');
     }
 }
 
@@ -57,13 +57,11 @@ export async function handleExistingLicense(license, onCreateUserId, onDeleteUse
                 if (data.error) {
                     alert(data.error.message);
                 }
+                let keyObjects = await crypto.importKeypack(license, data.keypack);
+                await crypto.storeLocalKeys({...keyObjects});
                 onCreateUserId(data.id);
-                return crypto.importKeypack(license, data.keypack);
             })
-            .then(keyObjects => {
-                return crypto.storeLocalKeys({...keyObjects});
-            })
-            .catch(function(error) {
+            .catch(error => {
                 console.error('Error:', error);
                 onDeleteUserId();
             });
