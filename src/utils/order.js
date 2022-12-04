@@ -12,6 +12,14 @@ export function reposition(items) {
 }
 
 
+/**
+ * Find items positioned directly before and after the startItemId.
+ * @param {*} startItemId the item to find nearest surrounding items for.
+ * @param {*} parentId the item id of the list whose items to consider.
+ * @param {*} items the global dictionary of all items.
+ * @returns An object containing the item objects that are directly prior
+ *          and next in order with respect to the item specified by startItemId.
+ */
 export function findAdjacent(startItemId, parentId, items) {
     let startItem = items[startItemId];
     let startItemOrder = startItem.parents[parentId].order;
