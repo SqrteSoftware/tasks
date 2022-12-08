@@ -54,6 +54,7 @@ class App extends Component {
         return (
             <div className="App">
                 <ToolBar
+                    isSyncing={this.props.sync.isSyncing}
                     onAddList={this.props.createNewParentItem}
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}

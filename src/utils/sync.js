@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 
 import {BASE_URL} from '../config'
-import {syncedUp, syncedDown} from '../actions/syncActions'
+import {syncedUp, syncedDown, updateIsSyncing} from '../actions/syncActions'
 import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
@@ -43,10 +43,11 @@ export async function syncUp(store) {
     let items = store.getState().items;
     let userId = store.getState().user.id;
     let lastSyncUp = store.getState().sync.lastSyncUp;
+    let isSyncing = store.getState().sync.isSyncing;
     let priorState = globalPriorState;
     globalPriorState = store.getState();
 
-    if (priorState.items === items && lastSyncUp !== null) {
+    if (priorState.items === items && (lastSyncUp !== null || isSyncing)) {
         console.log("Skip Sync: No changes");
         return;
     }
@@ -55,6 +56,8 @@ export async function syncUp(store) {
         console.log("Skip Sync: No userId");
         return;
     }
+
+    store.dispatch(updateIsSyncing(true));
 
     let itemsToSync = getItemsToSync(store, priorState);
     let keys = await app_crypto.loadLocalKeys();
@@ -104,9 +107,10 @@ export async function syncUp(store) {
     if (!error) {
         // Calling this will cause syncUp to be invoked again,
         // but without changes so it will exit immediately.
-        store.dispatch(syncedUp());
         clearItemsToSync();
     }
+    store.dispatch(syncedUp());
+    store.dispatch(updateIsSyncing(false));
 }
 
 
@@ -174,10 +178,11 @@ function clearItemsToSync() {
 
 export async function syncDown(store) {
     let userId = store.getState().user.id;
-
     let lastSyncDown = store.getState().sync.lastSyncDown;
 
     if (userId === null) return;
+
+    store.dispatch(updateIsSyncing(true));
 
     let keys = await app_crypto.loadLocalKeys();
     let authToken = await app_crypto.generateAuthToken(userId, keys.privateSigningKey);
@@ -228,5 +233,7 @@ export async function syncDown(store) {
         else {
             console.log('Error: ', res)
         }
+    }).finally(() => {
+        store.dispatch(updateIsSyncing(false));
     });
 }

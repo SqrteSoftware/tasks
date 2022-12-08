@@ -13,7 +13,8 @@ const mapStateToProps = (state) => {
         lists: state.lists,
         license: state.license,
         user: state.user,
-        dialogs: state.dialogs
+        dialogs: state.dialogs,
+        sync: state.sync
     }
 };
 

@@ -37,7 +37,7 @@ export default function ToolBar(props) {
 
             <div className="sync iconButton" title="Sync Data" onClick={props.onSyncData}>
                 <IconButton>
-                    <Sync fontSize="inherit"/>
+                    <Sync className={props.isSyncing ? "spin" : ""} fontSize="inherit"/>
                 </IconButton>
             </div>
 
