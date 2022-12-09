@@ -14,6 +14,10 @@ export default function ToolBar(props) {
         <div className="sidebar">
             <img className="logo" alt="logo" src={logo}/>
 
+            { props.isSyncing &&
+            <Sync className={"mobileSync spin"} fontSize="inherit"/>
+            }
+
             <div className="add iconButton" title="New List" onClick={props.onAddList}>
                 <IconButton>
                     <NoteAddOutlined fontSize="inherit"/>

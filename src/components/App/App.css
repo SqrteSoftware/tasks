@@ -20,6 +20,15 @@
   padding: 10px 10px 0 10px;
 }
 
+.App > .sidebar > .mobileSync {
+  font-size: 30px;
+  margin: 8px 0px 0px -15px;
+  color: #aaa;
+  position: absolute;
+  left: 50%;
+  right: 50%;
+}
+
 .App > .sidebar > .iconButton {
   display: none;
   margin: 0 0 0 30px;
@@ -78,6 +87,10 @@
 
   .App > .sidebar > .logo {
     display: block;
+  }
+
+  .App > .sidebar > .mobileSync {
+    display: none;
   }
 
   .App > .sidebar > .iconButton {
