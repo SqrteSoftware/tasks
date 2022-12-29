@@ -1,6 +1,5 @@
 let currentMutations = 1;
 let mutationThreshold = 2;
-let persistenceActive = false;
 
 
 // Ask the browser to protect this domain's local storage
