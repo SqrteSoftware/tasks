@@ -61,9 +61,9 @@ function IntroBody(props) {
       <DialogContent dividers>
         <Typography gutterBottom>
           Sync your tasks across multiple devices by subscribing
-          to a synchronization plan. The text of your tasks is
-          encrypted end-to-end so your tasks remain safe and only
-          readable by you. You can cancel your plan anytime.
+          to a synchronization plan for only $1/mo. The text of your
+          tasks is encrypted end-to-end so your tasks remain safe and
+          readable only by you. You can cancel your plan anytime.
         </Typography>
         <Typography gutterBottom>
           <i>Got questions? Contact us anytime:</i> <br/>support@sqrte.com
