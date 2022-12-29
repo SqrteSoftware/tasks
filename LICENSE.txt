@@ -5,13 +5,21 @@ Source code in this repository is covered by one of two licenses:
 The default license throughout the repository is GNU AGPL v3.0 unless otherwise
 specified in the list of files below.
 
+===============================
+
 GNU AGPL v3.0:
-LICENSE_GNU_AGPL.txt
+See: LICENSE_GNU_AGPL.txt
+
+===============================
 
 Sqrte Software License v1.0:
-LICENSE_SQRTE_SOFTWARE.txt
+See: LICENSE_SQRTE_SOFTWARE.txt
 
+Applies to:
+-----------
 src/utils/sync.js
 src/utils/app_crypto.js
 src/utils/license.js
 src/utils/stripe.js
+
+===============================
