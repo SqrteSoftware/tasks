@@ -32,7 +32,7 @@ store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
 store.subscribe(
-    debounce(() => persistenceCheck(store.getState().user.id !== null), 1000));
+    debounce(async () => persistenceCheck(store.getState().user.id !== null), 1000));
 
 keepFresh();
 initSync(store);

@@ -2,14 +2,20 @@ let currentMutations = 1;
 let mutationThreshold = 2;
 let persistenceActive = false;
 
+
 // Ask the browser to protect this domain's local storage
 // from user-agent cleanup:
 // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
 // https://storage.spec.whatwg.org/
 // https://developers.google.com/web/updates/2016/06/persistent-storage
-export function persistenceCheck(hasSync) {
-    if (persistenceActive) return;
+export async function persistenceCheck(hasSync) {
     if (currentMutations++ % mutationThreshold !== 0) return;
+
+    if (await navigator.storage.persisted()) {
+        // Storage was already persistent. Nothing more to do.
+        console.log('Persistence Granted')
+        return;
+    }
 
     // Only users without sync subscriptions need to see persistence alerts
     if (!hasSync) {
@@ -37,26 +43,28 @@ export function persistenceCheck(hasSync) {
         }
     }
 
-    navigator.storage.persisted().then((persisted) => {
-        persistenceActive = persisted;
-        if (persistenceActive) return undefined;
-        return navigator.storage.persist();
-    }).then(persisted => {
-        if (persisted === undefined) return;
-        persistenceActive = persisted;
-        // Only users without sync subscriptions need to see persistence alerts
-        if (!hasSync && !persistenceActive) {
-            let msg = "WARNING: Sqrte Tasks was denied permission to use 'protected persistent storage', " +
-                "which is required to preserve your data.\n\n" +
+    if (await navigator.storage.persist()) {
+        // Storage was not persistent, but now it is.
+        return;
+    }
 
-                "This can happen if the browser does not consider the site to be important. " +
-                "Try bookmarking the page to indicate importance.\n\n" +
-
-                "If you explicitly denied a prompt to use persistent storage, you " +
-                "will need to manually unblock the request.\n\n" +
-
-                "Permission will be requested again soon. You will be notified if the issue remains."
-            alert(msg);
+    if (await Notification.requestPermission() === 'granted') {
+        // Chromium browsers require permission to show notifications before
+        // they will allow persistent storage to be requested. Now that we have
+        // notification permission, try requesting persistence permission again.
+        if (await navigator.storage.persist()) {
+            return;
         }
-    })
+    }
+
+    // Despite our best efforts, the user/browser has denied all attempts to mark
+    // local storage as persistent. Display a warning to the user.
+    if (!hasSync) {
+        let msg = "WARNING: Permission to use Persistent Storage was denied. " +
+            "Without this, your browser may delete your local data.\n\n" +
+
+            "To fix this, reset permissions for this page and grant the " +
+            "permissions that you are subsequently prompted for."
+        alert(msg);
+    }
 }

@@ -5,9 +5,16 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { persistenceCheck } from '../../utils/persistence';
 
 
 export default function WelcomeDialog(props) {
+
+    const onClose = () => {
+      props.onClose();
+      persistenceCheck();
+    };
+
     return (
       <div>
         <Dialog onClose={props.onClose} aria-labelledby="customized-dialog-title" open={props.open}>
@@ -19,26 +26,26 @@ export default function WelcomeDialog(props) {
                 We hope you enjoy this fresh take on how to keep your tasks organized.
             </Typography>
 
-            <h4>IMPORTANT: Prevent Data Loss</h4>
+            <h4>Important Instructions to Prevent Data Loss</h4>
 
             <Typography gutterBottom>
-                Sqrte Tasks stores your data locally within your browser. If you
-                ever need to reset/clear your browser's cookies or cache, <b>you may
-                lose your data if you do not save it first! </b>
-                Please save your data periodically by clicking the save button.
+                Your data is stored locally within your browser. If you
+                clear your browser's cookies or cache, <i>you will lose your data
+                unless you save a copy</i> of it first by clilcking the save button.
             </Typography>
 
             <Typography gutterBottom>
-                Sqrte Tasks will also request that your browser use
-                protected 'persistent storage' to help prevent accidental deletion
-                of your data. If prompted, please accept.
+                Persistent Storage is required to prevent your browser
+                from deleting your local data. Depending on your browser
+                you will be prompted to grant permission to use Notifications
+                or Persistent Storage to allow this.
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button
                 variant="contained"
                 color="primary"
-                onClick={props.onClose}
+                onClick={onClose}
             >
             I Understand
             </Button>
