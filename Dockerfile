@@ -24,7 +24,7 @@ RUN npm install
 # Add the rest of the source
 ADD . /tasks/app
 
-ENTRYPOINT "./entrypoint.sh"
+ENTRYPOINT ["./entrypoint.sh"]
 
 
 ############################################################
