@@ -12,7 +12,9 @@ import Sync from "@mui/icons-material/Sync";
 export default function ToolBar(props) {
     return (
         <div className="sidebar">
-            <img className="logo" alt="logo" src={logo}/>
+            <a href="https://tasks.sqrte.com/info" target="_blank">
+                <img className="logo" alt="logo" src={logo}/>
+            </a>
 
             { props.isSyncing &&
             <Sync className={"mobileSync spin"} fontSize="inherit"/>
