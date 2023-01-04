@@ -12,7 +12,7 @@ import Sync from "@mui/icons-material/Sync";
 export default function ToolBar(props) {
     return (
         <div className="sidebar">
-            <a href="https://tasks.sqrte.com/info" target="_blank">
+            <a href="https://tasks.sqrte.com/info/" target="_blank">
                 <img className="logo" alt="logo" src={logo}/>
             </a>
 
