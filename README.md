@@ -2,7 +2,19 @@
 
 ## Task Management Reimagined
 
-See: https://tasks.sqrte.com/info/
+See the [Brochure Site](https://tasks.sqrte.com/info/) for more info.
+
+Sqrte Tasks allows you to view all of your todo lists together in one dashboard view, allowing you to easily multi-task between them.
+
+It aims to blend the simplicity of paper with the efficieny of a text editor.
+
+Some of the core values of this project include:
+- Simplicity
+- Efficiency
+- Privacy
+- Local First
+- Offline First
+- Open Source
 
 # Contributing
 
