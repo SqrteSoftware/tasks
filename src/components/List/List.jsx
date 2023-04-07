@@ -151,8 +151,7 @@ class List extends Component {
         if (e.key === "Enter") {
             let firstChild = this.props.firstChild;
             let nextId = firstChild ? firstChild.id : null;
-            let prevId = firstChild ? firstChild.parents[this.props.parent.id].prev : null;
-            this.props.createNewItemWithFocus(this.props.parent.id, prevId, nextId);
+            this.props.createNewItemWithFocus(this.props.parent.id, null, nextId);
         }
     };
 
