@@ -66,7 +66,6 @@ function updateItemText(items, itemId, text) {
 
 function moveItemToTop(itemId, parentId, items) {
     let item = items[itemId];
-    if (item.parents[parentId].prev === null) return items;
     items = detachItemFromParent(
         itemId,
         parentId,
