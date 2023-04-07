@@ -19,11 +19,11 @@ export default function generateTestData(log=true)
             layouts.lg.push({i: parentId, x: parentIndex%4*3, y: Math.floor(parentIndex/4)*6, w: 3, h: 6, minW: 3, maxW: 4})
             parentIndex++;
         } else if (lastItem === null) {
-            item.parents[parentId] = {id: parentId, prev: null, next: null};
+            item.parents[parentId] = {id: parentId, order: 0};
             lastItem = item;
         } else {
-            item.parents[parentId] = {id: parentId, prev: lastItem.id, next: null};
-            lastItem.parents[parentId].next = item.id;
+            let lastOrder = lastItem.parents[parentId].order;
+            item.parents[parentId] = {id: parentId, order: lastOrder + 100};
             lastItem = item;
         }
         items[item.id] = item;
