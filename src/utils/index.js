@@ -129,6 +129,16 @@ export function loadStateFromLocalStorage() {
     }
 }
 
+export function preprocessInitialState(state) {
+    if (!state) return state;
+    if (state.sync.isSyncing) {
+        // Set isSyncing to false on page load to prevent
+        // scenarios where status is stuck.
+        state.sync.isSyncing = false;
+    }
+    return state;
+}
+
 export function loadUrlQueryParams() {
     let queryParams = new URLSearchParams(window.location.search);
     let queryParamObject = {};
@@ -200,16 +210,9 @@ export const preventEvent = (e) => { e.preventDefault(); return false; }
  */
 export function chunker(list, chunkSize) {
     let chunkedList = [];
-    let currentIndex = 0;
-    let endIndex = currentIndex + chunkSize;
-    while (currentIndex < list.length) {
-        let chunk = []
-        while (currentIndex < endIndex) {
-            chunk.push(list[currentIndex])
-            currentIndex++;
-        }
-        chunkedList.push(chunk);
-        endIndex = Math.min(currentIndex + chunkSize, list.length);
+    for (let i = 0; i < list.length; i += chunkSize) {
+        let chunkOfItems = list.slice(i, i + chunkSize);
+        chunkedList.push(chunkOfItems);
     }
     return chunkedList;
 }

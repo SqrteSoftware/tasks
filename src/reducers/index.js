@@ -33,9 +33,9 @@ function customCombine(state={}, action) {
         lists: lists(state.lists, action),
         license: license(state.license, action),
         user: user(state.user, action),
-        dialogs: dialogs(state.dialogs, action)
+        dialogs: dialogs(state.dialogs, action),
+        sync: sync(state.sync, action),
     };
-    newState["sync"] = sync(state.sync, action, state, newState);
     return newState;
 }
 

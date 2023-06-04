@@ -1,10 +1,10 @@
-export const syncedUp = (date = new Date().toISOString()) => ({
-    type: 'SYNCED_UP',
+export const updateSyncUpDate = (date = new Date().toISOString()) => ({
+    type: 'UPDATE_SYNC_UP_DATE',
     date
 });
 
-export const syncedDown = (date = new Date().toISOString()) => ({
-    type: 'SYNCED_DOWN',
+export const updateSyncDownDate = (date = new Date().toISOString()) => ({
+    type: 'UPDATE_SYNC_DOWN_DATE',
     date
 });
 
@@ -14,3 +14,13 @@ export const updateIsSyncing = (isSyncing = false) => {
         isSyncing
     }
 };
+
+export const upsertChangeMarkers = (changeMarkers) => ({
+    type: 'UPSERT_CHANGE_MARKERS',
+    changeMarkers
+});
+
+export const deleteChangeMarkers = (changeMarkers) => ({
+    type: 'DELETE_CHANGE_MARKERS',
+    changeMarkers
+});

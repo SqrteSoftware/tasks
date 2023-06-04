@@ -10,7 +10,7 @@ import './index.css';
 import App from './components/App';
 import rootReducer from './reducers';
 import * as serviceWorker from './serviceWorker';
-import {loadStateFromLocalStorage, saveStateToLocalStorage} from './utils';
+import {loadStateFromLocalStorage, preprocessInitialState, saveStateToLocalStorage} from './utils';
 import { persistenceCheck } from './utils/persistence';
 import {handleNewRegistration} from './utils/license';
 import {initSync} from './utils/sync';
@@ -21,7 +21,7 @@ import { migrate } from './migrations';
 
 migrate();
 
-let initialState = loadStateFromLocalStorage();
+let initialState = preprocessInitialState(loadStateFromLocalStorage());
 
 const store = configureStore({
     reducer: rootReducer,
