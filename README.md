@@ -16,7 +16,16 @@ Some of the core values of this project include:
 - Offline First
 - Open Source
 
-# Contributing
+## Run the App
+
+Change into the root of the repo and execute the following.
+Running these the first time will take some time.
+```
+docker build --target develop -t tasks-app .
+docker run -it -p 3000:3000 -v ${PWD}:/tasks/app tasks-app
+```
+Open the app at localhost:3000 in your browser.
+## Contributing
 
 To help make sure time is not wasted and a contribution is accepted, please follow these steps:
 
