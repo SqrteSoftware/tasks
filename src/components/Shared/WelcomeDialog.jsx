@@ -29,15 +29,15 @@ export default function WelcomeDialog(props) {
             <h4>Important Instructions to Prevent Data Loss</h4>
 
             <Typography gutterBottom>
-                Your data is stored locally within your browser. If you
+                Sqrte Tasks stores your data locally within your browser. If you
                 clear your browser's cookies or cache, <i>you will lose your data
-                unless you save a copy</i> of it first by clilcking the save button.
+                unless you save a copy</i> of it first by clicking the save button.
             </Typography>
 
             <Typography gutterBottom>
                 Persistent Storage is required to prevent your browser
-                from deleting your local data. Depending on your browser
-                you will be prompted to grant permission to use Notifications
+                from deleting your local data. Your browser may prompt
+                you to grant permission to use Notifications
                 or Persistent Storage to allow this.
             </Typography>
           </DialogContent>
