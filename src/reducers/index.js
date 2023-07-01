@@ -3,10 +3,11 @@ import {focus} from "./focusReducer";
 import {dnd} from "./dndReducer";
 import {layouts} from "./layoutsReducer";
 import {sync} from "./syncReducer";
-import {lists} from "./listsReducer";
 import {license} from "./licenseReducer";
 import {user} from "./userReducer";
 import {dialogs} from "./dialogsReducer";
+
+import lists from "../slices/listsSlice"
 
 
 const rootReducer = (state={}, action) => {
@@ -37,6 +38,6 @@ function customCombine(state={}, action) {
         sync: sync(state.sync, action),
     };
     return newState;
-}
+};
 
 export default rootReducer;

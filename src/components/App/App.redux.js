@@ -18,7 +18,9 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = {...actions};
+const mapDispatchToProps = {
+    ...actions
+};
 
 const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
 

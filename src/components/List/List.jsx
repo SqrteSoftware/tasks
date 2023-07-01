@@ -132,7 +132,7 @@ class List extends Component {
 
     onToggleCompleted = (e) => {
         let showCompletedItems = this.props.settings ? this.props.settings.showCompletedItems : true;
-        this.props.onToggleCompleted(this.props.parent.id, !showCompletedItems);
+        this.props.onToggleCompleted({listId: this.props.parent.id, show: !showCompletedItems});
     };
 
     onDeleteList = (e) => {

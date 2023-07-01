@@ -5,10 +5,11 @@ export * from './itemsActions'
 export * from './dndActions'
 export * from './focusActions'
 export * from './layoutActions'
-export * from './listsActions'
 export * from './licenseActions'
 export * from './userActions'
 export * from './dialogsActions'
+
+export * from '../slices/listsSlice'
 
 
 export const resetData = () => ({type: 'RESET_DATA'});
