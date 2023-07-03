@@ -6,10 +6,15 @@ const listsSlice = createSlice({
     name: 'lists',
     initialState,
     reducers: {
-      showCompletedItems(state, action) {
-        const {listId, show} = action.payload;
-        state[listId] = state[listId] === undefined ? {} : state[listId];
-        state[listId].showCompletedItems = show;
+      showCompletedItems: {
+        reducer: (state, action) => {
+          const {listId, show} = action.payload;
+          state[listId] = state[listId] === undefined ? {} : state[listId];
+          state[listId].showCompletedItems = show;
+        },
+        prepare: (listId, show) => {
+          return { payload: { listId, show } }
+        }
       }
     }
   })
