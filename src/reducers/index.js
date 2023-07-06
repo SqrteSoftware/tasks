@@ -4,10 +4,10 @@ import {dnd} from "./dndReducer";
 import {layouts} from "./layoutsReducer";
 import {sync} from "./syncReducer";
 import {license} from "./licenseReducer";
-import {user} from "./userReducer";
-import {dialogs} from "./dialogsReducer";
 
 import lists from "../slices/listsSlice"
+import dialogs from "../slices/dialogsSlice"
+import user from "../slices/userSlice"
 
 
 const rootReducer = (state={}, action) => {

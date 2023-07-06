@@ -6,10 +6,10 @@ export * from './dndActions'
 export * from './focusActions'
 export * from './layoutActions'
 export * from './licenseActions'
-export * from './userActions'
-export * from './dialogsActions'
 
 export * from '../slices/listsSlice'
+export * from '../slices/dialogsSlice'
+export * from '../slices/userSlice'
 
 
 export const resetData = () => ({type: 'RESET_DATA'});
