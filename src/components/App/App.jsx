@@ -243,12 +243,7 @@ class App extends Component {
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
         let listItems = getSortedListItems(overlappedListId, this.props.items);
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
-        this.props.updateDnd({
-            'activeDragParentId': parentId,
-            'overlappedListId': overlappedListId,
-            'nearestItemId': nearestItem.id,
-            'nearestItemPos': nearestItem.position
-        });
+        this.props.updateDnd(parentId, overlappedListId, nearestItem.id, nearestItem.position);
     };
 
     updateBoundCache = () => {
@@ -276,11 +271,7 @@ class App extends Component {
         this.updateItemBounds(listItems);
 
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
-        this.props.updateDnd({
-            'overlappedListId': overlappedListId,
-            'nearestItemId': nearestItem.id,
-            'nearestItemPos': nearestItem.position
-        });
+        this.props.updateDnd(undefined, overlappedListId, nearestItem.id, nearestItem.position);
     };
 
     getOverlappedListId = (itemId, itemRefsById, listBoundsById) => {
@@ -321,12 +312,7 @@ class App extends Component {
                 );
             }
         }
-        this.props.updateDnd({
-            'activeDragParentId': null,
-            'overlappedListId': null,
-            'nearestItemId': null,
-            'nearestItemPos': null
-        });
+        this.props.updateDnd(null, null, null, null);
     };
 
     onItemRef = (obj) => {
