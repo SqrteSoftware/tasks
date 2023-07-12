@@ -1,5 +1,4 @@
 import {items} from "./itemsReducer";
-import {focus} from "./focusReducer";
 import {sync} from "./syncReducer";
 import {license} from "./licenseReducer";
 
@@ -8,6 +7,7 @@ import dialogs from "../slices/dialogsSlice"
 import user from "../slices/userSlice"
 import dnd from "../slices/dndSlice"
 import layouts from "../slices/layoutsSlice";
+import focus from "../slices/focusSlice";
 
 
 const rootReducer = (state={}, action) => {
