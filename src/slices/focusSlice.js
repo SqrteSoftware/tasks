@@ -25,19 +25,20 @@ const focusSlice = createSlice({
             })
         }
     },
-    extraReducers: {
-        'CREATE_NEW_ITEM_WITH_FOCUS': (state, action) => {
-            return {
-                'parentId': action.parentItemId,
-                'itemId': action.newItemId
-            }
-        },
-        'CREATE_NEW_PARENT_ITEM_WITH_FOCUS': (state, action) => {
-            return {
-                'parentId': action.newParentItemId,
-                'itemId': action.newChildItemId
-            }
-        }
+    extraReducers: (builder) => {
+        builder
+            .addCase('CREATE_NEW_ITEM_WITH_FOCUS', (state, action) => {
+                return {
+                    'parentId': action.parentItemId,
+                    'itemId': action.newItemId
+                }
+            })
+            .addCase('CREATE_NEW_PARENT_ITEM_WITH_FOCUS', (state, action) => {
+                return {
+                    'parentId': action.newParentItemId,
+                    'itemId': action.newChildItemId
+                }
+            })
     }
   })
 

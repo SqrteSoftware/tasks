@@ -15,18 +15,18 @@ const layoutsSlice = createSlice({
             reducer: (state, action) => clone(action.payload)
       }
     },
-    extraReducers: {
-        'CREATE_NEW_PARENT_ITEM_WITH_FOCUS': (state, action) => {
-            let newParentItemId = action.newParentItemId
-            return {
-                lg: shiftAndAddLayout(state, 'lg', newParentItemId),
-                md: shiftAndAddLayout(state, 'md', newParentItemId),
-                sm: shiftAndAddLayout(state, 'sm', newParentItemId),
-                xs: shiftAndAddLayout(state, 'xs', newParentItemId),
-                xxs: shiftAndAddLayout(state, 'xxs', newParentItemId)
-            };
-
-        }
+    extraReducers: (builder) => {
+        builder
+            .addCase('CREATE_NEW_PARENT_ITEM_WITH_FOCUS', (state, action) => {
+                let newParentItemId = action.newParentItemId
+                return {
+                    lg: shiftAndAddLayout(state, 'lg', newParentItemId),
+                    md: shiftAndAddLayout(state, 'md', newParentItemId),
+                    sm: shiftAndAddLayout(state, 'sm', newParentItemId),
+                    xs: shiftAndAddLayout(state, 'xs', newParentItemId),
+                    xxs: shiftAndAddLayout(state, 'xxs', newParentItemId)
+                }
+            })
     }
   })
 
