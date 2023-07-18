@@ -4,7 +4,7 @@ import {
   } from '../config'
 import * as crypto from './app_crypto'
 import {loadUrlQueryParams} from '../utils'
-import {createPaymentSession, createLicenseKey} from '../actions/licenseActions';
+import {createPaymentSession, createLicenseKey} from '../slices/licenseSlice';
 import { createUserId } from '../slices/userSlice';
 
 export async function handleNewRegistration(store) {

@@ -2,7 +2,6 @@ import generateTestData from '../data';
 
 
 export * from './itemsActions'
-export * from './licenseActions'
 
 export * from '../slices/listsSlice'
 export * from '../slices/dialogsSlice'
@@ -10,6 +9,7 @@ export * from '../slices/userSlice'
 export * from '../slices/dndSlice'
 export * from '../slices/layoutsSlice'
 export * from '../slices/focusSlice'
+export * from '../slices/licenseSlice'
 
 
 export const resetData = () => ({type: 'RESET_DATA'});
