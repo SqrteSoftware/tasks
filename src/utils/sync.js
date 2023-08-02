@@ -7,7 +7,7 @@ import {
     deleteChangeMarkers,
     updateSyncUpDate,
     updateSyncDownDate
-} from '../actions/syncActions'
+} from '../slices/syncSlice'
 import {syncItems} from '../actions/itemsActions'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'

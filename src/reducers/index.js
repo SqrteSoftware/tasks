@@ -1,5 +1,4 @@
 import {items} from "./itemsReducer";
-import {sync} from "./syncReducer";
 
 import lists from "../slices/listsSlice"
 import dialogs from "../slices/dialogsSlice"
@@ -8,6 +7,7 @@ import dnd from "../slices/dndSlice"
 import layouts from "../slices/layoutsSlice"
 import focus from "../slices/focusSlice"
 import license from "../slices/licenseSlice"
+import sync from "../slices/syncSlice"
 
 
 const rootReducer = (state={}, action) => {
