@@ -42,13 +42,10 @@ const syncSlice = createSlice({
         },
         upsertChangeMarkers: {
             reducer: (state, action) => {
-                let newState = {
+                return {
                     ...state,
                     changeMarkers: action.payload
                 }
-                console.log("action", action)
-                console.log("new state", newState)
-                return newState
             },
         },
         deleteChangeMarkers: {
