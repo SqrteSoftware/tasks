@@ -1,67 +1,149 @@
+import { createSlice } from '@reduxjs/toolkit'
+import { v4 as uuidv4 } from 'uuid';
+
 import {createItem, getFirstItemInList, set} from "../utils";
 import { ITEM_ORDER_SPACING, reposition } from "../utils/order";
 
-export function items(state = {}, action) {
-    let items = state;
-    switch (action.type) {
-        case 'UPDATE_ITEM_TEXT':
-            return updateItemText(items, action.itemId, action.text);
-        case 'UPDATE_ITEM_COMPLETE':
-            if (!action.complete) {
-                Object.keys(items[action.itemId].parents).forEach(parentId => {
-                    items = moveItemToTop(action.itemId, parentId, items);
-                });
-            }
-            items = setItem(items, action.itemId, 'complete', action.complete);
-            items = setItem(items, action.itemId, 'completeDate', action.completeDate);
-            return items;
-        case 'CREATE_NEW_ITEM_WITH_FOCUS':
-            let newItem = createItem(action.newItemId);
-            items = setItem(items, newItem.id, newItem);
-            return attachItemToParent(
-                action.newItemId,
-                action.parentItemId,
-                action.prevItemId,
-                action.nextItemId,
-                items
-            );
-        case 'MOVE_ITEM':
-            items = detachItemFromParent(
-                action.itemId,
-                action.oldParentId,
-                items
-            );
-            items = attachItemToParent(
-                action.itemId,
-                action.newParentId,
-                action.newPrevItemId,
-                action.newNextItemId,
-                items
-            );
-            return items;
-        case 'REMOVE_ITEM_FROM_PARENT':
-            return removeItemFromParent(action.itemId, action.parentId, state);
-        case 'DELETE_ITEM':
-            return deleteItem(action.itemId, items);
-        case 'CREATE_NEW_PARENT_ITEM_WITH_FOCUS':
-            return createNewParentItem(
-                state,
-                action.newParentItemId,
-                action.newChildItemId
-            );
-        case 'SYNC_ITEMS':
-            return mergeItems(items, action.items);
-        default:
-            return state;
+
+const initialState = {}
+
+const itemsSlice = createSlice({
+    name: 'items',
+    initialState,
+    reducers: {
+        updateItemText: {
+            reducer: (items, action) => {
+                const {itemId, text} = action.payload
+                if (items[itemId] === undefined) return
+                items[itemId].value = text
+            },
+            prepare: (itemId, text) => ({
+                payload: { itemId, text }
+            })
+        },
+        updateItemComplete: {
+            reducer: (items, action) => {
+                const { itemId, complete, completeDate } = action.payload
+                if (!complete) {
+                    Object.keys(items[itemId].parents).forEach(parentId => {
+                        items = moveItemToTop(itemId, parentId, items);
+                    });
+                }
+                items = setItem(items, itemId, 'complete', complete);
+                items = setItem(items, itemId, 'completeDate', completeDate);
+                return items
+            },
+            prepare: (itemId, complete, completeDate = new Date().toISOString()) => ({
+                payload: {
+                    itemId,
+                    complete,
+                    completeDate: complete ? completeDate : null
+                }
+            })
+        },
+        createNewItemWithFocus: {
+            reducer: (items, action) => {
+                const {
+                    newItemId,
+                    parentItemId,
+                    prevItemId,
+                    nextItemId
+                } = action.payload
+                let newItem = createItem(newItemId)
+                items = setItem(items, newItem.id, newItem)
+                return attachItemToParent(
+                    newItemId, parentItemId, prevItemId, nextItemId, items)
+            },
+            prepare: (parentItemId, prevItemId, nextItemId) => ({
+                payload: {
+                    newItemId: "item-" + uuidv4(),
+                    parentItemId,
+                    prevItemId,
+                    nextItemId
+                 }
+            })
+        },
+        moveItem: {
+            reducer: (items, { payload }) => {
+                items = detachItemFromParent(
+                    payload.itemId,
+                    payload.oldParentId,
+                    items
+                );
+                items = attachItemToParent(
+                    payload.itemId,
+                    payload.newParentId,
+                    payload.newPrevItemId,
+                    payload.newNextItemId,
+                    items
+                );
+                return items;
+            },
+            prepare: (itemId, oldParentId, newParentId, newPrevItemId, newNextItemId) => ({
+                payload: {
+                    itemId,
+                    oldParentId,
+                    newParentId,
+                    newPrevItemId,
+                    newNextItemId
+                }
+            })
+        },
+        removeItemFromParent: {
+            reducer: (items, { payload }) => {
+                return handleRemoveItemFromParent(
+                    payload.itemId, payload.parentId, items)
+            },
+            prepare: (itemId, parentId) => ({
+                payload: {
+                    itemId,
+                    parentId
+                }
+            })
+        },
+        deleteItem: {
+            reducer: (items, { payload }) => {
+                return handleDeleteItem(payload.itemId, items)
+            },
+            prepare: (itemId) => ({
+                payload: { itemId }
+            })
+        },
+        createNewParentItemWithFocus: {
+            reducer: (items, { payload }) => {
+                return createNewParentItem(
+                    items, payload.newParentItemId, payload.newChildItemId)
+            },
+            prepare: () => ({
+                payload: {
+                    newParentItemId: "item-" + uuidv4(),
+                    newChildItemId: "item-" + uuidv4(),
+                }
+            })
+        },
+        syncItems: {
+            reducer: (items, { payload }) => {
+                return mergeItems(items, payload.items)
+            },
+            prepare: (items) => ({
+                payload: { items }
+            })
+        }
     }
-}
+})
 
+export default itemsSlice.reducer
 
-function updateItemText(items, itemId, text) {
-    if (items[itemId] === undefined) return items;
-    items = setItem(items, itemId, 'value', text);
-    return items;
-}
+export const {
+    updateItemText,
+    updateItemComplete,
+    createNewItemWithFocus,
+    moveItem,
+    removeItemFromParent,
+    deleteItem,
+    createNewParentItemWithFocus,
+    syncItems
+} = itemsSlice.actions
 
 
 function moveItemToTop(itemId, parentId, items) {
@@ -172,7 +254,7 @@ function detachItemFromParent(itemId, parentId, items) {
 }
 
 
-function removeItemFromParent(itemId, parentId, items) {
+function handleRemoveItemFromParent(itemId, parentId, items) {
     items = detachItemFromParent(itemId, parentId, items);
     // Delete the item if it now has 0 parents
     if (Object.keys(items[itemId].parents).length <= 0) {
@@ -182,7 +264,7 @@ function removeItemFromParent(itemId, parentId, items) {
 }
 
 
-function deleteItem(itemId, items) {
+function handleDeleteItem(itemId, items) {
     items = {...items};
     // If this item has any children, detach them
     // all and delete them if they have no other parents
@@ -220,7 +302,7 @@ function mergeItems(currentItems, incomingItems) {
     incomingItems.forEach(incomingItem => {
         let currentItem = currentItems[incomingItem.id];
         if (incomingItem.deleted) {
-            modifiedItems = deleteItem(incomingItem.id, modifiedItems);
+            modifiedItems = handleDeleteItem(incomingItem.id, modifiedItems);
         }
         else if (currentItem === undefined) {
             // New item

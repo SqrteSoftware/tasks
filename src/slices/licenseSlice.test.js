@@ -1,4 +1,4 @@
-import * as actions from '../actions'
+import * as actions from './licenseSlice'
 import rootReducer from '../reducers'
 
 

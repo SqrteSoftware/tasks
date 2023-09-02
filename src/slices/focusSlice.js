@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+import {
+    createNewParentItemWithFocus,
+    createNewItemWithFocus } from './itemsSlice'
 
 const initialState = {
     parentId: null,
@@ -27,16 +30,16 @@ const focusSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase('CREATE_NEW_ITEM_WITH_FOCUS', (state, action) => {
+            .addCase(createNewItemWithFocus, (state, { payload }) => {
                 return {
-                    'parentId': action.parentItemId,
-                    'itemId': action.newItemId
+                    'parentId': payload.parentItemId,
+                    'itemId': payload.newItemId
                 }
             })
-            .addCase('CREATE_NEW_PARENT_ITEM_WITH_FOCUS', (state, action) => {
+            .addCase(createNewParentItemWithFocus, (state, { payload }) => {
                 return {
-                    'parentId': action.newParentItemId,
-                    'itemId': action.newChildItemId
+                    'parentId': payload.newParentItemId,
+                    'itemId': payload.newChildItemId
                 }
             })
     }

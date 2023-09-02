@@ -55,7 +55,7 @@ class App extends Component {
             <div className="App">
                 <ToolBar
                     isSyncing={this.props.sync.isSyncing}
-                    onAddList={this.props.createNewParentItem}
+                    onAddList={this.props.createNewParentItemWithFocus}
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                     onSyncData={this.onSyncData}
@@ -64,7 +64,7 @@ class App extends Component {
                 <MobileMenu
                     open={this.state.slidingMenuOpen}
                     onClose={this.onMenuClose}
-                    onAddList={this.props.createNewParentItem}
+                    onAddList={this.props.createNewParentItemWithFocus}
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                     onSyncData={this.onSyncData}

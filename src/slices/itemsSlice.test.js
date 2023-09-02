@@ -1,5 +1,5 @@
-import * as ia from '../actions/itemsActions'
-import rootReducer from './index'
+import * as actions from './itemsSlice'
+import rootReducer from '../reducers/index'
 import {createItem} from '../utils'
 import generateTestData from '../data'
 
@@ -10,7 +10,7 @@ describe('CREATE_ITEM', () => {
 
         let initialState = {items: {}};
 
-        let action = ia.createNewParentItem();
+        let action = actions.createNewParentItemWithFocus();
         let newState = rootReducer(initialState, action);
 
         let itemIds = Object.keys(newState.items);
@@ -33,7 +33,7 @@ describe('UPDATE_ITEM_TEXT', () => {
             }
         };
 
-        let action = ia.updateItemText(itemId, itemText);
+        let action = actions.updateItemText(itemId, itemText);
         let newState = rootReducer(initialState, action);
 
         expect(initialState.items[itemId].value).toEqual("");
@@ -48,7 +48,7 @@ describe('UPDATE_ITEM_TEXT', () => {
             items: {}
         };
 
-        let action = ia.updateItemText(itemId, itemText);
+        let action = actions.updateItemText(itemId, itemText);
         let newState = rootReducer(initialState, action);
 
         expect(initialState.items[itemId]).toEqual(undefined);
@@ -69,7 +69,7 @@ describe('UPDATE_ITEM_COMPLETE', () => {
             }
         };
 
-        let action = ia.updateItemComplete(itemId, true, completeDate);
+        let action = actions.updateItemComplete(itemId, true, completeDate);
         let newState = rootReducer(initialState, action);
 
         expect(initialState.items[itemId].complete).toEqual(false);
@@ -80,13 +80,13 @@ describe('UPDATE_ITEM_COMPLETE', () => {
     });
 });
 
-describe('MERGE_ITEMS', () => {
+describe('SYNC_ITEMS', () => {
 
     test('An empty incoming list of items should result in no updates', () => {
         let {items} = generateTestData(false);
         let initialState = {items};
 
-        let action = ia.mergeItems([]);
+        let action = actions.syncItems([]);
         let newState = rootReducer(initialState, action);
 
         expect(initialState.items).toEqual(newState.items);

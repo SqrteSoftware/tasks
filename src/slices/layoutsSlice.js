@@ -1,6 +1,7 @@
 import {clone} from '../utils'
 import { createSlice } from '@reduxjs/toolkit'
 
+import { createNewParentItemWithFocus } from './itemsSlice'
 
 const initialState = {
     lg: []
@@ -17,8 +18,8 @@ const layoutsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase('CREATE_NEW_PARENT_ITEM_WITH_FOCUS', (state, action) => {
-                let newParentItemId = action.newParentItemId
+            .addCase(createNewParentItemWithFocus, (state, { payload }) => {
+                let newParentItemId = payload.newParentItemId
                 return {
                     lg: shiftAndAddLayout(state, 'lg', newParentItemId),
                     md: shiftAndAddLayout(state, 'md', newParentItemId),

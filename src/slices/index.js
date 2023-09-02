@@ -1,15 +1,13 @@
 import generateTestData from '../data';
 
-
-export * from './itemsActions'
-
-export * from '../slices/listsSlice'
-export * from '../slices/dialogsSlice'
-export * from '../slices/userSlice'
-export * from '../slices/dndSlice'
-export * from '../slices/layoutsSlice'
-export * from '../slices/focusSlice'
-export * from '../slices/licenseSlice'
+export * from './listsSlice'
+export * from './dialogsSlice'
+export * from './userSlice'
+export * from './dndSlice'
+export * from './layoutsSlice'
+export * from './focusSlice'
+export * from './licenseSlice'
+export * from './itemsSlice'
 
 
 export const resetData = () => ({type: 'RESET_DATA'});

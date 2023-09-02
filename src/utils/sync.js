@@ -8,7 +8,7 @@ import {
     updateSyncUpDate,
     updateSyncDownDate
 } from '../slices/syncSlice'
-import {syncItems} from '../actions/itemsActions'
+import {syncItems} from '../slices/itemsSlice'
 import * as app_crypto from './app_crypto'
 import * as utils from '.'
 import { chunker } from '.';
