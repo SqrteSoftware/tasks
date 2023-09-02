@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 
-import * as actions from '../../slices';
+import * as actions from '../../slices/allActions';
 
 import App from './App';
 

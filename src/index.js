@@ -8,7 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import './index.css';
 import App from './components/App';
-import rootReducer from './reducers';
+import rootReducer from './slices/allReducers';
 import * as serviceWorker from './serviceWorker';
 import {loadStateFromLocalStorage, preprocessInitialState, saveStateToLocalStorage} from './utils';
 import { persistenceCheck } from './utils/persistence';

@@ -1,5 +1,5 @@
 import * as actions from './licenseSlice'
-import rootReducer from '../reducers'
+import rootReducer from '../slices/allReducers'
 
 
 describe('CREATE_LICENSE_KEY', () => {

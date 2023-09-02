@@ -1,5 +1,5 @@
 import * as actions from './itemsSlice'
-import rootReducer from '../reducers/index'
+import rootReducer from '../slices/allReducers'
 import {createItem} from '../utils'
 import generateTestData from '../data'
 
