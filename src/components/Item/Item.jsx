@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import { useState, useRef, useEffect, memo } from 'react'
 import {DraggableCore} from 'react-draggable'
 import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
@@ -6,76 +6,31 @@ import './Item.css'
 import {disableTouchMove, enableTouchMove} from "../../utils"
 
 
-class Item extends PureComponent {
+export default memo(function Item(props) {
+    const [activeDrag, setActiveDrag] = useState(false)
+    const [position, setPosition] = useState({x: 0, y: 0})
 
-    constructor(props) {
-        super(props);
-        this.widthOnDragStart = null;
-        this.inputRef = null;
-        this.itemRef = React.createRef();
-        this.itemMiddleY = 0;
-        this.handleMiddleX = 0;
-        this.state = {
-            'activeDrag': false,
-            'position': {x: 0, y: 0}
-        };
-    }
+    let afterOnDragCallback = useRef(null)
+    let widthOnDragStart = useRef(null)
+    let itemMiddleY = useRef(0)
+    let handleMiddleX = useRef(0)
 
-    componentDidMount() {
-        this.handleFocus();
-    }
+    let inputRef = useRef()
+    let itemRef = useRef(null)
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this.handleFocus();
-    }
+    let {item} = props
 
-    handleFocus() {
-        if (this.inputRef !== null && this.props.giveFocus) {
-            this.inputRef.focus();
+    useEffect(() => {
+        if (inputRef.current !== null && props.giveFocus) {
+            inputRef.current.focus()
         }
-    }
+        if (afterOnDragCallback.current) {
+            afterOnDragCallback.current()
+            afterOnDragCallback.current = null
+        }
+    });
 
-    render() {
-        let item = this.props.item;
-        let activeDrag = this.state.activeDrag;
-        let position = this.state.position;
-
-        return (
-            <DraggableCore
-                nodeRef={this.itemRef}
-                disabled={item.complete}
-                onDrag={this.onDrag}
-                onStart={this.onDragStart}
-                onStop={this.onDragStop}
-                handle={'.itemHandle'}>
-                <li className={"item" + (item.complete ? " complete" : "")}
-                    ref={this.onItemRef}
-                    style={this.getListItemStyles(activeDrag, position, this.widthOnDragStart)}>
-                    {item.complete ? '' : <DragIndicator className="dragHandle itemHandle"></DragIndicator>}
-                    <input
-                        className="itemCheckbox"
-                        type="checkbox"
-                        checked={item.complete}
-                        onChange={this.onCheckboxChange}/>
-                    <input
-                        className="itemInput"
-                        ref={ref => this.inputRef = ref}
-                        type="text"
-                        enterKeyHint="Go" /* For Android */
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        disabled={item.complete}
-                        value={item.value}
-                        onChange={ this.onChange}
-                        onKeyDown={this.onKeyDown}
-                        onFocus={this.onInputFocus}/>
-                </li>
-            </DraggableCore>
-        );
-    }
-
-    getListItemStyles(activeDrag, position, width) {
+    const getListItemStyles = (activeDrag, position, width) => {
         if (activeDrag) {
             // When dragging, we switch to absolute positioning. Before
             // doing this, we must lock in the item's current relative
@@ -95,81 +50,99 @@ class Item extends PureComponent {
         }
     }
 
-    onKeyDown = (event) => {
+    const onKeyDown = (event) => {
         let cursorPosition = event.target.selectionStart;
         let inputValue = event.target.value;
         let keyPressed = event.key;
-        this.props.onKeyDown(
-            this.props.item.id,
-            this.props.parentId,
+        props.onKeyDown(
+            props.item.id,
+            props.parentId,
             keyPressed,
             inputValue,
             cursorPosition,
             event
         );
-    };
+    }
 
-    onChange = (e, data) => {
-        this.props.onChange(this.props.item.id, e.target.value);
-    };
+    const onChange = (e, data) => {
+        props.onChange(props.item.id, e.target.value);
+    }
 
-    onDragStart = (e, data) => {
+    const onDragStart = (e, data) => {
         disableTouchMove();
         // Propagate event BEFORE re-rendering item with absolute positioning
-        this.props.onDragStart(this.props.item.id, this.props.parentId);
+        props.onDragStart(props.item.id, props.parentId);
         // Save current width
-        this.widthOnDragStart = getComputedStyle(data.node)['width'];
-        this.setState({
-            'activeDrag': true,
-            'position': {x: data.x - this.handleMiddleX, y: data.y - this.itemMiddleY}
-        }, () => {
-            if (this.props.onAfterDragStart) {
-                // fire onAfterDragStart only AFTER the item has re-rendered with absolute positioning
-                this.props.onAfterDragStart(this.props.item.id, this.props.parentId);
-            }
-        });
-    };
+        widthOnDragStart.current = getComputedStyle(data.node)['width'];
+        setActiveDrag(true)
+        setPosition({x: data.x - handleMiddleX.current, y: data.y - itemMiddleY.current})
+    }
 
-    onDrag = (e, data) => {
-        this.setState({
-            'position': {x: data.x - this.handleMiddleX, y: data.y - this.itemMiddleY}
-        }, () => {
-            // Call AFTER above state changes are rendered. This may get called AFTER
-            // onDragStop has been called, probably because react is batching things
-            // so stuff is happening out of order. Thus we need to check the activeDrag
-            // field before percolating the event.
-            if (this.state.activeDrag) {
-                data.id = this.props.item.id;
-                this.props.onDrag(data);
+    const onDrag = (e, data) => {
+        setPosition({x: data.x - handleMiddleX.current, y: data.y - itemMiddleY.current})
+        if (props.onDrag) {
+            // Execute callback AFTER state changes from onDrag event are rendered.
+            afterOnDragCallback.current = () => {
+                props.onDrag({id: props.item.id});
             }
-        });
-    };
+        }
+    }
 
-    onDragStop = () => {
+    const onDragStop = () => {
         enableTouchMove();
-        this.setState({
-            'activeDrag': false,
-            'position': {x: 0, y: 0}
-        });
-        this.props.onDragStop(this.props.item.id, this.props.parentId);
-    };
+        setActiveDrag(false)
+        setPosition({x: 0, y: 0})
+        props.onDragStop(props.item.id, props.parentId);
+    }
 
-    onCheckboxChange = (event) => {
-        this.props.onCheckboxChange(this.props.item.id, event.target.checked);
-    };
+    const onCheckboxChange = (event) => {
+        props.onCheckboxChange(props.item.id, event.target.checked);
+    }
 
     // Fired when item DOM element is mounted/unmounted
-    onItemRef = (ref) => {
-        this.itemRef.current = ref;
+    const onItemRef = (ref) => {
+        itemRef.current = ref;
         let totalHeight = ref ? ref.offsetHeight : 0;
-        this.props.onItemRef({'id': this.props.item.id, totalHeight, 'ref': ref});
-        this.itemMiddleY = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
-        this.handleMiddleX = ref === null ? 0 : ref.children[0].getBoundingClientRect().width / 2;
-    };
+        props.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
+        itemMiddleY.current = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
+        handleMiddleX.current = ref === null ? 0 : ref.children[0].getBoundingClientRect().width / 2;
+    }
 
-    onInputFocus = () => {
-        this.props.onItemFocus(this.props.item.id);
-    };
-}
+    const onInputFocus = () => {
+        props.onItemFocus(props.item.id);
+    }
 
-export default Item;
+    return (
+        <DraggableCore
+            nodeRef={itemRef}
+            disabled={item.complete}
+            onDrag={onDrag}
+            onStart={onDragStart}
+            onStop={onDragStop}
+            handle={'.itemHandle'}>
+            <li className={"item" + (item.complete ? " complete" : "")}
+                ref={onItemRef}
+                style={getListItemStyles(activeDrag, position, widthOnDragStart.current)}>
+                {item.complete ? '' : <DragIndicator className="dragHandle itemHandle"></DragIndicator>}
+                <input
+                    className="itemCheckbox"
+                    type="checkbox"
+                    checked={item.complete}
+                    onChange={onCheckboxChange}/>
+                <input
+                    className="itemInput"
+                    ref={inputRef}
+                    type="text"
+                    enterKeyHint="Go" /* For Android */
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    disabled={item.complete}
+                    value={item.value}
+                    onChange={onChange}
+                    onKeyDown={onKeyDown}
+                    onFocus={onInputFocus}/>
+            </li>
+        </DraggableCore>
+    );
+})
