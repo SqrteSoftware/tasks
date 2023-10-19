@@ -24,7 +24,10 @@ export default memo(function Item(props) {
         if (inputRef.current !== null && props.giveFocus) {
             inputRef.current.focus()
         }
-        if (afterOnDragCallback.current) {
+        if (afterOnDragCallback.current && activeDrag) {
+            // The activeDrag MUST be checked because this may be called
+            // after the onDragStop event fires due to the fact that
+            // effects execute after render.
             afterOnDragCallback.current()
             afterOnDragCallback.current = null
         }
@@ -70,6 +73,8 @@ export default memo(function Item(props) {
 
     const onDragStart = (e, data) => {
         disableTouchMove();
+        // Remove focus while dragging
+        inputRef.current.blur()
         // Propagate event BEFORE re-rendering item with absolute positioning
         props.onDragStart(props.item.id, props.parentId);
         // Save current width
