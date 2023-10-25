@@ -28,22 +28,12 @@ class App extends Component {
         this.listRefsById = {};
         this.listBoundsById = {};
 
-        this.throttledUpdateBoundCache = throttle(this.updateBoundCache, 200);
-
         this.state = {
           "slidingMenuOpen": false,
           "syncModalOpen": false,
           "licenseModalOpen": props.license.paymentSession != null
         };
     }
-
-    componentDidMount = () => {
-        window.addEventListener('scroll', this.throttledUpdateBoundCache);
-    };
-
-    componentWillUnmount = () => {
-        window.removeEventListener('scroll', this.throttledUpdateBoundCache);
-    };
 
     render() {
         let listData = createViewData(this.props.items);
@@ -115,10 +105,7 @@ class App extends Component {
                                     onItemDragStop={this.onItemDragStop}
                                     nearestItemId={this.props.dnd.nearestItemId}
                                     nearestItemPos={this.props.dnd.nearestItemPos}
-                                    onItemChange={this.props.updateItemText}
                                     onItemKeyDown={this.onItemKeyDown}
-                                    onItemCheckboxChange={this.props.updateItemComplete}
-                                    onItemFocus={this.onItemFocus}
                                     onDeleteList={this.props.deleteItem}
                                     onToggleCompleted={this.props.showCompletedItems}
                                     createNewItemWithFocus={this.props.createNewItemWithFocus}
@@ -228,30 +215,20 @@ class App extends Component {
         }
     };
 
-    onItemFocus = (itemId) => {
-        // If the item was given focus through state,
-        // clear the state so that focus can now shift to
-        // other elements again.
-        if (this.props.focus.itemId !== null) {
-            this.props.updateFocus();
-        }
-    };
-
     onItemDragStart = (itemId, parentId) => {
-        this.updateBoundCache();
+        this.resetBounds()
+        this.updateListBounds()
 
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
         let listItems = getSortedListItems(overlappedListId, this.props.items);
+
+        this.updateItemBounds(listItems);
+
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
         this.props.updateDnd(parentId, overlappedListId, nearestItem.id, nearestItem.position);
     };
 
-    updateBoundCache = () => {
-        // Update the bounds of all items
-        Object.keys(this.itemRefsById).forEach(itemId => {
-            let itemRef = this.itemRefsById[itemId];
-            this.itemBoundsById[itemId] = itemRef.getBoundingClientRect();
-        });
+    updateListBounds = () => {
         // Update the bounds of all lists
         Object.keys(this.listRefsById).forEach(listId => {
             let listRef = this.listRefsById[listId];
@@ -260,16 +237,17 @@ class App extends Component {
     };
 
     onItemDrag = (itemId) => {
+        this.updateListBounds()
+
         // Update bound of dragged item
-        let itemRef = this.itemRefsById[itemId];
-        let itemBound = itemRef.getBoundingClientRect();
-        this.itemBoundsById[itemId] = itemBound;
+        this.updateItemBounds([this.props.items[itemId]])
 
         // Update bounds of items for currently overlapped list
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
         let listItems = getSortedListItems(overlappedListId, this.props.items);
         this.updateItemBounds(listItems);
 
+        // Find the nearest item in the currently overlapped list
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
         this.props.updateDnd(undefined, overlappedListId, nearestItem.id, nearestItem.position);
     };
@@ -281,6 +259,7 @@ class App extends Component {
     };
 
     updateItemBounds(items) {
+        // Update bounds of items specified
         items.forEach(item => {
             let itemRef = this.itemRefsById[item.id];
             this.itemBoundsById[item.id] = itemRef.getBoundingClientRect();
@@ -312,8 +291,16 @@ class App extends Component {
                 );
             }
         }
+
+        this.resetBounds()
+
         this.props.updateDnd(null, null, null, null);
     };
+
+    resetBounds() {
+        this.itemBoundsById = {}
+        this.listBoundsById = {}
+    }
 
     onItemRef = (obj) => {
         if (obj.ref !== null) {
@@ -321,7 +308,6 @@ class App extends Component {
         }
         else {
             delete this.itemRefsById[obj.id];
-            delete this.itemBoundsById[obj.id];
         }
     };
 
@@ -331,7 +317,6 @@ class App extends Component {
         }
         else {
             delete this.listRefsById[obj.id];
-            delete this.listBoundsById[obj.id];
         }
     };
 

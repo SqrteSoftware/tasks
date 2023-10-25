@@ -1,20 +1,27 @@
 import { useState, useRef, useEffect, memo } from 'react'
+import { useDispatch } from 'react-redux'
 import {DraggableCore} from 'react-draggable'
 import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './Item.css'
 import {disableTouchMove, enableTouchMove} from "../../utils"
+import { updateItemComplete, updateItemText } from '../../slices/itemsSlice'
+import { updateFocus } from '../../slices/focusSlice'
 
 
 export default memo(function Item(props) {
+    const dispatch = useDispatch()
+
     const [activeDrag, setActiveDrag] = useState(false)
     const [position, setPosition] = useState({x: 0, y: 0})
 
+    // Drag and Drop related state
     let afterOnDragCallback = useRef(null)
     let widthOnDragStart = useRef(null)
     let itemMiddleY = useRef(0)
     let handleMiddleX = useRef(0)
 
+    // DOM Refs
     let inputRef = useRef()
     let itemRef = useRef(null)
 
@@ -68,7 +75,7 @@ export default memo(function Item(props) {
     }
 
     const onChange = (e, data) => {
-        props.onChange(props.item.id, e.target.value);
+        dispatch(updateItemText(props.item.id, e.target.value))
     }
 
     const onDragStart = (e, data) => {
@@ -101,12 +108,14 @@ export default memo(function Item(props) {
     }
 
     const onCheckboxChange = (event) => {
-        props.onCheckboxChange(props.item.id, event.target.checked);
+        dispatch(updateItemComplete(props.item.id, event.target.checked))
     }
 
     // Fired when item DOM element is mounted/unmounted
     const onItemRef = (ref) => {
+        // DraggableCore requires a ref to the child component
         itemRef.current = ref;
+
         let totalHeight = ref ? ref.offsetHeight : 0;
         props.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
         itemMiddleY.current = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
@@ -114,7 +123,10 @@ export default memo(function Item(props) {
     }
 
     const onInputFocus = () => {
-        props.onItemFocus(props.item.id);
+        // When an item receives focus, it should clear
+        // the global focus state so that subsequent renders
+        // do not try to re-apply focus.
+        dispatch(updateFocus())
     }
 
     return (

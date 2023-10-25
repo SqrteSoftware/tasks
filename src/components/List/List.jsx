@@ -67,14 +67,11 @@ class List extends Component {
                                         item={item}
                                         parentId={this.props.parent.id}
                                         giveFocus={itemIdWithFocus === item.id}
-                                        onItemFocus={this.onItemFocus}
                                         onDragStart={this.onItemDragStart}
                                         onDrag={this.onItemDrag}
                                         onDragStop={this.onItemDragStop}
                                         onItemRef={this.onItemRef}
-                                        onChange={this.onItemChange}
                                         onKeyDown={this.props.onItemKeyDown}
-                                        onCheckboxChange={this.onItemCheckboxChange}
                                     />
                                 )
                             }
@@ -121,7 +118,6 @@ class List extends Component {
                                 item={item}
                                 parentId={this.props.parent.id}
                                 onItemRef={this.onItemRef}
-                                onCheckboxChange={this.onItemCheckboxChange}
                             />
                         )
                     }
@@ -155,10 +151,6 @@ class List extends Component {
         }
     };
 
-    onItemChange = (itemId, value) => {
-        this.props.onItemChange(itemId, value);
-    };
-
     onItemDragStart = (itemId, parentId) => {
         this.props.onItemDragStart(itemId, parentId);
     };
@@ -172,20 +164,13 @@ class List extends Component {
     };
 
     onItemRef = (obj) => {
+        console.log("onItemRef", obj)
         if (obj.ref !== null) {
             // Save the height of items so we know how
             // tall a placeholder should be
             this.itemPlaceholderHeight = obj.totalHeight;
         }
         this.props.onItemRef(obj);
-    };
-
-    onItemCheckboxChange = (itemId, value) => {
-        this.props.onItemCheckboxChange(itemId, value);
-    };
-
-    onItemFocus = (itemId) => {
-        this.props.onItemFocus(itemId);
     };
 
     // Fired when item DOM element is mounted/unmounted
