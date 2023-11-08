@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import throttle from 'lodash/throttle'
 
 import './App.css';
 import List from '../List';
@@ -221,7 +220,6 @@ class App extends Component {
 
         let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
         let listItems = getSortedListItems(overlappedListId, this.props.items);
-
         this.updateItemBounds(listItems);
 
         let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);

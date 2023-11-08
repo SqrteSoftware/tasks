@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
+    inMemoryOnly: true,
     activeDragParentId: null,
     overlappedListId: null,
     nearestItemId: null,
