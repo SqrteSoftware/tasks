@@ -34,5 +34,5 @@ const dndSlice = createSlice({
   })
   
   export const { updateDnd } = dndSlice.actions
-  
+
   export default dndSlice.reducer

@@ -5,8 +5,10 @@ import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './Item.css'
 import {disableTouchMove, enableTouchMove} from "../../utils"
-import { updateItemComplete, updateItemText } from '../../slices/itemsSlice'
+import * as dnd from "../../utils/dnd"
+import { moveItem, updateItemComplete, updateItemText } from '../../slices/itemsSlice'
 import { updateFocus } from '../../slices/focusSlice'
+import { updateDnd } from '../../slices/dndSlice'
 
 
 export default memo(function Item(props) {
@@ -83,7 +85,9 @@ export default memo(function Item(props) {
         // Remove focus while dragging
         inputRef.current.blur()
         // Propagate event BEFORE re-rendering item with absolute positioning
-        props.onDragStart(props.item.id, props.parentId);
+        // props.onDragStart(props.item.id, props.parentId);
+        let result = dnd.onItemDragStart(props.item.id, props.parentId)
+        dispatch(updateDnd(...result))
         // Save current width
         widthOnDragStart.current = getComputedStyle(data.node)['width'];
         setActiveDrag(true)
@@ -92,11 +96,11 @@ export default memo(function Item(props) {
 
     const onDrag = (e, data) => {
         setPosition({x: data.x - handleMiddleX.current, y: data.y - itemMiddleY.current})
-        if (props.onDrag) {
-            // Execute callback AFTER state changes from onDrag event are rendered.
-            afterOnDragCallback.current = () => {
-                props.onDrag({id: props.item.id});
-            }
+        // Execute callback AFTER state changes from onDrag event are rendered.
+        afterOnDragCallback.current = () => {
+            // props.onDrag({id: props.item.id});
+            let result = dnd.onItemDrag(props.item.id);
+            dispatch(updateDnd(...result))
         }
     }
 
@@ -104,7 +108,12 @@ export default memo(function Item(props) {
         enableTouchMove();
         setActiveDrag(false)
         setPosition({x: 0, y: 0})
-        props.onDragStop(props.item.id, props.parentId);
+        // props.onDragStop(props.item.id, props.parentId);
+        let result = dnd.onItemDragStop(props.item.id, props.parentId);
+        if (result) {
+            dispatch(moveItem(...result))
+        }
+        dispatch(updateDnd(null, null, null, null))
     }
 
     const onCheckboxChange = (event) => {
@@ -118,6 +127,7 @@ export default memo(function Item(props) {
 
         let totalHeight = ref ? ref.offsetHeight : 0;
         props.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
+        dnd.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
         itemMiddleY.current = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
         handleMiddleX.current = ref === null ? 0 : ref.children[0].getBoundingClientRect().width / 2;
     }

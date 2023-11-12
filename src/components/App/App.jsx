@@ -5,7 +5,7 @@ import 'react-resizable/css/styles.css'
 
 import './App.css';
 import List from '../List';
-import {createViewData, getSortedListItems, downloadJSON, disableTouchMove, enableTouchMove} from '../../utils';
+import {createViewData, downloadJSON, disableTouchMove, enableTouchMove} from '../../utils';
 import MobileMenu from "../Shared/MobileMenu";
 import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
@@ -20,12 +20,6 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-
-        this.itemRefsById = {};
-        this.itemBoundsById = {};
-
-        this.listRefsById = {};
-        this.listBoundsById = {};
 
         this.state = {
           "slidingMenuOpen": false,
@@ -97,11 +91,6 @@ class App extends Component {
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
                                     freezeScroll={this.shouldFreezeListScroll(item.parent.id)}
                                     settings={listSettings[item.parent.id]}
-                                    onListRef={this.onListRef}
-                                    onItemRef={this.onItemRef}
-                                    onItemDragStart={this.onItemDragStart}
-                                    onItemDrag={this.onItemDrag}
-                                    onItemDragStop={this.onItemDragStop}
                                     nearestItemId={this.props.dnd.nearestItemId}
                                     nearestItemPos={this.props.dnd.nearestItemPos}
                                     onItemKeyDown={this.onItemKeyDown}
@@ -213,147 +202,6 @@ class App extends Component {
             }
         }
     };
-
-    onItemDragStart = (itemId, parentId) => {
-        this.resetBounds()
-        this.updateListBounds()
-
-        let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
-        let listItems = getSortedListItems(overlappedListId, this.props.items);
-        this.updateItemBounds(listItems);
-
-        let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
-        this.props.updateDnd(parentId, overlappedListId, nearestItem.id, nearestItem.position);
-    };
-
-    updateListBounds = () => {
-        // Update the bounds of all lists
-        Object.keys(this.listRefsById).forEach(listId => {
-            let listRef = this.listRefsById[listId];
-            this.listBoundsById[listId] = listRef.getBoundingClientRect();
-        });
-    };
-
-    onItemDrag = (itemId) => {
-        this.updateListBounds()
-
-        // Update bound of dragged item
-        this.updateItemBounds([this.props.items[itemId]])
-
-        // Update bounds of items for currently overlapped list
-        let overlappedListId = this.getOverlappedListId(itemId, this.itemRefsById, this.listBoundsById);
-        let listItems = getSortedListItems(overlappedListId, this.props.items);
-        this.updateItemBounds(listItems);
-
-        // Find the nearest item in the currently overlapped list
-        let nearestItem = this.findNearestItem(itemId, listItems, this.itemBoundsById);
-        this.props.updateDnd(undefined, overlappedListId, nearestItem.id, nearestItem.position);
-    };
-
-    getOverlappedListId = (itemId, itemRefsById, listBoundsById) => {
-        let itemRef = itemRefsById[itemId];
-        let itemBound = itemRef.getBoundingClientRect();
-        return this.findOverlappedBoundId(itemId, itemBound, listBoundsById);
-    };
-
-    updateItemBounds(items) {
-        // Update bounds of items specified
-        items.forEach(item => {
-            let itemRef = this.itemRefsById[item.id];
-            this.itemBoundsById[item.id] = itemRef.getBoundingClientRect();
-        });
-    }
-
-    onItemDragStop = (draggedItemId, currentListId) => {
-        let nearestItemId = this.props.dnd.nearestItemId;
-        let nearestItemPos = this.props.dnd.nearestItemPos;
-        let overlappedListId = this.props.dnd.overlappedListId;
-        if (nearestItemId) {
-            // Find the dragged item's new prev and next
-            let adjacentItems = findAdjacent(nearestItemId, overlappedListId, this.props.items);
-            let nextId = adjacentItems.next?.id || null;
-            let prevId = adjacentItems.prev?.id || null;
-            let draggedItemNewPrev = nearestItemPos === 'above' ? prevId : nearestItemId;
-            let draggedItemNewNext = nearestItemPos === 'above' ? nearestItemId : nextId;
-            // Only insert dragged item into new position if the dragged item is
-            // NOT the same as the new next or new prev item. If it is the same,
-            // then we're dropping the item into the same place it was in.
-            if (draggedItemId !== draggedItemNewPrev &&
-                draggedItemId !== draggedItemNewNext) {
-                this.props.moveItem(
-                    draggedItemId,
-                    currentListId,
-                    overlappedListId,
-                    draggedItemNewPrev,
-                    draggedItemNewNext
-                );
-            }
-        }
-
-        this.resetBounds()
-
-        this.props.updateDnd(null, null, null, null);
-    };
-
-    resetBounds() {
-        this.itemBoundsById = {}
-        this.listBoundsById = {}
-    }
-
-    onItemRef = (obj) => {
-        if (obj.ref !== null) {
-            this.itemRefsById[obj.id] = obj.ref;
-        }
-        else {
-            delete this.itemRefsById[obj.id];
-        }
-    };
-
-    onListRef = (obj) => {
-        if (obj.ref !== null) {
-            this.listRefsById[obj.id] = obj.ref;
-        }
-        else {
-            delete this.listRefsById[obj.id];
-        }
-    };
-
-    findOverlappedBoundId(hoverId, hoverBound, boundsById) {
-        let hoverMidX = hoverBound.x + (hoverBound.width / 2);
-        let hoverMidY = hoverBound.y + (hoverBound.height / 2);
-        let coveredId = null;
-        Object.keys(boundsById).forEach((boundId) => {
-            if (boundId === hoverId) return;
-            let bound = boundsById[boundId];
-            if (hoverMidX > bound.left && hoverMidY > bound.top) {
-                if (hoverMidX < bound.right && hoverMidY < bound.bottom) {
-                    coveredId = boundId;
-                }
-            }
-        });
-        return coveredId;
-    }
-
-    findNearestItem(draggedId, listItems, itemBoundsById) {
-        let draggedBound = itemBoundsById[draggedId];
-        let draggedMidY = draggedBound.y + (draggedBound.height / 2);
-
-        let nearestItem = {id: null, position: null};
-        let currentLeastDistance = null;
-        listItems.forEach((item) => {
-            let itemId = item.id;
-            if (itemId === draggedId) return;
-            let itemBound = itemBoundsById[itemId];
-            let itemMidY = itemBound.y + (itemBound.height / 2);
-            if (Math.abs(draggedMidY - itemMidY) < currentLeastDistance
-                || currentLeastDistance === null) {
-                currentLeastDistance = Math.abs(draggedMidY - itemMidY);
-                nearestItem.id = itemId;
-                nearestItem.position = draggedMidY <= itemMidY ? 'above' : 'below';
-            }
-        });
-        return nearestItem;
-    }
 }
 
 export default App;

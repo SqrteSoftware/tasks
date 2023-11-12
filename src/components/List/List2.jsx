@@ -3,12 +3,12 @@ import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './List.css'
 import Item from '../Item';
+import * as dnd from "../../utils/dnd"
 import {CollapseIndicator} from "../Shared/CollapseIndicator"
 
 export default memo(function List(props) {
     let itemPlaceholderHeight = useRef(0)
 
-    const {onItemDragStart, onItemDrag, onItemDragStop, onItemRef, onListRef} = props
     const parentId = props.parent.id
 
     function onTitleChange(e, data) {
@@ -36,36 +36,24 @@ export default memo(function List(props) {
         }
     }
 
-    // Fired when item DOM element is mounted/unmounted
-    const onListRef2 = useCallback((ref) => {
+    // Fired when list DOM element is mounted/unmounted
+    const onListRef = useCallback((ref) => {
         if (ref !== null) {
-            onListRef({'id': parentId, 'ref': ref});
+            dnd.onListRef({'id': parentId, 'ref': ref});
         }
         else {
-            onListRef({'id': parentId, 'ref': null});
+            dnd.onListRef({'id': parentId, 'ref': null});
         }
-    }, [onListRef, parentId])
+    }, [parentId])
 
-    const onItemDragStart2 = useCallback((itemId, parentId) => {
-        onItemDragStart(itemId, parentId);
-    }, [onItemDragStart])
-
-    const onItemDrag2 = useCallback((meta) => {
-        onItemDrag(meta.id);
-    }, [onItemDrag])
-
-    const onItemDragStop2 = useCallback((itemId, parentId) => {
-        onItemDragStop(itemId, parentId);
-    }, [onItemDragStop])
-
-    const onItemRef2 = useCallback((obj) => {
+    // Fired when item DOM element is mounted/unmounted
+    const onItemRef = useCallback((obj) => {
         if (obj.ref !== null) {
             // Save the height of items so we know how
             // tall a placeholder should be
             itemPlaceholderHeight.current = obj.totalHeight;
         }
-        onItemRef(obj);
-    }, [onItemRef])
+    }, [])
 
     function activeItems(items, itemIdWithFocus) {
         if (items.length > 0) {
@@ -83,10 +71,7 @@ export default memo(function List(props) {
                                         item={item}
                                         parentId={props.parent.id}
                                         giveFocus={itemIdWithFocus === item.id}
-                                        onDragStart={onItemDragStart2}
-                                        onDrag={onItemDrag2}
-                                        onDragStop={onItemDragStop2}
-                                        onItemRef={onItemRef2}
+                                        onItemRef={onItemRef}
                                         onKeyDown={props.onItemKeyDown}
                                     />
                                 )
@@ -133,7 +118,7 @@ export default memo(function List(props) {
                                 key={item.id}
                                 item={item}
                                 parentId={props.parent.id}
-                                onItemRef={onItemRef2}
+                                onItemRef={onItemRef}
                             />
                         )
                     }
@@ -171,7 +156,7 @@ export default memo(function List(props) {
                     onChange={onTitleChange}
                     onKeyDown={onTitleKeyDown}/>
             </div>
-            <div className="listContent noDrag" ref={onListRef2} style={props.freezeScroll ? {overflow: 'hidden'} : {}}>
+            <div className="listContent noDrag" ref={onListRef} style={props.freezeScroll ? {overflow: 'hidden'} : {}}>
                 {activeItems(items, itemIdWithFocus)}
                 {completedItems(history, showCompletedItems)}
             </div>
