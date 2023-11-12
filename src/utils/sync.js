@@ -152,7 +152,7 @@ async function syncUp(store) {
         let preparedItems = await getPreparedItems(store.getState().items, changeMarkers, keys);
         let chunkedPreparedItems = chunker(preparedItems, 50);
 
-        console.log(chunkedPreparedItems)
+        console.log("PREPARED:", chunkedPreparedItems)
 
         success = await uploadBatches(chunkedPreparedItems, authToken);
         if (success) {

@@ -4,12 +4,8 @@ import { findAdjacent } from './order';
 
 let itemsState = null
 let dndState = null
-
 let itemRefsById = {}
-let itemBoundsById = {}
-
 let listRefsById = {}
-let listBoundsById = {}
 
 
 export function setItemsState(items) {
@@ -20,58 +16,47 @@ export function setDndState(dnd) {
     dndState = dnd
 }
 
+export function onItemRef(obj) {
+    if (obj.ref !== null) {
+        itemRefsById[obj.id] = obj.ref;
+    }
+    else {
+        delete itemRefsById[obj.id];
+    }
+}
+
+export function onListRef(obj) {
+    if (obj.ref !== null) {
+        listRefsById[obj.id] = obj.ref;
+    }
+    else {
+        delete listRefsById[obj.id];
+    }
+}
+
 export function onItemDragStart(itemId, parentId) {
-    resetBounds()
-    updateListBounds()
+    let listBoundsById = getListBounds()
+    let overlappedListId = getOverlappedListId(itemId, itemRefsById, listBoundsById)
+    let listItems = getSortedListItems(overlappedListId, itemsState)
+    let itemBoundsById = getItemBounds(listItems)
+    let nearestItem = findNearestItem(itemId, listItems, itemBoundsById)
 
-    let overlappedListId = getOverlappedListId(itemId, itemRefsById, listBoundsById);
-    let listItems = getSortedListItems(overlappedListId, itemsState);
-    updateItemBounds(listItems);
-
-    let nearestItem = findNearestItem(itemId, listItems, itemBoundsById);
-
-    // this.props.updateDnd(parentId, overlappedListId, nearestItem.id, nearestItem.position);
     return [parentId, overlappedListId, nearestItem.id, nearestItem.position]
-};
-
-function updateListBounds() {
-    // Update the bounds of all lists
-    Object.keys(listRefsById).forEach(listId => {
-        let listRef = listRefsById[listId];
-        listBoundsById[listId] = listRef.getBoundingClientRect();
-    });
-};
+}
 
 export function onItemDrag(itemId) {
-    updateListBounds()
-
-    // Update bound of dragged item
-    updateItemBounds([itemsState[itemId]])
-
     // Update bounds of items for currently overlapped list
+    let listBoundsById = getListBounds()
     let overlappedListId = getOverlappedListId(itemId, itemRefsById, listBoundsById);
     let listItems = getSortedListItems(overlappedListId, itemsState);
-    updateItemBounds(listItems);
 
+    // Add dragged item
+    listItems.push(itemsState[itemId])
     // Find the nearest item in the currently overlapped list
+    let itemBoundsById = getItemBounds(listItems)
     let nearestItem = findNearestItem(itemId, listItems, itemBoundsById);
 
-    // this.props.updateDnd(undefined, overlappedListId, nearestItem.id, nearestItem.position);
     return [undefined, overlappedListId, nearestItem.id, nearestItem.position]
-};
-
-function getOverlappedListId(itemId, itemRefsById, listBoundsById) {
-    let itemRef = itemRefsById[itemId];
-    let itemBound = itemRef.getBoundingClientRect();
-    return findOverlappedBoundId(itemId, itemBound, listBoundsById);
-};
-
-function updateItemBounds(items) {
-    // Update bounds of items specified
-    items.forEach(item => {
-        let itemRef = itemRefsById[item.id];
-        itemBoundsById[item.id] = itemRef.getBoundingClientRect();
-    });
 }
 
 export function onItemDragStop(draggedItemId, currentListId) {
@@ -90,13 +75,6 @@ export function onItemDragStop(draggedItemId, currentListId) {
         // then we're dropping the item into the same place it was in.
         if (draggedItemId !== draggedItemNewPrev &&
             draggedItemId !== draggedItemNewNext) {
-            // this.props.moveItem(
-            //     draggedItemId,
-            //     currentListId,
-            //     overlappedListId,
-            //     draggedItemNewPrev,
-            //     draggedItemNewNext
-            // );
             return [
                 draggedItemId,
                 currentListId,
@@ -106,32 +84,29 @@ export function onItemDragStop(draggedItemId, currentListId) {
             ]
         }
     }
-    resetBounds()
-    // this.props.updateDnd(null, null, null, null);
-};
-
-function resetBounds() {
-    itemBoundsById = {}
-    listBoundsById = {}
 }
 
-export function onItemRef(obj) {
-    if (obj.ref !== null) {
-        itemRefsById[obj.id] = obj.ref;
-    }
-    else {
-        delete itemRefsById[obj.id];
-    }
-};
+function getListBounds() {
+    let listBoundsById = {}
+    Object.keys(listRefsById).forEach(listId => {
+        listBoundsById[listId] = listRefsById[listId].getBoundingClientRect()
+    })
+    return listBoundsById
+}
 
-export function onListRef(obj) {
-    if (obj.ref !== null) {
-        listRefsById[obj.id] = obj.ref;
-    }
-    else {
-        delete listRefsById[obj.id];
-    }
-};
+function getItemBounds(items) {
+    let itemBoundsById = {}
+    items.forEach(item => {
+        itemBoundsById[item.id] = itemRefsById[item.id].getBoundingClientRect()
+    })
+    return itemBoundsById
+}
+
+function getOverlappedListId(itemId, itemRefsById, listBoundsById) {
+    let itemRef = itemRefsById[itemId];
+    let itemBound = itemRef.getBoundingClientRect();
+    return findOverlappedBoundId(itemId, itemBound, listBoundsById);
+}
 
 function findOverlappedBoundId(hoverId, hoverBound, boundsById) {
     let hoverMidX = hoverBound.x + (hoverBound.width / 2);
