@@ -17,7 +17,6 @@ import {initSync} from './utils/sync';
 import {testCryptoStorage} from './utils/app_crypto';
 import { keepFresh } from './utils/refresh';
 import { migrate } from './migrations';
-import * as dnd from './utils/dnd'
 
 
 migrate();
@@ -34,11 +33,6 @@ store.subscribe(
 
 store.subscribe(
     debounce(async () => persistenceCheck(store.getState().user.id !== null), 1000));
-
-store.subscribe(() => {
-    dnd.setItemsState(store.getState().items)
-    dnd.setDndState(store.getState().dnd)
-})
 
 keepFresh();
 initSync(store);

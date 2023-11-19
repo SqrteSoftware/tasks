@@ -2,26 +2,25 @@ import { getSortedListItems } from '.';
 import { findAdjacent } from './order';
 
 
-let itemsState = null
-let dndState = null
+let items = {}
+let dndStatus = {
+    overlappedListId: null,
+    nearestItemId: null,
+    nearestItemPos: null
+}
 let itemRefsById = {}
 let listRefsById = {}
 
 
-export function setItemsState(items) {
-    itemsState = items
-}
-
-export function setDndState(dnd) {
-    dndState = dnd
-}
-
-export function onItemRef(obj) {
-    if (obj.ref !== null) {
-        itemRefsById[obj.id] = obj.ref;
+export function onItemRef(e) {
+    let {item, ref} = e
+    if (ref !== null) {
+        itemRefsById[item.id] = ref
+        items[item.id] = item
     }
     else {
-        delete itemRefsById[obj.id];
+        delete itemRefsById[item.id]
+        delete items[item.id]
     }
 }
 
@@ -37,10 +36,11 @@ export function onListRef(obj) {
 export function onItemDragStart(itemId, parentId) {
     let listBoundsById = getListBounds()
     let overlappedListId = getOverlappedListId(itemId, itemRefsById, listBoundsById)
-    let listItems = getSortedListItems(overlappedListId, itemsState)
+    let listItems = getSortedListItems(overlappedListId, items)
     let itemBoundsById = getItemBounds(listItems)
     let nearestItem = findNearestItem(itemId, listItems, itemBoundsById)
 
+    setDndStatus(overlappedListId, nearestItem.id, nearestItem.position)
     return [parentId, overlappedListId, nearestItem.id, nearestItem.position]
 }
 
@@ -48,24 +48,25 @@ export function onItemDrag(itemId) {
     // Update bounds of items for currently overlapped list
     let listBoundsById = getListBounds()
     let overlappedListId = getOverlappedListId(itemId, itemRefsById, listBoundsById);
-    let listItems = getSortedListItems(overlappedListId, itemsState);
+    let listItems = getSortedListItems(overlappedListId, items);
 
     // Add dragged item
-    listItems.push(itemsState[itemId])
+    listItems.push(items[itemId])
     // Find the nearest item in the currently overlapped list
     let itemBoundsById = getItemBounds(listItems)
     let nearestItem = findNearestItem(itemId, listItems, itemBoundsById);
 
+    setDndStatus(overlappedListId, nearestItem.id, nearestItem.position)
     return [undefined, overlappedListId, nearestItem.id, nearestItem.position]
 }
 
 export function onItemDragStop(draggedItemId, currentListId) {
-    let nearestItemId = dndState.nearestItemId;
-    let nearestItemPos = dndState.nearestItemPos;
-    let overlappedListId = dndState.overlappedListId;
+    let { overlappedListId, nearestItemId, nearestItemPos} = dndStatus
+    setDndStatus(null, null, null)
+
     if (nearestItemId) {
         // Find the dragged item's new prev and next
-        let adjacentItems = findAdjacent(nearestItemId, overlappedListId, itemsState);
+        let adjacentItems = findAdjacent(nearestItemId, overlappedListId, items);
         let nextId = adjacentItems.next?.id || null;
         let prevId = adjacentItems.prev?.id || null;
         let draggedItemNewPrev = nearestItemPos === 'above' ? prevId : nearestItemId;
@@ -84,6 +85,10 @@ export function onItemDragStop(draggedItemId, currentListId) {
             ]
         }
     }
+}
+
+function setDndStatus(overlappedListId, nearestItemId, nearestItemPos) {
+    dndStatus = {overlappedListId, nearestItemId, nearestItemPos}
 }
 
 function getListBounds() {
