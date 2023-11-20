@@ -86,8 +86,8 @@ export default memo(function Item(props) {
         inputRef.current.blur()
         // Propagate event BEFORE re-rendering item with absolute positioning
         // props.onDragStart(props.item.id, props.parentId);
-        let result = dnd.onItemDragStart(props.item.id, props.parentId)
-        dispatch(updateDnd(...result))
+        let result = dnd.onItemDragProgress(props.item.id)
+        dispatch(updateDnd(props.parentId, ...result))
         // Save current width
         widthOnDragStart.current = getComputedStyle(data.node)['width'];
         setActiveDrag(true)
@@ -99,8 +99,8 @@ export default memo(function Item(props) {
         // Execute callback AFTER state changes from onDrag event are rendered.
         afterOnDragCallback.current = () => {
             // props.onDrag({id: props.item.id});
-            let result = dnd.onItemDrag(props.item.id);
-            dispatch(updateDnd(...result))
+            let result = dnd.onItemDragProgress(props.item.id);
+            dispatch(updateDnd(undefined, ...result))
         }
     }
 
