@@ -39,7 +39,7 @@ export function onListRef(obj) {
 export function onItemDragProgress(itemId) {
     let overlappedListId = findOverlappedBoundId(getItemBound(itemId), getListBoundsById())
     let listItems = getSortedListItems(overlappedListId, items)
-    let nearestItem = findNearestItem(itemId, listItems)
+    let nearestItem = findNearestBound(itemId, getItemBound(itemId), getItemBoundsById(listItems))
 
     setDndStatus(overlappedListId, nearestItem.id, nearestItem.position)
     return [overlappedListId, nearestItem.id, nearestItem.position]
@@ -79,8 +79,12 @@ function getItemBound(itemId) {
 }
 
 
-function setDndStatus(overlappedListId, nearestItemId, nearestItemPos) {
-    dndStatus = {overlappedListId, nearestItemId, nearestItemPos}
+function getItemBoundsById(items) {
+    let boundsById = {}
+    items.forEach(item => {
+        boundsById[item.id] = itemRefsById[item.id].getBoundingClientRect()
+    })
+    return boundsById
 }
 
 
@@ -90,6 +94,11 @@ function getListBoundsById() {
         listBoundsById[listId] = listRefsById[listId].getBoundingClientRect()
     })
     return listBoundsById
+}
+
+
+function setDndStatus(overlappedListId, nearestItemId, nearestItemPos) {
+    dndStatus = {overlappedListId, nearestItemId, nearestItemPos}
 }
 
 
@@ -115,23 +124,28 @@ function findOverlappedBoundId(hoverBound, boundsById) {
 }
 
 
-function findNearestItem(draggedId, listItems) {
-    let draggedBound = getItemBound(draggedId)
+/**
+ * Given a dragged bound and a set of other bounds around it, find the nearest
+ * bound to the one being dragged.
+ * @param {*} draggedBoundId the id of the dragged bound
+ * @param {*} draggedBound the DOM bound of the dragged bound
+ * @param {*} otherBoundsById the other DOM bounds to compare to
+ * @returns an object conveying the id and position of the nearest bound.
+ */
+function findNearestBound(draggedBoundId, draggedBound, otherBoundsById) {
     let draggedMidY = draggedBound.y + (draggedBound.height / 2);
-
-    let nearestItem = {id: null, position: null};
+    let nearestBound = {id: null, position: null};
     let currentLeastDistance = null;
-    listItems.forEach((item) => {
-        let itemId = item.id;
-        if (itemId === draggedId) return;
-        let itemBound = getItemBound(itemId)
-        let itemMidY = itemBound.y + (itemBound.height / 2);
-        if (Math.abs(draggedMidY - itemMidY) < currentLeastDistance
+    Object.keys(otherBoundsById).forEach((otherBoundId) => {
+        if (otherBoundId === draggedBoundId) return;
+        let otherBound = otherBoundsById[otherBoundId]
+        let otherBoundMidY = otherBound.y + (otherBound.height / 2)
+        if (Math.abs(draggedMidY - otherBoundMidY) < currentLeastDistance
             || currentLeastDistance === null) {
-            currentLeastDistance = Math.abs(draggedMidY - itemMidY);
-            nearestItem.id = itemId;
-            nearestItem.position = draggedMidY <= itemMidY ? 'above' : 'below';
+            currentLeastDistance = Math.abs(draggedMidY - otherBoundMidY);
+            nearestBound.id = otherBoundId;
+            nearestBound.position = draggedMidY <= otherBoundMidY ? 'above' : 'below';
         }
     });
-    return nearestItem;
+    return nearestBound;
 }
