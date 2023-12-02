@@ -16,6 +16,7 @@ const itemsSlice = createSlice({
                 const {itemId, text} = action.payload
                 if (items[itemId] === undefined) return
                 items[itemId].value = text
+                items[itemId].modifiedDate = new Date().toISOString()
             },
             prepare: (itemId, text) => ({
                 payload: { itemId, text }
