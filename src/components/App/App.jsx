@@ -11,7 +11,6 @@ import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
 import WelcomeDialog from "../Shared/WelcomeDialog";
-import { findAdjacent } from '../../utils/order';
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -32,7 +31,6 @@ class App extends Component {
         let listData = createViewData(this.props.items);
         let listIdWithFocus = this.props.focus.parentId;
         let itemIdWithFocus = this.props.focus.itemId;
-        let listSettings = this.props.lists || {};
 
         return (
             <div className="App">
@@ -85,18 +83,11 @@ class App extends Component {
                                  style={this.props.dnd.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
                                     parent={item.parent}
-                                    firstChild={item.firstChild}
-                                    children={item.children}
-                                    history={item.history}
+                                    listItems={item.listItems}
+                                    activeListItems={item.activeListItems}
+                                    completedListItems={item.completedListItems}
                                     itemIdWithFocus={listIdWithFocus === item.parent.id ? itemIdWithFocus : null}
                                     freezeScroll={this.shouldFreezeListScroll(item.parent.id)}
-                                    settings={listSettings[item.parent.id]}
-                                    nearestItemId={this.props.dnd.nearestItemId}
-                                    nearestItemPos={this.props.dnd.nearestItemPos}
-                                    onItemKeyDown={this.onItemKeyDown}
-                                    onDeleteList={this.props.deleteItem}
-                                    onToggleCompleted={this.props.showCompletedItems}
-                                    createNewItemWithFocus={this.props.createNewItemWithFocus}
                                 />
                             </div>
                         )})
@@ -170,37 +161,6 @@ class App extends Component {
 
     onLayoutChange = (currentLayout, allLayouts) => {
         this.props.updateAllLayouts(allLayouts);
-    };
-
-    onItemKeyDown = (itemId, parentId, keyPressed, itemValue, cursorPosition, event) => {
-        if (keyPressed === "Enter") {
-
-            let currentItem = this.props.items[itemId];
-            let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
-            if (cursorPosition > 0 || itemValue.length === 0) {
-                // Insert new item AFTER current item
-                let nextId = adjacentItems.next?.id || null;
-                this.props.createNewItemWithFocus(parentId, itemId, nextId);
-            }
-            else {
-                // Insert new item BEFORE current item
-                let prevId = adjacentItems.prev?.id || null;
-                this.props.createNewItemWithFocus(parentId, prevId, itemId);
-            }
-        }
-        else if (keyPressed === "Backspace" && itemValue === "") {
-            let currentItem = this.props.items[itemId];
-            let adjacentItems = findAdjacent(currentItem.id, parentId, this.props.items)
-            let prevId = adjacentItems.prev?.id || null;
-            this.props.removeItemFromParent(itemId, parentId);
-            if (prevId !== null) {
-                // If there's an item above the removed item, change focus to it.
-                this.props.updateFocus(parentId, prevId);
-                // If we don't prevent default action here, the cursor will
-                // move up to the next item and delete the last character there.
-                event.preventDefault();
-            }
-        }
     };
 }
 

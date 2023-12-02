@@ -126,7 +126,9 @@ export default memo(function Item(props) {
         itemRef.current = ref;
 
         let totalHeight = ref ? ref.offsetHeight : 0;
-        props.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
+        if (props.onItemRef) {
+            props.onItemRef({'id': props.item.id, totalHeight, 'ref': ref});
+        }
         dnd.onItemRef({'item': props.item, 'ref': ref});
         itemMiddleY.current = ref === null ? 0 : (ref.offsetHeight / 2) - 2;
         handleMiddleX.current = ref === null ? 0 : ref.children[0].getBoundingClientRect().width / 2;
