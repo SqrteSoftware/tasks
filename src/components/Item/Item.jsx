@@ -85,7 +85,6 @@ export default memo(function Item(props) {
         // Remove focus while dragging
         inputRef.current.blur()
         // Propagate event BEFORE re-rendering item with absolute positioning
-        // props.onDragStart(props.item.id, props.parentId);
         let result = dnd.onItemDragProgress(props.item.id)
         dispatch(updateDnd(props.parentId, ...result))
         // Save current width
@@ -108,7 +107,6 @@ export default memo(function Item(props) {
         enableTouchMove();
         setActiveDrag(false)
         setPosition({x: 0, y: 0})
-        // props.onDragStop(props.item.id, props.parentId);
         let result = dnd.onItemDragStop(props.item.id, props.parentId);
         if (result) {
             dispatch(moveItem(...result))

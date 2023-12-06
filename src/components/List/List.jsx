@@ -1,187 +1,217 @@
-import React, {Component} from 'react';
+import React, { useCallback, useRef, memo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
 
 import './List.css'
 import Item from '../Item';
+import * as dnd from "../../utils/dnd"
+import { findAdjacent } from '../../utils/order';
 import {CollapseIndicator} from "../Shared/CollapseIndicator"
+import { createNewItemWithFocus, deleteItem, removeItemFromParent, updateItemText } from '../../slices/itemsSlice';
+import { showCompletedItems } from '../../slices/listsSlice';
+import { updateFocus } from '../../slices/focusSlice';
 
 
-class List extends Component {
+export default memo(function List(props) {
+    const parentId = props.parent.id
 
-    constructor(props) {
-        super(props);
-        this.itemPlaceholderHeight = 0;
+    const dndState = useSelector((state) => state.dnd)
+    const listState = useSelector((state) => state.lists[parentId] || {})
+
+    const dispatch = useDispatch()
+
+    function handleTitleChange(e, data) {
+        dispatch(updateItemText(parentId, e.target.value))
     }
 
-    render() {
-        let settings = this.props.settings || {};
-        let showCompletedItems = settings.showCompletedItems === undefined ? true : settings.showCompletedItems;
-        let itemIdWithFocus = this.props.itemIdWithFocus;
-        let items = this.props.children.slice(0);
-        let history = this.props.history;
-        let nearestItemIndex = items.findIndex(item => item.id === this.props.nearestItemId);
-        if (nearestItemIndex >= 0) {
-            if (this.props.nearestItemPos === 'below') nearestItemIndex++;
-            items.splice(nearestItemIndex, 0, {'placeholder': true});
+    function handleTitleKeyDown(e) {
+        if (e.key === "Enter") {
+            let firstChild = props.listItems[0]
+            let nextId = firstChild ? firstChild.id : null
+            dispatch(createNewItemWithFocus(parentId, null, nextId))
         }
-        return (
-            <div className="list">
-                <div className="listDelete noDrag" onClick={this.onDeleteList}>
-                    X
-                </div>
-                <div className="listTitle">
-                    <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
-                    <input
-                        className="listTitleInput noDrag"
-                        type="text"
-                        enterKeyHint="Go" /* For Android */
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        placeholder="Title"
-                        value={this.props.parent.value}
-                        onChange={this.onTitleChange}
-                        onKeyDown={this.onTitleKeyDown}/>
-                </div>
-                <div className="listContent noDrag" ref={this.onRef} style={this.props.freezeScroll ? {overflow: 'hidden'} : {}}>
-                    {this.activeItems(items, itemIdWithFocus)}
-                    {this.completedItems(history, showCompletedItems)}
-                </div>
-            </div>
-        );
     }
 
-    activeItems(items, itemIdWithFocus) {
-        if (items.length > 0) {
-            return (
-                <ul className="listContentActive">
-                    {items.map((item) =>
-                        {
-                            if (item.placeholder) {
-                                return <li key={"placeholder"} style={{height: this.itemPlaceholderHeight, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
-                            }
-                            else {
-                                return (
-                                    <Item
-                                        key={item.id}
-                                        item={item}
-                                        parentId={this.props.parent.id}
-                                        giveFocus={itemIdWithFocus === item.id}
-                                        onDragStart={this.onItemDragStart}
-                                        onDrag={this.onItemDrag}
-                                        onDragStop={this.onItemDragStop}
-                                        onItemRef={this.onItemRef}
-                                        onKeyDown={this.props.onItemKeyDown}
-                                    />
-                                )
-                            }
-                        }
-                    )}
-                </ul>
-            )
+    function handleDeleteList(e) {
+        let msg = "Are you sure you want to delete? This cannot be undone!";
+        let confirmed = window.confirm(msg);
+        if (confirmed) {
+            dispatch(deleteItem(parentId))
+        }
+    }
+
+    // Fired when list DOM element is mounted/unmounted
+    const onListRef = useCallback((ref) => {
+        if (ref !== null) {
+            dnd.onListRef({'id': parentId, 'ref': ref});
         }
         else {
-            return (
-                <span className="listEmptyNotice">
-                    Click list title and press enter to insert item
-                </span>
-            )
-
+            dnd.onListRef({'id': parentId, 'ref': null});
         }
+    }, [parentId])
+
+    let showCompleted = listState.showCompletedItems === undefined ? true : listState.showCompletedItems;
+    let itemIdWithFocus = props.itemIdWithFocus;
+    let items = props.activeListItems.slice(0);
+    let completedListItems = props.completedListItems;
+    let nearestItemIndex = items.findIndex(item => item.id === dndState.nearestItemId);
+    if (nearestItemIndex >= 0) {
+        if (dndState.nearestItemPos === 'below') nearestItemIndex++;
+        items.splice(nearestItemIndex, 0, {'placeholder': true});
     }
-
-    completedItems(items, show) {
-        if (items.length <= 0) {
-            return null;
-        }
-        return (
-            <div className="completed">
-                <span className="completedTitle" onClick={this.onToggleCompleted}>
-                    <CollapseIndicator expanded={show}>
-                        {'Completed (' + items.length + ')'}
-                    </CollapseIndicator>
-                </span>
-                {this.completedItemsList(items, show)}
+    return (
+        <div className="list">
+            <div className="listDelete noDrag" onClick={handleDeleteList}>
+                X
             </div>
-        )
-    }
+            <div className="listTitle">
+                <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
+                <input
+                    className="listTitleInput noDrag"
+                    type="text"
+                    enterKeyHint="Go" /* For Android */
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    placeholder="Title"
+                    value={props.parent.value}
+                    onChange={handleTitleChange}
+                    onKeyDown={handleTitleKeyDown}/>
+            </div>
+            <div className="listContent noDrag" ref={onListRef} style={props.freezeScroll ? {overflow: 'hidden'} : {}}>
+                <ActiveItemsList
+                    listItems={props.listItems}
+                    activeItems={items}
+                    itemIdWithFocus={itemIdWithFocus}
+                    parentId={parentId}
+                />
+                <CompletedItemsList
+                    items={completedListItems}
+                    {...{parentId, showCompleted}}
+                />
+            </div>
+        </div>
+    );
+})
 
-    completedItemsList(items, show) {
-        if (!show) return null;
+
+function ActiveItemsList(props) {
+    let dispatch = useDispatch()
+    let {activeItems, listItems, itemIdWithFocus, parentId} = props
+
+    let itemPlaceholderHeight = useRef(0)
+
+    const handleItemKeyDown = useCallback((itemId, parentId, keyPressed, itemValue, cursorPosition, event) => {
+
+        if (keyPressed === "Enter") {
+            let itemsHash = {}
+            listItems.forEach(item => { itemsHash[item.id] = item})
+            let currentItem = itemsHash[itemId];
+            let adjacentItems = findAdjacent(currentItem.id, parentId, itemsHash)
+            if (cursorPosition > 0 || itemValue.length === 0) {
+                // Insert new item AFTER current item
+                let nextId = adjacentItems.next?.id || null;
+                dispatch(createNewItemWithFocus(parentId, itemId, nextId))
+            }
+            else {
+                // Insert new item BEFORE current item
+                let prevId = adjacentItems.prev?.id || null;
+                dispatch(createNewItemWithFocus(parentId, prevId, itemId))
+            }
+        }
+        else if (keyPressed === "Backspace" && itemValue === "") {
+            let itemsHash = {}
+            listItems.forEach(item => { itemsHash[item.id] = item})
+            let currentItem = itemsHash[itemId];
+            let adjacentItems = findAdjacent(currentItem.id, parentId, itemsHash)
+            let prevId = adjacentItems.prev?.id || null;
+            dispatch(removeItemFromParent(itemId, parentId))
+            if (prevId !== null) {
+                // If there's an item above the removed item, change focus to it.
+                // this.props.updateFocus(parentId, prevId);
+                dispatch(updateFocus(parentId, prevId))
+                // If we don't prevent default action here, the cursor will
+                // move up to the next item and delete the last character there.
+                event.preventDefault();
+            }
+        }
+    }, [listItems, dispatch])
+
+    // Fired when item DOM element is mounted/unmounted
+    const onItemRef = useCallback((obj) => {
+        if (obj.ref !== null) {
+            // Save the height of items so we know how
+            // tall a placeholder should be
+            itemPlaceholderHeight.current = obj.totalHeight;
+        }
+    }, [])
+
+    if (activeItems.length > 0) {
         return (
-            <ul className="listContentCompleted noDrag">
-                {items.map((item) =>
+            <ul className="listContentActive">
+                {activeItems.map((item) =>
                     {
-                        return (
-                            <Item
-                                key={item.id}
-                                item={item}
-                                parentId={this.props.parent.id}
-                                onItemRef={this.onItemRef}
-                            />
-                        )
+                        if (item.placeholder) {
+                            return <li key={"placeholder"} style={{height: itemPlaceholderHeight.current, backgroundColor: '#eeeeee', listStyleType: 'none'}}>&nbsp;</li>
+                        }
+                        else {
+                            return (
+                                <Item
+                                    key={item.id}
+                                    item={item}
+                                    parentId={parentId}
+                                    giveFocus={itemIdWithFocus === item.id}
+                                    onItemRef={onItemRef}
+                                    onKeyDown={handleItemKeyDown}
+                                />
+                            )
+                        }
                     }
                 )}
             </ul>
         )
     }
+    else {
+        return (
+            <span className="listEmptyNotice">
+                Click list title and press enter to insert item
+            </span>
+        )
 
-    onToggleCompleted = (e) => {
-        let showCompletedItems = this.props.settings ? this.props.settings.showCompletedItems : true;
-        this.props.onToggleCompleted(this.props.parent.id, !showCompletedItems);
-    };
-
-    onDeleteList = (e) => {
-        let msg = "Are you sure you want to delete? This cannot be undone!";
-        let confirmed = window.confirm(msg);
-        if (confirmed) {
-            this.props.onDeleteList(this.props.parent.id);
-        }
-    };
-
-    onTitleChange = (e, data) => {
-        this.props.onItemChange(this.props.parent.id, e.target.value);
-    };
-
-    onTitleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            let firstChild = this.props.firstChild;
-            let nextId = firstChild ? firstChild.id : null;
-            this.props.createNewItemWithFocus(this.props.parent.id, null, nextId);
-        }
-    };
-
-    onItemDragStart = (itemId, parentId) => {
-        this.props.onItemDragStart(itemId, parentId);
-    };
-
-    onItemDrag = (meta) => {
-        this.props.onItemDrag(meta.id);
-    };
-
-    onItemDragStop = (itemId, parentId) => {
-        this.props.onItemDragStop(itemId, parentId);
-    };
-
-    onItemRef = (obj) => {
-        console.log("onItemRef", obj)
-        if (obj.ref !== null) {
-            // Save the height of items so we know how
-            // tall a placeholder should be
-            this.itemPlaceholderHeight = obj.totalHeight;
-        }
-        this.props.onItemRef(obj);
-    };
-
-    // Fired when item DOM element is mounted/unmounted
-    onRef = (ref) => {
-        if (ref !== null) {
-            this.props.onListRef({'id': this.props.parent.id, 'ref': ref});
-        }
-        else {
-            this.props.onListRef({'id': this.props.parent.id, 'ref': null});
-        }
-    };
+    }
 }
 
-export default List;
+
+function CompletedItemsList({parentId, items, showCompleted}) {
+    const dispatch = useDispatch()
+
+    function handleToggleCompleted(e) {
+        dispatch(showCompletedItems(parentId, !showCompleted))
+    }
+
+    if (items.length <= 0) {
+        return null;
+    }
+    return (
+        <div className="completed">
+            <span className="completedTitle" onClick={handleToggleCompleted}>
+                <CollapseIndicator expanded={showCompleted}>
+                    {'Completed (' + items.length + ')'}
+                </CollapseIndicator>
+            </span>
+            <ul className="listContentCompleted noDrag">
+                {showCompleted && items.map((item) =>
+                    {
+                        return (
+                            <Item
+                                key={item.id}
+                                item={item}
+                                parentId={parentId}
+                            />
+                        )
+                    }
+                )}
+            </ul>
+        </div>
+    )
+}
