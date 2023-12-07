@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
+    inMemoryOnly: true,
     activeDragParentId: null,
     overlappedListId: null,
     nearestItemId: null,
@@ -33,5 +34,5 @@ const dndSlice = createSlice({
   })
   
   export const { updateDnd } = dndSlice.actions
-  
+
   export default dndSlice.reducer
