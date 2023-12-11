@@ -1,0 +1,16 @@
+.listMenu .MuiPaper-root {
+    box-shadow: none;
+    border: 1px solid #ccc;
+}
+
+.listMenu .circle-picker > span > div > span > div {
+    border: 1px solid #ccc;
+}
+
+.listMenuItem.delete {
+    color: red;
+}
+
+.listMenuButton .MuiSvgIcon-root {
+    color: #ccc;
+}

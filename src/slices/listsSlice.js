@@ -15,10 +15,20 @@ const listsSlice = createSlice({
         prepare: (listId, show) => {
           return { payload: { listId, show } }
         }
+      },
+      updateBackgroundColor: {
+        reducer: (state, action) => {
+          const {listId, backgroundColor} = action.payload;
+          state[listId] = state[listId] === undefined ? {} : state[listId];
+          state[listId].backgroundColor = backgroundColor;
+        },
+        prepare: (listId, backgroundColor) => {
+          return { payload: { listId, backgroundColor } }
+        }
       }
     }
   })
   
-  export const { showCompletedItems } = listsSlice.actions
+  export const { showCompletedItems, updateBackgroundColor } = listsSlice.actions
   
   export default listsSlice.reducer

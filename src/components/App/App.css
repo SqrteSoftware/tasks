@@ -60,12 +60,6 @@
   margin: 50px 20px 0px 20px;
 }
 
-.App-list {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
 .noListTip {
   font-size: 50px;
   width: 75%;

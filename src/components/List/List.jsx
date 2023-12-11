@@ -7,9 +7,10 @@ import Item from '../Item';
 import * as dnd from "../../utils/dnd"
 import { findAdjacent } from '../../utils/order';
 import {CollapseIndicator} from "../Shared/CollapseIndicator"
-import { createNewItemWithFocus, deleteItem, removeItemFromParent, updateItemText } from '../../slices/itemsSlice';
+import { createNewItemWithFocus, removeItemFromParent, updateItemText } from '../../slices/itemsSlice';
 import { showCompletedItems } from '../../slices/listsSlice';
 import { updateFocus } from '../../slices/focusSlice';
+import ListMenu from './ListMenu';
 
 
 export default memo(function List(props) {
@@ -29,14 +30,6 @@ export default memo(function List(props) {
             let firstChild = props.listItems[0]
             let nextId = firstChild ? firstChild.id : null
             dispatch(createNewItemWithFocus(parentId, null, nextId))
-        }
-    }
-
-    function handleDeleteList(e) {
-        let msg = "Are you sure you want to delete? This cannot be undone!";
-        let confirmed = window.confirm(msg);
-        if (confirmed) {
-            dispatch(deleteItem(parentId))
         }
     }
 
@@ -60,9 +53,9 @@ export default memo(function List(props) {
         items.splice(nearestItemIndex, 0, {'placeholder': true});
     }
     return (
-        <div className="list">
-            <div className="listDelete noDrag" onClick={handleDeleteList}>
-                X
+        <div className="list" style={{"backgroundColor": listState.backgroundColor}}>
+            <div className="listDelete noDrag">
+                <ListMenu {...{parentId}}/>
             </div>
             <div className="listTitle">
                 <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
