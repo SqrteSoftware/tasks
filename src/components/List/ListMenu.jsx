@@ -15,17 +15,8 @@ import './ListMenu.css'
 export default function ListMenu({parentId}) {
     const dispatch = useDispatch()
     const [anchorEl, setAnchorEl] = React.useState(null)
+    const [deleteList, setDeleteList] = React.useState(false)
     const open = Boolean(anchorEl)
-    // const colors = [
-    //     "#ffe0e0",
-    //     "#ffe9ce",
-    //     "#fffece",
-    //     "#deffd1",
-    //     "#e4fcff",
-    //     "#f2e4ff",
-    //     "#e4ebff",
-    //     "#ffffff"
-    // ]
     const colors = [
         "#fff2f2",
         "#fff4e5",
@@ -37,29 +28,34 @@ export default function ListMenu({parentId}) {
         "#ffffff"
     ]
 
-    const handleMenuButtonClick = (event) => {
+    function handleMenuButtonClick(event) {
         setAnchorEl(event.currentTarget);
     }
 
-    const handleClose = () => {
+    function handleClose() {
         setAnchorEl(null);
     }
 
-    const handleColorPicked = (color, event) => {
+    function handleColorPicked(color, event) {
         dispatch(updateBackgroundColor(parentId, color.hex))
         setAnchorEl(null)
     }
 
     function handleDeleteList(e) {
+        setDeleteList(true)
         setAnchorEl(null)
-        // Allow menu to close before prompting
-        setTimeout(() => {
+    }
+
+    function handleTransitionEnd(e) {
+        // Allow the menu to fully close before displaying the
+        // synchronous confirmation dialog
+        if (deleteList) {
             let msg = "Are you sure you want to delete? This cannot be undone!";
-            let confirmed = window.confirm(msg);
+            let confirmed = window.confirm(msg)
             if (confirmed) {
                 dispatch(deleteItem(parentId))
             }
-        })
+        }
     }
 
     return (
@@ -69,6 +65,7 @@ export default function ListMenu({parentId}) {
                 <ExpandCircleDownOutlinedIcon />
             </IconButton>
             <Menu
+                onTransitionEnd={handleTransitionEnd}
                 className='listMenu nodrag'
                 anchorEl={anchorEl}
                 open={open}
