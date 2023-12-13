@@ -48,8 +48,9 @@ export default function ListMenu({parentId}) {
 
     function handleTransitionEnd(e) {
         // Allow the menu to fully close before displaying the
-        // synchronous confirmation dialog
+        // synchronous deletion confirmation dialog
         if (deleteList) {
+            setDeleteList(false)
             let msg = "Are you sure you want to delete? This cannot be undone!";
             let confirmed = window.confirm(msg)
             if (confirmed) {
