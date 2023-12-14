@@ -54,7 +54,7 @@ export default memo(function List(props) {
     }
     return (
         <div className="list" style={{"backgroundColor": listState.backgroundColor}}>
-            <div className="listDelete noDrag">
+            <div className="listMenu noDrag">
                 <ListMenu {...{parentId}}/>
             </div>
             <div className="listTitle">
@@ -94,8 +94,13 @@ function ActiveItemsList(props) {
 
     let itemPlaceholderHeight = useRef(0)
 
-    const handleItemKeyDown = useCallback((itemId, parentId, keyPressed, itemValue, cursorPosition, event) => {
+    function handleNewItemClick(e) {
+        let firstChild = listItems[0]
+        let nextId = firstChild ? firstChild.id : null
+        dispatch(createNewItemWithFocus(parentId, null, nextId))
+    }
 
+    const handleItemKeyDown = useCallback((itemId, parentId, keyPressed, itemValue, cursorPosition, event) => {
         if (keyPressed === "Enter") {
             let itemsHash = {}
             listItems.forEach(item => { itemsHash[item.id] = item})
@@ -166,8 +171,11 @@ function ActiveItemsList(props) {
     }
     else {
         return (
-            <span className="listEmptyNotice">
-                Click list title and press enter to insert item
+            <span
+                className="listEmptyNotice"
+                onClick={handleNewItemClick}
+            >
+                Click here to create a new item
             </span>
         )
 
