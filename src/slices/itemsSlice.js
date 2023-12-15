@@ -158,7 +158,7 @@ function moveItemToTop(itemId, parentId, items) {
         itemId,
         parentId,
         null,
-        firstItem.id,
+        firstItem && firstItem.id,
         items
     );
     return items;
