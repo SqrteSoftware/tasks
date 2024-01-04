@@ -1,4 +1,5 @@
 body {
+  border-top: 1px solid #ccc; /* For safari web apps */
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
