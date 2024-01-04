@@ -3,27 +3,27 @@
   "name": "Sqrte Tasks",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "icons/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "sqrte-tasks-128.png",
+      "src": "icons/sqrte-tasks-128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "sqrte-tasks-256.png",
+      "src": "icons/sqrte-tasks-256.png",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "sqrte-tasks-512.png",
+      "src": "icons/sqrte-tasks-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "sqrte-tasks-1024.png",
+      "src": "icons/sqrte-tasks-1024.png",
       "sizes": "1024x1024",
       "type": "image/png"
     }
