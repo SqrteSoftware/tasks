@@ -1,69 +1,111 @@
-let currentMutations = 1;
-let mutationThreshold = 2;
+import Bowser from 'bowser'
+import { openDialog } from "../slices/dialogsSlice"
 
 
-// Ask the browser to protect this domain's local storage
-// from user-agent cleanup:
-// https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
-// https://storage.spec.whatwg.org/
-// https://developers.google.com/web/updates/2016/06/persistent-storage
-export async function persistenceCheck(hasSync) {
-    if (currentMutations++ % mutationThreshold !== 0) return;
+// Persistence Actions
+export const INSTALL_TO_HOME = "INSTALL_TO_HOME"
+export const INSTALL_TO_DOCK = "INSTALL_TO_DOCK"
+export const ENABLE_NOTIFICATIONS = "ENABLE_NOTIFICATIONS"
+export const ENABLE_PERSISTENCE = "ENABLE_PERSISTENCE"
+export const UNKNOWN = "UNKNOWN"
 
+
+let persistenceAction = getRequiredPersistenceAction()
+
+
+export async function persistenceCheck(dispatch) {
+    // If persistence is granted, do nothing
+    if (await isPersisted()) return
+
+    // Prompt the user to enable persistence
+    dispatch(openDialog('welcome'))
+}
+
+
+export async function isPersisted() {
+    if ([INSTALL_TO_HOME, INSTALL_TO_DOCK].includes(persistenceAction)) {
+        // For Safari or iOS we're persisted if in 'standalone' mode
+        return navigator.standalone
+    }
+    if (navigator.standalone) {
+        return true
+    }
     if (await navigator.storage.persisted()) {
-        // Storage was already persistent. Nothing more to do.
-        console.log('Persistence Granted')
-        return;
+        return true
+    }
+    return false
+}
+
+
+/**
+ * Ask the browser to protect this domain's local storage from user-agent cleanup:
+ *   https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
+ *   https://storage.spec.whatwg.org/
+ *   https://developers.google.com/web/updates/2016/06/persistent-storage
+ * @returns true if persistence requirements are met.
+ */
+export async function enablePersistence() {
+
+    // We can't programmatically enable persistence for Safari or iOS.
+    // They will be directed to install the web app.
+    if ([INSTALL_TO_HOME, INSTALL_TO_DOCK].includes(persistenceAction)) {
+        return false
     }
 
-    // Only users without sync subscriptions need to see persistence alerts
-    if (!hasSync) {
-        if (navigator.vendor.toLowerCase().includes('apple')) {
-            let msg = "WARNING: Unfortunately Safari (and iOS in general) do not adequately support " +
-                "persistent storage. This means your local data could be deleted without warning. " +
-                "We recommend using one of these browsers instead while using the free version of " +
-                "Sqrte Tasks: Brave, Chrome, Edge, and FireFox.\n\n" +
-
-                "Alternatively, you can also sign up for a sync subscription, which will store your data " +
-                "safely in the cloud.";
-            alert(msg);
-            return;
-        }
-        else if ((!navigator.storage || !navigator.storage.persisted || !navigator.storage.persist)) {
-            let msg = "WARNING: Unfortunately your browser does not adequately support persistent storage. " +
-                "This means your local data could be deleted without warning. We recommend using one of " +
-                "these browsers instead while using the free version of Sqrte Tasks: " +
-                "Brave, Chrome, Edge, and FireFox.\n\n" +
-
-                "Alternatively, you can also sign up for a sync subscription, which will store your data " +
-                "safely in the cloud.";
-            alert(msg);
-            return;
-        }
-    }
-
+    // First try requesting persistence directly. Firefox will show
+    // a prompt and chromium browsers will ignore.
     if (await navigator.storage.persist()) {
-        // Storage was not persistent, but now it is.
-        return;
+        console.log("Persistence granted via direct request")
+        return true
     }
 
-    if (await Notification.requestPermission() === 'granted') {
-        // Chromium browsers require permission to show notifications before
-        // they will allow persistent storage to be requested. Now that we have
-        // notification permission, try requesting persistence permission again.
-        if (await navigator.storage.persist()) {
-            return;
+    // Chromium browsers require permission to show notifications before
+    // they will allow persistent storage to be requested.
+    if ([ENABLE_NOTIFICATIONS, UNKNOWN].includes(persistenceAction)) {
+        // Request notification permission
+        if (await Notification.requestPermission() === 'granted') {
+            // Now that we have notification permission, try requesting
+            // persistence permission again.
+            if (await navigator.storage.persist()) {
+                console.log("Persistence granted via enabling notifications")
+                return true
+            }
         }
     }
 
-    // Despite our best efforts, the user/browser has denied all attempts to mark
-    // local storage as persistent. Display a warning to the user.
-    if (!hasSync) {
-        let msg = "WARNING: Permission to use Persistent Storage was denied. " +
-            "Without this, your browser may delete your local data.\n\n" +
+    return false
+}
 
-            "To fix this, reset permissions for this page and grant the " +
-            "permissions that you are subsequently prompted for."
-        alert(msg);
+
+
+
+
+/**
+ * Determine what kind of action is needed to
+ * enable persistence for this browser.
+ * @returns one of the persistence actions from this module
+ */
+export function getRequiredPersistenceAction() {
+    let systemInfo = Bowser.parse(navigator.userAgent)
+    let browser = systemInfo.browser.name.toLowerCase()
+    let os = systemInfo.os.name.toLowerCase()
+
+    if (os.includes('ios')) {
+        return INSTALL_TO_HOME
+    }
+    else if (browser.includes('safari')) {
+        return INSTALL_TO_DOCK
+    }
+    else if (browser.includes('chrome')) {
+        return ENABLE_NOTIFICATIONS
+    }
+    else if (browser.includes('edge')) {
+        return ENABLE_NOTIFICATIONS
+    }
+    else if (browser.includes('firefox')) {
+        return ENABLE_PERSISTENCE
+    }
+    else {
+        return UNKNOWN
     }
 }

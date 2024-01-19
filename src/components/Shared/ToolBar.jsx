@@ -1,6 +1,6 @@
 import React from "react";
 
-import logo from "../../braindump90.png";
+import logo from "../../images/braindump90.png";
 import IconButton from "@mui/material/IconButton";
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';

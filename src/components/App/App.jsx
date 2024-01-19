@@ -62,10 +62,7 @@ class App extends Component {
                     licenseKey={this.props.license.licenseKey}
                     onClose={this.onLicenseModalClose}
                 />
-                <WelcomeDialog
-                    open={this.props.dialogs.activeDialog === 'welcome'}
-                    onClose={this.props.closeDialog}
-                />
+                <WelcomeDialog />
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={30}

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import {configureStore} from '@reduxjs/toolkit';
 import throttle from 'lodash/throttle';
-import debounce from 'lodash/debounce';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import './index.css';
@@ -31,9 +30,7 @@ const store = configureStore({
 store.subscribe(
     throttle(() => saveStateToLocalStorage(store.getState()), 1000));
 
-store.subscribe(
-    debounce(async () => persistenceCheck(store.getState().user.id !== null), 1000));
-
+persistenceCheck(store.dispatch)
 keepFresh();
 initSync(store);
 handleNewRegistration(store);
@@ -59,12 +56,10 @@ root.render(
     </React.StrictMode>
 );
 
-
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
-
 
 // Make util methods public
 window.testCryptoStorage = testCryptoStorage;
