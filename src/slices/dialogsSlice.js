@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    // Open welcome dialog on first load
-    activeDialog: 'welcome'
+    activeDialog: ''
 }
 
 const dialogsSlice = createSlice({
