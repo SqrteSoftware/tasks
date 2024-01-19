@@ -23,16 +23,21 @@ export async function persistenceCheck(dispatch) {
 
 
 export async function isPersisted() {
+    console.log("Persistence Action: ", persistenceAction)
     if ([INSTALL_TO_HOME, INSTALL_TO_DOCK].includes(persistenceAction)) {
         // For Safari or iOS we're persisted if in 'standalone' mode
+        console.log("Apple Detected", navigator.standalonej)
         return navigator.standalone
     }
     if (navigator.standalone) {
+        console.log("Generic Standalone Mode Detected")
         return true
     }
     if (await navigator.storage.persisted()) {
+        console.log("Persistence Enabled")
         return true
     }
+    console.log("Persistence Not Enabled")
     return false
 }
 
