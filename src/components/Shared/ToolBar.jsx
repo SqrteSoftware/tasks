@@ -7,6 +7,8 @@ import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import MenuIcon from "@mui/icons-material/Menu";
 import Sync from "@mui/icons-material/Sync";
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { refresh } from "../../utils/refresh";
 
 
 export default function ToolBar(props) {
@@ -46,6 +48,14 @@ export default function ToolBar(props) {
                     <Sync className={props.isSyncing ? "spin" : ""} fontSize="inherit"/>
                 </IconButton>
             </div>
+
+            { navigator.standalone &&
+            <div className="refresh iconButton" title="Refresh" onClick={refresh}>
+                <IconButton>
+                    <RefreshIcon fontSize="inherit"/>
+                </IconButton>
+            </div>
+            }
 
             <div className="menu iconButton" title="Menu">
                 <IconButton onClick={props.onMenuClick} edge="start">

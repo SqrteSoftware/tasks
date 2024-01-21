@@ -56,8 +56,8 @@ export default function WelcomeDialog(props) {
 function PersistenceInstructions(props) {
     let action = getRequiredPersistenceAction()
 
-    let imgStyle = {width: '35px', height: '35px', position: 'relative', top: "10px"}
-    let nestedOlStyle = {position: 'relative', top: '-15px'}
+    let imgStyle = {width: '35px', height: '35px', verticalAlign: 'middle'}
+    let nestedOlStyle = {paddingLeft: '20px'}
     let parentLiStyle = {listStyle: 'none', padding: '0px'}
 
     if (action === INSTALL_TO_HOME) {
@@ -67,11 +67,10 @@ function PersistenceInstructions(props) {
                 <Li style={parentLiStyle}>
                     <ol style={nestedOlStyle}>
                         <Li>
-                            Click the share button: <img src={shareIcon} style={imgStyle} alt={"Share Button"}/>
-
+                            <span>Click your browser's share button:</span> <img src={shareIcon} style={imgStyle} alt={"Share Button"}/>
                         </Li>
-                        <Li>Click "Add to Home Screen"</Li>
-                        <Li>Open the app from your Home Screen</Li>
+                        <Li><span>Click "Add to Home Screen"</span></Li>
+                        <Li><span>Open the app from your Home Screen</span></Li>
                     </ol>
                 </Li>
             </>
@@ -84,10 +83,10 @@ function PersistenceInstructions(props) {
                 <Li style={parentLiStyle}>
                     <ol style={nestedOlStyle}>
                         <Li>
-                            Click the share button: <img src={shareIcon} style={imgStyle} alt={"Share Button"}/>
+                            <span>Click your browser's share button:</span> <img src={shareIcon} style={imgStyle} alt={"Share Button"}/>
                         </Li>
-                        <Li>Click "Add to Dock"</Li>
-                        <Li>Open the app from the dock</Li>
+                        <Li><span>Click "Add to Dock"</span></Li>
+                        <Li><span>Open the app from the dock</span></Li>
                     </ol>
                 </Li>
             </>

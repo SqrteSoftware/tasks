@@ -10,8 +10,10 @@ import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import Sync from "@mui/icons-material/Sync";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { Box } from "@mui/system";
+import { refresh } from "../../utils/refresh";
 
 
 export default function MobileMenu(props) {
@@ -69,6 +71,15 @@ export default function MobileMenu(props) {
                         <ListItemText primary="Open" />
                     </ListItem>
                     </label>
+
+                    { navigator.standalone &&
+                    <ListItem button key="Refresh" onClick={refresh}>
+                        <ListItemIcon>
+                            <RefreshIcon fontSize="inherit"/>
+                        </ListItemIcon>
+                        <ListItemText primary="Refresh" />
+                    </ListItem>
+                    }
 
                     <ListItem button key="Sync" onClick={handleSyncClick}>
                         <ListItemIcon>
