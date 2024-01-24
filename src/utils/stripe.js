@@ -1,3 +1,5 @@
+import Bowser from 'bowser'
+
 import {
   BASE_URL,
   STRIPE_PUBLISHABLE_KEY,
@@ -6,6 +8,19 @@ import {
 
 export function onClick(e) {
   e.preventDefault();
+
+  let systemInfo = Bowser.parse(navigator.userAgent)
+  let browser = systemInfo.browser.name.toLowerCase()
+  let os = systemInfo.os.name.toLowerCase()
+  if (os.includes('ios') || browser.includes('safari')) {
+    alert(
+      'Registration is not supported on Safari or iOS devices. ' +
+      'Please use a different browser and/or device to register and ' +
+      'then enter the license key you receive here.'
+    )
+    return
+  }
+
   window.grecaptcha.ready(function() {
     window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(function(token) {
         fetch(BASE_URL + '/payment-sessions', {
