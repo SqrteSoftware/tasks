@@ -95,7 +95,7 @@ export function getRequiredPersistenceAction() {
     let browser = systemInfo.browser.name.toLowerCase()
     let os = systemInfo.os.name.toLowerCase()
 
-    if (os.includes('ios')) {
+    if (isiOS(os)) {
         return INSTALL_TO_HOME
     }
     else if (browser.includes('safari')) {
@@ -113,4 +113,10 @@ export function getRequiredPersistenceAction() {
     else {
         return UNKNOWN
     }
+}
+
+
+function isiOS(os) {
+    // Touch event check necessary to detect ipad
+    return os.includes('ios') || (os.includes('mac') && "ontouchend" in document)
 }
