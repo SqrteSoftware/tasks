@@ -65,7 +65,7 @@ class App extends Component {
                 <WelcomeDialog />
                 <ResponsiveGridLayout
                     className="layout"
-                    rowHeight={30}
+                    rowHeight={50}
                     breakpoints={{xxs: 0, xs: 480, sm: 768, md: 996, lg: 1200}}
                     cols={{xxs: 2, xs: 6, sm: 6, md: 9, lg: 12,}}
                     layouts={this.props.layouts}
