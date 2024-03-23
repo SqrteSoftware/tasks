@@ -1,4 +1,5 @@
 import { migrateFromLinkedListsToOrderSequence } from "./v1-linked-to-order";
+import { cleanupLayouts } from "./v2-clean-layouts";
 
 export function migrate() {
     let initialVersion = localStorage.getItem('schemaVersion');
@@ -28,6 +29,10 @@ const schemaMigrations = [
     {
         version: 1,
         migrate: migrateFromLinkedListsToOrderSequence
-    }
+    },
+    {
+        version: 2,
+        migrate: cleanupLayouts
+    },
 ]
 
