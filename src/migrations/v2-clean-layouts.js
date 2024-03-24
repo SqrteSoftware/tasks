@@ -5,6 +5,8 @@ export function cleanupLayouts(state) {
     let layouts = state.layouts
     console.log("Cleaning Up Layouts")
     console.log("Current Layout State:", clone(layouts))
+    // save the phone layout before deleting
+    layouts['xs'] = layouts['xxs'] || []
     delete layouts['xxs']
     Object.keys(layouts).forEach(breakpoint => {
         console.log("Cleanup Breakpoint:", breakpoint)
