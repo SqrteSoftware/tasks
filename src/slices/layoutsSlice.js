@@ -9,10 +9,6 @@ const initialState = {
 
 const breakpoints = {'xs': 2, 'sm': 6, 'md': 9, 'lg': 12}
 
-// TODO:
-// migration to cleanup old layouts
-// test syncing
-// test delete layouts
 
 const layoutsSlice = createSlice({
     name: 'layouts',
