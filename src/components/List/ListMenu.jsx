@@ -5,11 +5,16 @@ import Divider from '@mui/material/Divider';
 import ExpandCircleDownOutlinedIcon from '@mui/icons-material/ExpandCircleDownOutlined';
 import { IconButton } from '@mui/material';
 import { Circle } from 'react-color/lib/components/circle/Circle';
-import { useDispatch } from 'react-redux';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { updateBackgroundColor } from '../../slices/listsSlice';
 import { deleteItem } from '../../slices/itemsSlice';
 import './ListMenu.css'
+import { collapseLayout, expandLayout } from '../../slices/layoutsSlice';
 
 
 export default function ListMenu({parentId}) {
@@ -62,6 +67,7 @@ export default function ListMenu({parentId}) {
     return (
         // stopPropagation required to disable dragging lists while menu is open
         <div onMouseDown={e => e.stopPropagation()}>
+            <CollapseToggle parentId={parentId}/>
             <IconButton className='listMenuButton' onClick={handleMenuButtonClick}>
                 <ExpandCircleDownOutlinedIcon />
             </IconButton>
@@ -88,4 +94,40 @@ export default function ListMenu({parentId}) {
             </Menu>
         </div>
     )
+}
+
+
+function CollapseToggle({parentId}) {
+    const layouts = useSelector((state) => state.layouts)
+    const dispatch = useDispatch()
+
+    if (isCollapsed(parentId, layouts)) {
+        return (
+            <IconButton className='listMenuButton' onClick={e => {dispatch(expandLayout(parentId))}}>
+                <UnfoldMoreIcon />
+            </IconButton>
+        )
+    } else {
+        return (
+            <IconButton className='listMenuButton' onClick={e => {dispatch(collapseLayout(parentId))}}>
+                <UnfoldLessIcon />
+            </IconButton>
+        )
+    }
+
+}
+
+
+function isCollapsed(itemId, layouts) {
+    let breakpointLayouts = layouts.breakpointLayouts
+    let currentBreakpoint = layouts.currentBreakpoint
+
+    if (! breakpointLayouts[currentBreakpoint]) {
+        return false
+    }
+
+    let isCollapsed = breakpointLayouts[currentBreakpoint].some(layout => {
+        return layout.i === itemId && layout.h === 1
+    })
+    return isCollapsed
 }

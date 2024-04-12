@@ -13,11 +13,12 @@ export * from './itemsSlice'
 export const resetData = () => ({type: 'RESET_DATA'});
 window.resetData = resetData;
 
-export const loadData = ({items, layouts}) => {
+export const loadData = ({items, layouts, lists}) => {
     return {
         type: 'LOAD_DATA',
         items,
-        layouts
+        layouts,
+        lists,
     };
 };
 

@@ -11,9 +11,12 @@ import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
 import WelcomeDialog from "../Shared/WelcomeDialog";
+import { breakpointColumns, breakpointWidths } from '../../slices/layoutsSlice';
+import { migrateAppState } from '../../migrations';
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
 
 class App extends Component {
 
@@ -66,12 +69,13 @@ class App extends Component {
                 <ResponsiveGridLayout
                     className="layout"
                     rowHeight={50}
-                    breakpoints={{xs: 0, sm: 480, md: 996, lg: 1200}}
-                    cols={{xs: 2, sm: 6, md: 9, lg: 12}}
-                    layouts={this.props.layouts}
-                    onLayoutChange={this.onLayoutChange.bind(this)}
-                    onDragStart={ disableTouchMove }
-                    onDragStop={ enableTouchMove }
+                    breakpoints={breakpointWidths}
+                    cols={breakpointColumns}
+                    layouts={this.props.layouts.breakpointLayouts}
+                    onLayoutChange={this.onLayoutChange}
+                    onDragStart={disableTouchMove}
+                    onDragStop={enableTouchMove}
+                    onWidthChange={this.onWidthChange}
                     draggableCancel=".noDrag">
                     {
                         listData.map(item => { return (
@@ -120,7 +124,12 @@ class App extends Component {
     };
 
     onExportData = (e) => {
-        let state = {items: this.props.items, layouts: this.props.layouts};
+        let state = {
+            schemaVersion: localStorage.getItem('schemaVersion'),
+            items: this.props.items, 
+            layouts: this.props.layouts,
+            lists: this.props.lists,
+        }
         let now = Date.now();
         downloadJSON(state, 'sqrte-tasks-' + now + '.json');
     };
@@ -132,7 +141,10 @@ class App extends Component {
                 let fileReader = new FileReader();
                 fileReader.onload = e => {
                     let data = JSON.parse(e.target.result);
-                    this.props.loadData(data);
+                    let schemaVersion = data.schemaVersion || 2
+                    migratedData = migrateAppState(data, schemaVersion)
+                    localStorage.setItem('schemaVersion', data.schemaVersion)
+                    this.props.loadData(migratedData);
                 };
                 fileReader.readAsText(file);
             }
@@ -159,6 +171,10 @@ class App extends Component {
     onLayoutChange = (currentLayout, allLayouts) => {
         this.props.updateAllLayouts(allLayouts);
     };
+
+    onWidthChange = (width) => {
+        this.props.widthChanged(width)
+    }
 }
 
 export default App;

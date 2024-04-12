@@ -3,11 +3,43 @@ import { createSlice } from '@reduxjs/toolkit'
 
 import { createNewParentItemWithFocus, syncItems, deleteItem } from './itemsSlice'
 
-const initialState = {
-    lg: []
+import {Responsive} from 'react-grid-layout'
+const getBreakpointFromWidth = Responsive.utils.getBreakpointFromWidth
+
+
+export const breakpoints = {
+    xs: {
+        cols: 2,
+        width: 0
+    }, 
+    sm: {
+        cols: 6,
+        width: 480
+    },
+    md: {
+        cols: 9,
+        width: 996
+    },
+    lg: {
+        cols: 12,
+        width: 1200
+    }
 }
 
-const breakpoints = {'xs': 2, 'sm': 6, 'md': 9, 'lg': 12}
+export const breakpointColumns = Object.fromEntries(
+    Object.entries(breakpoints).map(v => [v[0], v[1].cols]))
+
+
+export const breakpointWidths = Object.fromEntries(
+    Object.entries(breakpoints).map(v => [v[0], v[1].width]))
+
+
+const initialState = {
+    'breakpointLayouts': Object.fromEntries(
+        Object.entries(breakpoints).map(v => [v[0], []])),
+    'currentBreakpoint': null,
+    'lastHeights': {}
+}
 
 
 const layoutsSlice = createSlice({
@@ -15,29 +47,85 @@ const layoutsSlice = createSlice({
     initialState,
     reducers: {
         updateAllLayouts: {
-            reducer: (state, action) => {
-                return clone(action.payload)
+            reducer: (layouts, action) => {
+                let breakpointLayouts = action.payload
+
+                // RGL sends us this data. Clone it to break any reference
+                // that RGL might be holding onto.
+                layouts.breakpointLayouts = clone(breakpointLayouts)
+
+                // Cleanup any lastHeights that no longer have layouts (ie: have been deleted)
+                let layoutsForBreakpoint = breakpointLayouts[layouts.currentBreakpoint] || []
+                if (layoutsForBreakpoint) {
+                    Object.keys(layouts.lastHeights).forEach(itemId => {
+                        if (! layoutsForBreakpoint.some(layout => layout.i === itemId)) {
+                            delete layouts.lastHeights[itemId]
+                        }
+                    })
+                }
+            }
+        },
+        collapseLayout: {
+            reducer: (layouts, {payload}) => {
+                let parentId = payload
+                let breakpointLayouts = layouts.breakpointLayouts
+                Object.keys(breakpointLayouts).forEach(breakpoint => {
+                    breakpointLayouts[breakpoint].forEach(layout => {
+                        if (layout.i === parentId) {
+                            layouts.lastHeights[layout.i] = layout.h
+                            layout.h = 1
+                            layout.minH = 1
+                        }
+                    })
+                })
+            }
+        },
+        expandLayout: {
+            reducer: (layouts, {payload}) => {
+                let parentId = payload
+                let breakpointLayouts = layouts.breakpointLayouts
+                Object.keys(breakpointLayouts).forEach(breakpoint => {
+                    breakpointLayouts[breakpoint].forEach(layout => {
+                        if (layout.i === parentId) {
+                            layout.h = layouts.lastHeights[layout.i] || 5
+                            layout.minH = 1
+                        }
+                    })
+                })
+            }
+        },
+        widthChanged: {
+            reducer: (layouts, {payload}) => {
+                let width = payload
+                layouts.currentBreakpoint = getBreakpointFromWidth(breakpointWidths, width)
             }
         }
+
     },
     extraReducers: (builder) => {
         builder
-            .addCase(createNewParentItemWithFocus, (state, { payload }) => {
+            .addCase(createNewParentItemWithFocus, (layouts, { payload }) => {
                 let newParentItemId = payload.newParentItemId
-                return {
-                    lg: shiftAndAddLayoutV2(state['lg'], newParentItemId, 12),
-                    md: shiftAndAddLayoutV2(state['md'], newParentItemId, 9),
-                    sm: shiftAndAddLayoutV2(state['sm'], newParentItemId, 6),
-                    xs: shiftAndAddLayoutV2(state['xs'], newParentItemId, 2),
+                layouts.breakpointLayouts = {
+                    lg: shiftAndAddLayoutV2(
+                        layouts.breakpointLayouts['lg'], newParentItemId, 12),
+                    md: shiftAndAddLayoutV2(
+                        layouts.breakpointLayouts['md'], newParentItemId, 9),
+                    sm: shiftAndAddLayoutV2(
+                        layouts.breakpointLayouts['sm'], newParentItemId, 6),
+                    xs: shiftAndAddLayoutV2(
+                        layouts.breakpointLayouts['xs'], newParentItemId, 2),
                 }
             })
-            .addCase(syncItems, (state, { payload }) => {
+            .addCase(syncItems, (layouts, { payload }) => {
                 let items = payload.items
-                return addLayoutsForItems(state, items)
+                layouts.breakpointLayouts = addLayoutsForItems(
+                    layouts.breakpointLayouts, items)
             })
-            .addCase(deleteItem, (state, { payload }) => {
+            .addCase(deleteItem, (layouts, { payload }) => {
                 let itemId = payload.itemId
-                return removeLayoutsForItem(state, itemId)
+                layouts.breakpointLayouts = removeLayoutsForItem(
+                    layouts.breakpointLayouts, itemId)
             })
     }
 })
@@ -60,7 +148,7 @@ function addLayoutsForItems(layouts, items) {
 
 
 function removeLayoutsForItem(layouts, itemId) {
-    Object.keys(breakpoints).forEach(breakpoint => {
+    Object.keys(breakpointColumns).forEach(breakpoint => {
         let layoutsForBreakpoint = layouts[breakpoint] || []
         layouts = {
             ...layouts,
@@ -72,7 +160,7 @@ function removeLayoutsForItem(layouts, itemId) {
 
 
 function adjustLayoutsForItem(layouts, itemId) {
-    Object.entries(breakpoints).forEach(([breakpoint, columnWidth]) => {
+    Object.entries(breakpointColumns).forEach(([breakpoint, columnWidth]) => {
         let layoutsForBreakpoint = layouts[breakpoint] || []
         if (layoutsForBreakpoint.find(layout => layout.i === itemId)) {
             // Do nothing if a layout already exists for the item
@@ -143,16 +231,5 @@ function layoutOverlapsListColumn(layout, listColumn, listColWidth) {
 }
 
 
-function shiftAndAddLayout(layoutsForBreakpoint, newParentItemId) {
-    layoutsForBreakpoint = layoutsForBreakpoint || [];
-    return [
-        // move existing leftmost lists down to make space for new list
-        ...layoutsForBreakpoint.map(l => l.x === 0 ? { ...l, y: l.y + 5 } : l),
-        // add new layout for new list
-        { i: newParentItemId, x: 0, y: 0, w: 3, h: 5, minW: 3, maxW: 4, minH: 1 }
-    ]
-}
-
-
-export const { updateAllLayouts } = layoutsSlice.actions
+export const { updateAllLayouts, collapseLayout, expandLayout, widthChanged } = layoutsSlice.actions
 export default layoutsSlice.reducer

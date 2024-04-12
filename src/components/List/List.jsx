@@ -54,9 +54,6 @@ export default memo(function List(props) {
     }
     return (
         <div className="list" style={{"backgroundColor": listState.backgroundColor}}>
-            <div className="listMenu noDrag">
-                <ListMenu {...{parentId}}/>
-            </div>
             <div className="listTitle">
                 <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
                 <input
@@ -70,6 +67,9 @@ export default memo(function List(props) {
                     value={props.parent.value}
                     onChange={handleTitleChange}
                     onKeyDown={handleTitleKeyDown}/>
+            </div>
+            <div className="listMenu noDrag">
+                <ListMenu {...{parentId}}/>
             </div>
             <div className="listContent noDrag" ref={onListRef} style={props.freezeScroll ? {overflow: 'hidden'} : {}}>
                 <ActiveItemsList

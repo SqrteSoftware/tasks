@@ -17,7 +17,8 @@ const rootReducer = (state={}, action) => {
             return {
                 ...state,
                 items: action.items,
-                layouts: action.layouts
+                layouts: action.layouts,
+                lists: action.lists,
             };
         default:
             return customCombine(state, action);

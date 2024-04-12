@@ -1,5 +1,6 @@
 import { migrateFromLinkedListsToOrderSequence } from "./v1-linked-to-order";
 import { cleanupLayouts } from "./v2-clean-layouts";
+import { reformatLayouts } from "./v3-rerformat-layouts";
 
 export function migrate() {
     let initialVersion = localStorage.getItem('schemaVersion');
@@ -9,6 +10,19 @@ export function migrate() {
         return;
     }
     let appState = JSON.parse(localStorage.getItem('appState'));
+
+    let migratedAppState = migrateAppState(appState, initialVersion)
+
+    localStorage.setItem('schemaVersion', latestMigration);
+    localStorage.setItem('appState', JSON.stringify(migratedAppState));
+}
+
+export function migrateAppState(appState, initialVersion) {
+    let latestMigration = schemaMigrations[schemaMigrations.length - 1].version;
+    if (initialVersion === latestMigration) {
+        console.log('Schema up to date');
+        return;
+    }
     if (!appState) {
         console.log('There is no app state to migrate');
         localStorage.setItem('schemaVersion', latestMigration);
@@ -21,8 +35,7 @@ export function migrate() {
             currentVersion = migration.version;
         }
     })
-    localStorage.setItem('schemaVersion', currentVersion);
-    localStorage.setItem('appState', JSON.stringify(appState));
+    return appState
 }
 
 const schemaMigrations = [
@@ -34,5 +47,8 @@ const schemaMigrations = [
         version: 2,
         migrate: cleanupLayouts
     },
+    {
+        version: 3,
+        migrate: reformatLayouts
+    },
 ]
-
