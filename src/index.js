@@ -18,9 +18,10 @@ import { keepFresh } from './utils/refresh';
 import { migrate } from './migrations';
 
 
-migrate();
+let appState = loadStateFromLocalStorage()
+appState = migrate(appState)
 
-let initialState = preprocessInitialState(loadStateFromLocalStorage());
+let initialState = preprocessInitialState(appState);
 
 const store = configureStore({
     reducer: rootReducer,

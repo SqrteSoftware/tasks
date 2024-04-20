@@ -11,6 +11,7 @@ import ToolBar from "../Shared/ToolBar";
 import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
 import WelcomeDialog from "../Shared/WelcomeDialog";
+import { migrate } from '../../migrations';
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -120,7 +121,12 @@ class App extends Component {
     };
 
     onExportData = (e) => {
-        let state = {items: this.props.items, layouts: this.props.layouts};
+        let state = {
+            schema: this.props.schema,
+            items: this.props.items,
+            layouts: this.props.layouts,
+            lists: this.props.lists,
+        }
         let now = Date.now();
         downloadJSON(state, 'sqrte-tasks-' + now + '.json');
     };
@@ -132,6 +138,9 @@ class App extends Component {
                 let fileReader = new FileReader();
                 fileReader.onload = e => {
                     let data = JSON.parse(e.target.result);
+                    // Migrate imported data as necessary
+                    data = migrate(data)
+                    // Load the data into memory
                     this.props.loadData(data);
                 };
                 fileReader.readAsText(file);

@@ -130,8 +130,7 @@ export function loadStateFromLocalStorage() {
 }
 
 export function preprocessInitialState(state) {
-    if (!state) return state;
-    if (state.sync.isSyncing) {
+    if (state?.sync?.isSyncing) {
         // Set isSyncing to false on page load to prevent
         // scenarios where status is stuck.
         state.sync.isSyncing = false;
@@ -152,7 +151,7 @@ export function saveStateToLocalStorage(state) {
         // only be stored in-memory.
         let stateToSave = {};
         for (var key in state) {
-            if (!state[key].inMemoryOnly) {
+            if (!state[key]?.inMemoryOnly) {
                 stateToSave[key] = state[key];
             }
         }
@@ -160,6 +159,7 @@ export function saveStateToLocalStorage(state) {
         localStorage.setItem('appState', serializedState);
     }
     catch (e) {
+        console.log("Save Error:", e)
         alert("There was an error while saving");
     }
 }
