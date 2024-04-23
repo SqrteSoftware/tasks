@@ -5,8 +5,6 @@ import Divider from '@mui/material/Divider';
 import ExpandCircleDownOutlinedIcon from '@mui/icons-material/ExpandCircleDownOutlined';
 import { IconButton } from '@mui/material';
 import { Circle } from 'react-color/lib/components/circle/Circle';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import { useDispatch, useSelector } from 'react-redux';
