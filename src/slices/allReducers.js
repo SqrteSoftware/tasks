@@ -16,17 +16,19 @@ const rootReducer = (state={}, action) => {
         case 'LOAD_DATA':
             return {
                 ...state,
+                schema: action.schema,
                 items: action.items,
                 layouts: action.layouts,
-                lists: action.lists,
+                lists: action.lists || {},
             };
         default:
             return customCombine(state, action);
     }
 };
 
-function customCombine(state={}, action) {
+export function customCombine(state={}, action) {
     let newState = {
+        schema: state?.schema || {version: undefined},
         items: items(state.items, action),
         focus: focus(state.focus, action),
         dnd: dnd(state.dnd, action),

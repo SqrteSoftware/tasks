@@ -6,6 +6,7 @@ import App from './App';
 
 const mapStateToProps = (state) => {
     return {
+        schema: state.schema,
         items: state.items,
         focus: state.focus,
         dnd: state.dnd,

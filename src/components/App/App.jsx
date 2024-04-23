@@ -12,7 +12,7 @@ import SyncDialog from "../Shared/SyncDialog";
 import LicenseDialog from "../Shared/LicenseDialog";
 import WelcomeDialog from "../Shared/WelcomeDialog";
 import { breakpointColumns, breakpointWidths } from '../../slices/layoutsSlice';
-import { migrateAppState } from '../../migrations';
+import { migrate } from '../../migrations';
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -125,8 +125,8 @@ class App extends Component {
 
     onExportData = (e) => {
         let state = {
-            schemaVersion: localStorage.getItem('schemaVersion'),
-            items: this.props.items, 
+            schema: this.props.schema,
+            items: this.props.items,
             layouts: this.props.layouts,
             lists: this.props.lists,
         }
@@ -141,10 +141,10 @@ class App extends Component {
                 let fileReader = new FileReader();
                 fileReader.onload = e => {
                     let data = JSON.parse(e.target.result);
-                    let schemaVersion = data.schemaVersion || 2
-                    migratedData = migrateAppState(data, schemaVersion)
-                    localStorage.setItem('schemaVersion', data.schemaVersion)
-                    this.props.loadData(migratedData);
+                    // Migrate imported data as necessary
+                    data = migrate(data)
+                    // Load the data into memory
+                    this.props.loadData(data);
                 };
                 fileReader.readAsText(file);
             }
