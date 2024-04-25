@@ -26,6 +26,7 @@ export const breakpoints = {
     }
 }
 
+
 export const breakpointColumns = Object.fromEntries(
     Object.entries(breakpoints).map(v => [v[0], v[1].cols]))
 
@@ -34,9 +35,12 @@ export const breakpointWidths = Object.fromEntries(
     Object.entries(breakpoints).map(v => [v[0], v[1].width]))
 
 
+export const breakpointsToList = Object.fromEntries(
+    Object.entries(breakpoints).map(v => [v[0], []]))
+
+
 const initialState = {
-    'breakpointLayouts': Object.fromEntries(
-        Object.entries(breakpoints).map(v => [v[0], []])),
+    'breakpointLayouts': breakpointsToList,
     'currentBreakpoint': null,
     'lastHeights': {}
 }
@@ -53,16 +57,6 @@ const layoutsSlice = createSlice({
                 // RGL sends us this data. Clone it to break any reference
                 // that RGL might be holding onto.
                 layouts.breakpointLayouts = clone(breakpointLayouts)
-
-                // Cleanup any lastHeights that no longer have layouts (ie: have been deleted)
-                let layoutsForBreakpoint = breakpointLayouts[layouts.currentBreakpoint] || []
-                if (layoutsForBreakpoint) {
-                    Object.keys(layouts.lastHeights).forEach(itemId => {
-                        if (! layoutsForBreakpoint.some(layout => layout.i === itemId)) {
-                            delete layouts.lastHeights[itemId]
-                        }
-                    })
-                }
             }
         },
         collapseLayout: {
@@ -72,7 +66,10 @@ const layoutsSlice = createSlice({
                 Object.keys(breakpointLayouts).forEach(breakpoint => {
                     breakpointLayouts[breakpoint].forEach(layout => {
                         if (layout.i === parentId) {
-                            layouts.lastHeights[layout.i] = layout.h
+                            if (layouts.lastHeights[parentId] === undefined) {
+                                layouts.lastHeights[parentId] = {}
+                            }
+                            layouts.lastHeights[parentId][breakpoint] = layout.h
                             layout.h = 1
                             layout.minH = 1
                         }
@@ -87,7 +84,7 @@ const layoutsSlice = createSlice({
                 Object.keys(breakpointLayouts).forEach(breakpoint => {
                     breakpointLayouts[breakpoint].forEach(layout => {
                         if (layout.i === parentId) {
-                            layout.h = layouts.lastHeights[layout.i] || 5
+                            layout.h = layouts.lastHeights[parentId][breakpoint] || 5
                             layout.minH = 1
                         }
                     })
@@ -126,6 +123,9 @@ const layoutsSlice = createSlice({
                 let itemId = payload.itemId
                 layouts.breakpointLayouts = removeLayoutsForItem(
                     layouts.breakpointLayouts, itemId)
+
+                // Cleanup any lastHeights for the deleted item
+                delete layouts.lastHeights[itemId]
             })
     }
 })
