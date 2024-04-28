@@ -119,13 +119,24 @@ function CollapseToggle({parentId}) {
 function isCollapsed(itemId, layouts) {
     let breakpointLayouts = layouts.breakpointLayouts
     let currentBreakpoint = layouts.currentBreakpoint
+    let layoutsForBreakpoint = breakpointLayouts[currentBreakpoint]
 
-    if (! breakpointLayouts[currentBreakpoint]) {
-        return false
+    let isCollapsed
+    if (layoutsForBreakpoint) {
+        isCollapsed = layoutsForBreakpoint.some(layout => {
+            return layout.i === itemId && layout.h === 1
+        })
+    } else {
+        // Fallback if current layout can't be found
+        isCollapsed = true
+        Object.values(breakpointLayouts).forEach(layouts => {
+            layouts.forEach(layout => {
+                if (layout.i === itemId && layout.h > 1) {
+                    isCollapsed = false
+                }
+            })
+        })
     }
 
-    let isCollapsed = breakpointLayouts[currentBreakpoint].some(layout => {
-        return layout.i === itemId && layout.h === 1
-    })
     return isCollapsed
 }
