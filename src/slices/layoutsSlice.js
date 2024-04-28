@@ -39,6 +39,10 @@ export const breakpointsToList = Object.fromEntries(
     Object.entries(breakpoints).map(v => [v[0], []]))
 
 
+const DEFAULT_LIST_HEIGHT = 5
+const DEFAULT_LIST_WIDTH = 3
+
+
 const initialState = {
     'breakpointLayouts': breakpointsToList,
     'currentBreakpoint': null,
@@ -84,7 +88,8 @@ const layoutsSlice = createSlice({
                 Object.keys(breakpointLayouts).forEach(breakpoint => {
                     breakpointLayouts[breakpoint].forEach(layout => {
                         if (layout.i === parentId) {
-                            layout.h = layouts.lastHeights[parentId][breakpoint] || 5
+                            let lastHeight = layouts.lastHeights[parentId]?.[breakpoint]
+                            layout.h = lastHeight > 1 ? lastHeight : DEFAULT_LIST_HEIGHT
                             layout.minH = 1
                         }
                     })
@@ -177,20 +182,16 @@ function adjustLayoutsForItem(layouts, itemId) {
 
 function shiftAndAddLayoutV2(layoutsForBreakpoint, newParentItemId, layoutColumns) {
     layoutsForBreakpoint = layoutsForBreakpoint || [];
-    // Count the number of layouts in each column
-    let listWidth = 3
-    let listHeight = 5
-
-    let shortestColumn = getShortestColumn(layoutsForBreakpoint, listWidth, layoutColumns)
+    let shortestColumn = getShortestColumn(layoutsForBreakpoint, DEFAULT_LIST_WIDTH, layoutColumns)
     return [
         // move existing leftmost lists down to make space for new list
-        ...layoutsForBreakpoint.map(l => layoutOverlapsListColumn(l, shortestColumn, listWidth) ? { ...l, y: l.y + listHeight } : l),
+        ...layoutsForBreakpoint.map(l => layoutOverlapsListColumn(l, shortestColumn, DEFAULT_LIST_WIDTH) ? { ...l, y: l.y + listHeight } : l),
         // add new layout for new list
         { i: newParentItemId,
-            x: shortestColumn * listWidth,
+            x: shortestColumn * DEFAULT_LIST_WIDTH,
             y: 0,
-            w: listWidth,
-            h: listHeight,
+            w: DEFAULT_LIST_WIDTH,
+            h: DEFAULT_LIST_HEIGHT,
             minW: 3,
             maxW: 4,
             minH: 1 }
