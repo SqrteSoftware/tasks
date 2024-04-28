@@ -185,7 +185,7 @@ function shiftAndAddLayoutV2(layoutsForBreakpoint, newParentItemId, layoutColumn
     let shortestColumn = getShortestColumn(layoutsForBreakpoint, DEFAULT_LIST_WIDTH, layoutColumns)
     return [
         // move existing leftmost lists down to make space for new list
-        ...layoutsForBreakpoint.map(l => layoutOverlapsListColumn(l, shortestColumn, DEFAULT_LIST_WIDTH) ? { ...l, y: l.y + listHeight } : l),
+        ...layoutsForBreakpoint.map(l => layoutOverlapsListColumn(l, shortestColumn, DEFAULT_LIST_WIDTH) ? { ...l, y: l.y + DEFAULT_LIST_HEIGHT } : l),
         // add new layout for new list
         { i: newParentItemId,
             x: shortestColumn * DEFAULT_LIST_WIDTH,
