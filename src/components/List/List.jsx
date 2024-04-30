@@ -54,22 +54,26 @@ export default memo(function List(props) {
     }
     return (
         <div className="list" style={{"backgroundColor": listState.backgroundColor}}>
-            <div className="listTitle">
-                <DragIndicator className="listTitleHandle dragHandle"></DragIndicator>
-                <input
-                    className="listTitleInput noDrag"
-                    type="text"
-                    enterKeyHint="Go" /* For Android */
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    placeholder="Title"
-                    value={props.parent.value}
-                    onChange={handleTitleChange}
-                    onKeyDown={handleTitleKeyDown}/>
-            </div>
-            <div className="listMenu noDrag">
-                <ListMenu {...{parentId}}/>
+            <div className="listHeader">
+                <div className="listDragHandle">
+                    <DragIndicator className="dragHandle"></DragIndicator>
+                </div>
+                <div className="listTitle">
+                    <input
+                        className="listTitleInput noDrag"
+                        type="text"
+                        enterKeyHint="Go" /* For Android */
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        placeholder="Title"
+                        value={props.parent.value}
+                        onChange={handleTitleChange}
+                        onKeyDown={handleTitleKeyDown}/>
+                </div>
+                <div className="listMenu noDrag">
+                    <ListMenu {...{parentId}}/>
+                </div>
             </div>
             <div className="listContent noDrag" ref={onListRef} style={props.freezeScroll ? {overflow: 'hidden'} : {}}>
                 <ActiveItemsList

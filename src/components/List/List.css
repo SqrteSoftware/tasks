@@ -6,31 +6,27 @@
     border-radius: 5px;
 }
 
-.listMenu {
-    position: absolute;
-    right: 10px;
-    top: 5px;
-    color: #aaa;
-    cursor: pointer;
-}
-
-.listTitle {
+.listHeader {
     display: flex;
     flex-direction: row;
     flex-shrink: 0;
-    align-items: center;
-    padding: 10px 30px 10px 0px;
 }
 
-.listTitleHandle.dragHandle {
-    padding: 0 5px 0 5px;
+.listDragHandle {
+    padding: 10px 5px 0 5px;
     font-size: 28px;
 }
 
-.listTitleInput {
+.listTitle {
     flex-grow: 1;
+    padding: 12px 0px 0px 0px;
+    text-align: left;
+}
+
+.listTitleInput {
     padding: 0;
     margin: 0;
+    width: 100%;
     font-size: 20px;
     border: none;
     text-overflow: ellipsis;
@@ -39,6 +35,14 @@
     background-color: transparent;
     /* Prevent highlight during DnD in iOS */
     -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.listMenu {
+    flex: 0 0 100px;
+    text-align: right;
+    padding-top: 4px;
+    color: #aaa;
+    cursor: pointer;
 }
 
 .listContent {
@@ -72,10 +76,4 @@
     color: #aaa;
     display: inline-block;
     padding: 10px;
-}
-
-@media (min-width: 576px) and (orientation: landscape) {
-    .listTitleHandle.dragHandle {
-        padding: 0;
-    }
 }
