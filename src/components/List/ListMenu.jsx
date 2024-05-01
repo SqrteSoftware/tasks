@@ -96,13 +96,34 @@ export default function ListMenu({parentId}) {
 
 
 function CollapseToggle({parentId}) {
-    const layouts = useSelector((state) => state.layouts)
     const dispatch = useDispatch()
+
+    const layouts = useSelector((state) => state.layouts)
+    const itemCount = useSelector((state) => {
+        let count = 0
+        Object.values(state.items).forEach(item => {
+            if (item.parents[parentId] && !item.complete) {
+                count++
+            } 
+        })
+        return count
+    })
+    
+    let externalItemCount = itemCount > 99 ? '99+' : itemCount.toString()
+
+    let style = {
+        'padding': '2px',
+        'font-size': '12px',
+        'width': '15px',
+        'height': '15px',
+        'margin-left': '-5px',
+    }
 
     if (isCollapsed(parentId, layouts)) {
         return (
             <IconButton className='listMenuButton' onClick={e => {dispatch(expandLayout(parentId))}}>
                 <UnfoldMoreIcon />
+                {itemCount > 0 && <span style={style}>{externalItemCount}</span>}
             </IconButton>
         )
     } else {
