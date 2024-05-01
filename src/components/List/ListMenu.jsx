@@ -109,7 +109,7 @@ function CollapseToggle({parentId}) {
         return count
     })
     
-    let externalItemCount = itemCount > 10 ? '99+' : itemCount.toString()
+    let externalItemCount = itemCount > 99 ? '99+' : itemCount.toString()
 
     let style = {
         'padding': '2px',
