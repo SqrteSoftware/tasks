@@ -9,6 +9,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import NoteAddOutlined from "@mui/icons-material/NoteAddOutlined";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import Sync from "@mui/icons-material/Sync";
 import RefreshIcon from '@mui/icons-material/Refresh';
 
@@ -30,6 +32,16 @@ export default function MobileMenu(props) {
 
     function handleImportClick(e) {
         props.onImportData(e);
+        props.onClose(e);
+    }
+
+    function handleCollapseAllClick(e) {
+        props.onCollapseAll();
+        props.onClose(e);
+    }
+
+    function handleExpandAllClick(e) {
+        props.onExpandAll();
         props.onClose(e);
     }
 
@@ -71,6 +83,20 @@ export default function MobileMenu(props) {
                         <ListItemText primary="Open" />
                     </ListItem>
                     </label>
+
+                    <ListItem button key="CollapseAll" onClick={handleCollapseAllClick}>
+                        <ListItemIcon>
+                            <UnfoldLessIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Collapse All" />
+                    </ListItem>
+
+                    <ListItem button key="ExpandAll" onClick={handleExpandAllClick}>
+                        <ListItemIcon>
+                            <UnfoldMoreIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Expand All" />
+                    </ListItem>
 
                     { navigator.standalone &&
                     <ListItem button key="Refresh" onClick={refresh}>

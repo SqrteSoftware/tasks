@@ -44,6 +44,8 @@ class App extends Component {
                     onImportData={this.onImportData}
                     onSyncData={this.onSyncData}
                     onMenuClick={this.onMenuClick}
+                    onCollapseAll={this.props.collapseLayout}
+                    onExpandAll={this.props.expandLayout}
                 />
                 <MobileMenu
                     open={this.state.slidingMenuOpen}
@@ -52,6 +54,8 @@ class App extends Component {
                     onExportData={this.onExportData}
                     onImportData={this.onImportData}
                     onSyncData={this.onSyncData}
+                    onCollapseAll={this.props.collapseLayout}
+                    onExpandAll={this.props.expandLayout}
                 />
                 <SyncDialog
                     open={this.state.syncModalOpen}

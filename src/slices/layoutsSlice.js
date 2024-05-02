@@ -69,11 +69,11 @@ const layoutsSlice = createSlice({
                 let breakpointLayouts = layouts.breakpointLayouts
                 Object.keys(breakpointLayouts).forEach(breakpoint => {
                     breakpointLayouts[breakpoint].forEach(layout => {
-                        if (layout.i === parentId) {
-                            if (layouts.lastHeights[parentId] === undefined) {
-                                layouts.lastHeights[parentId] = {}
+                        if (layout.i === parentId || parentId === undefined) {
+                            if (layouts.lastHeights[layout.i] === undefined) {
+                                layouts.lastHeights[layout.i] = {}
                             }
-                            layouts.lastHeights[parentId][breakpoint] = layout.h
+                            layouts.lastHeights[layout.i][breakpoint] = layout.h
                             layout.h = 1
                             layout.minH = 1
                         }
@@ -87,8 +87,8 @@ const layoutsSlice = createSlice({
                 let breakpointLayouts = layouts.breakpointLayouts
                 Object.keys(breakpointLayouts).forEach(breakpoint => {
                     breakpointLayouts[breakpoint].forEach(layout => {
-                        if (layout.i === parentId) {
-                            let lastHeight = layouts.lastHeights[parentId]?.[breakpoint]
+                        if (layout.i === parentId || parentId === undefined) {
+                            let lastHeight = layouts.lastHeights[layout.i]?.[breakpoint]
                             layout.h = lastHeight > 1 ? lastHeight : DEFAULT_LIST_HEIGHT
                             layout.minH = 1
                         }

@@ -8,6 +8,8 @@ import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import MenuIcon from "@mui/icons-material/Menu";
 import Sync from "@mui/icons-material/Sync";
 import RefreshIcon from '@mui/icons-material/Refresh';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import { refresh } from "../../utils/refresh";
 
 
@@ -41,6 +43,18 @@ export default function ToolBar(props) {
                         <FolderOpenOutlinedIcon fontSize="inherit"/>
                     </IconButton>
                 </label>
+            </div>
+
+            <div className="collapseAll iconButton" title="Collapse All" onClick={e => props.onCollapseAll()}>
+                <IconButton>
+                    <UnfoldLessIcon fontSize="inherit"/>
+                </IconButton>
+            </div>
+
+            <div className="expandAll iconButton" title="Expand All" onClick={e => props.onExpandAll()}>
+                <IconButton>
+                    <UnfoldMoreIcon fontSize="inherit"/>
+                </IconButton>
             </div>
 
             <div className="sync iconButton" title="Sync Data" onClick={props.onSyncData}>

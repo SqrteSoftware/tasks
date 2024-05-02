@@ -113,10 +113,10 @@ function CollapseToggle({parentId}) {
 
     let style = {
         'padding': '2px',
-        'font-size': '12px',
+        'fontSize': '12px',
         'width': '15px',
         'height': '15px',
-        'margin-left': '-5px',
+        'marginLeft': '-5px',
     }
 
     if (isCollapsed(parentId, layouts)) {
