@@ -52,7 +52,7 @@
 .listContent {
     flex-grow: 1;
     overflow: auto;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
 }
 
 .listContentActive,
