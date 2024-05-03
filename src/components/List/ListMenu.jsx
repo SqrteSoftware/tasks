@@ -112,11 +112,9 @@ function CollapseToggle({parentId}) {
     let externalItemCount = itemCount > 99 ? '99+' : itemCount.toString()
 
     let style = {
-        'padding': '2px',
         'fontSize': '12px',
-        'width': '15px',
-        'height': '15px',
-        'marginLeft': '-5px',
+        'position': 'absolute',
+        'left': '28px',
     }
 
     if (isCollapsed(parentId, layouts)) {
