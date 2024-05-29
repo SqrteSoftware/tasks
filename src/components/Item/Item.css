@@ -39,6 +39,11 @@
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
+.itemSublistButton {
+    color: #ccc;
+    cursor: pointer;
+}
+
 .item.complete > .itemInput {
     text-decoration: line-through;
 }

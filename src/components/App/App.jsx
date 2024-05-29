@@ -31,7 +31,7 @@ class App extends Component {
     }
 
     render() {
-        let listData = createViewData(this.props.items);
+        let listData = createViewData(this.props.items, this.props.lists);
         let listIdWithFocus = this.props.focus.parentId;
         let itemIdWithFocus = this.props.focus.itemId;
 
@@ -83,11 +83,12 @@ class App extends Component {
                     draggableCancel=".noDrag">
                     {
                         listData.map(item => { return (
-                            <div key={item.parent.id}
+                            <div key={item.rootParentItem.id}
                                  className="App-list"
                                  style={this.props.dnd.activeDragParentId === item.parent.id ? {zIndex: 1} : {zIndex: 0}}>
                                 <List
                                     parent={item.parent}
+                                    rootParentItem={item.rootParentItem}
                                     listItems={item.listItems}
                                     activeListItems={item.activeListItems}
                                     completedListItems={item.completedListItems}

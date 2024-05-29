@@ -8,7 +8,7 @@ import * as dnd from "../../utils/dnd"
 import { findAdjacent } from '../../utils/order';
 import {CollapseIndicator} from "../Shared/CollapseIndicator"
 import { createNewItemWithFocus, removeItemFromParent, updateItemText } from '../../slices/itemsSlice';
-import { showCompletedItems } from '../../slices/listsSlice';
+import { showCompletedItems, resetActiveRoot } from '../../slices/listsSlice';
 import { updateFocus } from '../../slices/focusSlice';
 import ListMenu from './ListMenu';
 
@@ -54,6 +54,12 @@ export default memo(function List(props) {
     }
     return (
         <div className="list" style={{"backgroundColor": listState.backgroundColor}}>
+            {
+            props.rootParentItem?.id !== props.parent.id && 
+            <span onClick={e => {dispatch(resetActiveRoot(props.rootParentItem?.id))}}>
+                {props.rootParentItem?.value}
+            </span>
+            }
             <div className="listHeader">
                 <div className="listDragHandle">
                     <DragIndicator className="dragHandle"></DragIndicator>

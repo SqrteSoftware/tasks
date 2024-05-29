@@ -2,11 +2,12 @@ import { useState, useRef, useEffect, memo } from 'react'
 import { useDispatch } from 'react-redux'
 import {DraggableCore} from 'react-draggable'
 import DragIndicator from '@mui/icons-material/DragIndicatorOutlined'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import './Item.css'
 import {disableTouchMove, enableTouchMove} from "../../utils"
 import * as dnd from "../../utils/dnd"
-import { moveItem, updateItemComplete, updateItemText } from '../../slices/itemsSlice'
+import { moveItem, updateItemComplete, updateItemText, createNestedListWithChildFocus } from '../../slices/itemsSlice'
 import { updateFocus } from '../../slices/focusSlice'
 import { updateDnd } from '../../slices/dndSlice'
 
@@ -16,6 +17,7 @@ export default memo(function Item(props) {
 
     const [activeDrag, setActiveDrag] = useState(false)
     const [position, setPosition] = useState({x: 0, y: 0})
+    const [inputHasFocus, setInputHasFocus] = useState(false)
 
     // Drag and Drop related state
     let afterOnDragCallback = useRef(null)
@@ -97,7 +99,6 @@ export default memo(function Item(props) {
         setPosition({x: data.x - handleMiddleX.current, y: data.y - itemMiddleY.current})
         // Execute callback AFTER state changes from onDrag event are rendered.
         afterOnDragCallback.current = () => {
-            // props.onDrag({id: props.item.id});
             let result = dnd.onItemDragProgress(props.item.id);
             dispatch(updateDnd(undefined, ...result))
         }
@@ -137,6 +138,11 @@ export default memo(function Item(props) {
         // the global focus state so that subsequent renders
         // do not try to re-apply focus.
         dispatch(updateFocus())
+        setInputHasFocus(true)
+    }
+
+    const onInputBlur = () => {
+        setInputHasFocus(false)
     }
 
     return (
@@ -168,8 +174,34 @@ export default memo(function Item(props) {
                     value={item.value}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    onFocus={onInputFocus}/>
+                    onFocus={onInputFocus}
+                    onBlur={onInputBlur}/>
+                <SublistButton
+                    show={inputHasFocus} 
+                    parentId={props.parentId} 
+                    itemId={item.id}
+                />
             </li>
         </DraggableCore>
     );
 })
+
+
+function SublistButton({show, parentId, itemId}) {
+    const dispatch = useDispatch()
+
+    function handleCreateNestedList() {
+        dispatch(createNestedListWithChildFocus(
+            parentId,
+            itemId,
+        ))
+    }
+    if (show) {
+        return (
+            <ChevronRightIcon 
+                className='itemSublistButton' 
+                onMouseDown={handleCreateNestedList}
+            />
+        )
+    }
+}
