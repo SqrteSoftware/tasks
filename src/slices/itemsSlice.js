@@ -61,7 +61,7 @@ const itemsSlice = createSlice({
                     parentItemId,
                     prevItemId,
                     nextItemId
-                 }
+                }
             })
         },
         moveItem: {
@@ -122,6 +122,26 @@ const itemsSlice = createSlice({
                 }
             })
         },
+        createNestedListWithChildFocus: {
+            reducer: (items, action) => {
+                // TODO: add validation to ensure this is a nested relation before attaching
+                const {
+                    parentItemId,
+                    newChildItemId,
+                } = action.payload
+                let newChildItem = createItem(newChildItemId)
+                items = setItem(items, newChildItem.id, newChildItem)
+                return attachItemToParent(
+                    newChildItemId, parentItemId, null, null, items)
+            },
+            prepare: (rootItemId, parentItemId) => ({
+                payload: {
+                    rootItemId,
+                    parentItemId,
+                    newChildItemId: "item-" + uuidv4(),
+                }
+            })
+        },
         syncItems: {
             reducer: (items, { payload }) => {
                 return mergeItems(items, payload.items)
@@ -143,7 +163,8 @@ export const {
     removeItemFromParent,
     deleteItem,
     createNewParentItemWithFocus,
-    syncItems
+    createNestedListWithChildFocus,
+    syncItems,    
 } = itemsSlice.actions
 
 

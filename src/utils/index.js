@@ -12,14 +12,20 @@ export function createItem(id=null, value="", complete=false, date=null, parents
     };
 }
 
-export function createViewData(items) {
+export function createViewData(items, listSettings) {
     let listData = [];
     Object.keys(items).forEach(itemId => {
         let item = items[itemId];
         if (Object.keys(item.parents).length <= 0) {
-            let parentItem = item;
+            let parentItem = item
+            let rootParentItem = item
+            let activeRootItemId = listSettings[parentItem.id]?.activeRootItemId
+            if (activeRootItemId) {
+                parentItem = items[activeRootItemId]
+            }
             let children = getSortedListItems(parentItem.id, items, false);
             listData.push({
+                rootParentItem,
                 'parent': parentItem,
                 'listItems': children,
                 'activeListItems': children.filter(i => !i.complete),
