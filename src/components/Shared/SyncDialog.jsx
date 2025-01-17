@@ -63,10 +63,11 @@ function IntroBody(props) {
           Sync your tasks across multiple devices by subscribing
           to a synchronization plan for only $1/mo. The text of your
           tasks is encrypted end-to-end so your tasks remain safe and
-          readable only by you. You can cancel your plan anytime.
+          readable only by you. You can cancel your plan anytime by visiting
+          the <a href="https://billing.stripe.com/p/login/5kA15M0IN5sV8ko7ss" target='_blank'>customer portal</a>.
         </Typography>
         <Typography gutterBottom>
-          <i>Got questions? Contact us anytime:</i> <br/>support@sqrte.com
+          <i>Got questions? Contact us at:</i> <br/>support@sqrte.com
         </Typography>
         <Typography variant="body2" color="text.disabled" sx={{'maxWidth': '350px'}}>
         This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
@@ -133,9 +134,11 @@ function ConnectedBody(props) {
           You are currently connected and syncing your data.
           <br/><br/>
           You can disconnect <i>this device</i> by clicking 'Disconnect' below. You can connect
-          again by entering your existing license key again.
+          again by entering your existing license key again. Disconnecting does NOT cancel your subscription.
           <br/><br/>
-          If you wish to cancel <i>your subscription</i> completely, please contact us:<br/>
+          If you wish to <i>cancel your subscription</i>, please visit the <a href="https://billing.stripe.com/p/login/5kA15M0IN5sV8ko7ss" target='_blank'>customer portal</a>.
+          <br/><br/>
+          If you have any questions, please contact us at:<br/>
           support@sqrte.com
         </Typography>
       </DialogContent>
